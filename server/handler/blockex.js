@@ -429,7 +429,7 @@ const getTX = async (req, res) => {
     // vin section of the tx.
     const vin = [];
     await forEach(tx.vin, async (vi) => {
-      if (tx.vout[0].address === 'NON_STANDARD'){
+      if (tx.vout[0].address === 'NON_STANDARD' && !vi.coinbase){
         vin.push({coinstake:true});
       } else if (vi.txId) {
         const t = await TX.findOne({ txId: vi.txId });
