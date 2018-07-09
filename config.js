@@ -29,6 +29,9 @@ const config = {
     'user': 'wagerr',
     'pass': 'this',
     'timeout': 8000, // 8 seconds
+  },
+  'coin':{
+    'testnet':true,
   }
 };
 

@@ -3,6 +3,7 @@ import Component from '../../core/Component';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import React from 'react';
+import config from '../../../config';
 
 import Card from './Card';
 import CountUp from '../CountUp';
@@ -30,6 +31,10 @@ export default class CardStatus extends Component {
     return (
       <div className="animated fadeInUp">
       <Card title="Status" className="card--status" >
+        <div className="card__row">
+          <span className="card__label">Chain:</span>
+          {config.coin.testnet ? 'TestNet' : 'MainNet' }
+        </div>
         <div className="card__row">
           <span className="card__label">Status:</span>
           <span className="card__result card__result--status">
