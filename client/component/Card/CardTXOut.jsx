@@ -33,9 +33,11 @@ export default class CardTXOut extends Component {
         cols={ this.state.cols }
         data={ this.props.txs.map(tx => ({
           ...tx,
-          address: (
-            <Link to={ `/address/${ tx.address }` }>{ tx.address }</Link>
-          ),
+          address:
+            (tx.address.indexOf('OP_RETURN') !== -1) ?
+              <span>{tx.address}</span>
+              :<Link to={`/address/${ tx.address }`}>{tx.address}</Link>
+          ,
           value: (
             <span className="badge badge-success">
               { numeral(tx.value).format('0,0.0000') } WGR
