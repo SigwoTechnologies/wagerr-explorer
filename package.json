@@ -13,6 +13,7 @@
     "cron:coin": "node ./cron/coin.js >> ./tmp/coin.log",
     "cron:masternode": "node ./cron/masternode.js >> ./tmp/masternode.log",
     "cron:peer": "node ./cron/peer.js >> ./tmp/peer.log",
+    "cron:betevent": "node ./cron/betevent.js >> ./tmp/betevent.log",
     "cron:rich": "node ./cron/rich.js >> ./tmp/rich.log",
     "start:api": "NODE_ENV=production node ./server/index.js",
     "start:maint": "NODE_ENV=production node ./server/maintenance.js",

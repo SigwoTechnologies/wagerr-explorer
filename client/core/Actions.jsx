@@ -179,6 +179,12 @@ export const removeWatch = (dispatch, term) => {
   dispatch({ payload: term, type: WATCH_REMOVE });
 };
 
+export const getBetEvents = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('betevents', resolve, reject, query);
+  });
+};
+
 export default {
   getAddress,
   getBlock,
@@ -193,6 +199,7 @@ export default {
   getTXs,
   getTXsWeek,
   setTXs,
+  getBetEvents,
   setWatch,
   removeWatch
 };

@@ -12,6 +12,7 @@ const Peer = require('../../model/peer');
 const Rich = require('../../model/rich');
 const TX = require('../../model/tx');
 const UTXO = require('../../model/utxo');
+const BetEvent = require('../../model/betevent');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -526,6 +527,20 @@ const getTXsWeek = () => {
   };
 };
 
+const getBetEvents = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+    const total = await BetEvent.find().sort({ starting: 1 }).count();
+    const events = await BetEvent.find().skip(skip).limit(limit).sort({ starting: 1});
+
+    res.json({ events, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+  } catch(err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+};
+
 module.exports =  {
   getAddress,
   getAvgBlockTime,
@@ -544,5 +559,6 @@ module.exports =  {
   getTXLatest,
   getTX,
   getTXs,
-  getTXsWeek
+  getTXsWeek,
+  getBetEvents
 };

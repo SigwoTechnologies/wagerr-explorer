@@ -24,6 +24,7 @@ import Peer from './container/Peer';
 import Statistics from './container/Statistics';
 import Top100 from './container/Top100';
 import TX from './container/TX';
+import BetEvent from './container/BetEvent';
 
 // Layout
 import CoinSummary from './container/CoinSummary';
@@ -167,6 +168,7 @@ class App extends Component {
                   <Route exact path="/coin" component={ CoinInfo } />
                   <Route exact path="/faq" component={ FAQ } />
                   <Route exact path="/masternode" component={ Masternode } />
+                  <Route exact path="/betevents" component={ BetEvent } />
                   <Route exact path="/movement" component={ Movement } />
                   <Route exact path="/peer" component={ Peer } />
                   <Route exact path="/statistics" component={ Statistics } />
