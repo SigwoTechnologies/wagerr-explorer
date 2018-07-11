@@ -179,9 +179,9 @@ export const removeWatch = (dispatch, term) => {
   dispatch({ payload: term, type: WATCH_REMOVE });
 };
 
-export const getBetEvents = (query) => {
+export const getListEvents = (query) => {
   return new promise((resolve, reject) => {
-    return getFromWorker('betevents', resolve, reject, query);
+    return getFromWorker('listevents', resolve, reject, query);
   });
 };
 
@@ -199,7 +199,7 @@ export default {
   getTXs,
   getTXsWeek,
   setTXs,
-  getBetEvents,
+  getListEvents,
   setWatch,
   removeWatch
 };

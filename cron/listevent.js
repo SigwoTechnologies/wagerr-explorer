@@ -7,16 +7,16 @@ const {forEach} = require('p-iteration')
 const locker = require('../lib/locker')
 const moment = require('moment')
 // Models.
-const BetEvent = require('../model/betevent')
+const ListEvent = require('../model/listevent')
 
 /**
  * Get a list of the mns and request IP information
  * from freegeopip.net.
  */
-async function syncBetEvents () {
+async function syncListEvents () {
   const date = moment().utc().startOf('minute').toDate()
 
-  await BetEvent.remove({})
+  await ListEvent.remove({})
 
   // Increase the timeout for listevents.
   rpc.timeout(10000) // 10 secs
@@ -26,7 +26,7 @@ async function syncBetEvents () {
   await forEach(events, async (event) => {
     let teams = await getTeams(event)
 
-    const betEvent = new BetEvent({
+    const listEvent = new ListEvent({
       txId: event['tx-id'],
       id: event.id,
       createdAt: date,
@@ -36,11 +36,11 @@ async function syncBetEvents () {
       teams: teams
     })
 
-    inserts.push(betEvent)
+    inserts.push(listEvent)
   })
 
   if (inserts.length) {
-    await BetEvent.insertMany(inserts)
+    await ListEvent.insertMany(inserts)
   }
 }
 
@@ -61,12 +61,12 @@ async function getTeams (event) {
  * Handle locking.
  */
 async function update () {
-  const type = 'betevent'
+  const type = 'listevent'
   let code = 0
 
   try {
     locker.lock(type)
-    await syncBetEvents()
+    await syncListEvents()
   } catch (err) {
     console.log(err)
     code = 1

@@ -12,7 +12,7 @@ const Peer = require('../../model/peer');
 const Rich = require('../../model/rich');
 const TX = require('../../model/tx');
 const UTXO = require('../../model/utxo');
-const BetEvent = require('../../model/betevent');
+const ListEvent = require('../../model/listevent');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -527,12 +527,12 @@ const getTXsWeek = () => {
   };
 };
 
-const getBetEvents = async (req, res) => {
+const getListEvents = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
-    const total = await BetEvent.find().sort({ starting: 1 }).count();
-    const events = await BetEvent.find().skip(skip).limit(limit).sort({ starting: 1});
+    const total = await ListEvent.find().sort({ starting: 1 }).count();
+    const events = await ListEvent.find().skip(skip).limit(limit).sort({ starting: 1});
 
     res.json({ events, pages: total <= limit ? 1 : Math.ceil(total / limit) });
   } catch(err) {
@@ -560,5 +560,5 @@ module.exports =  {
   getTX,
   getTXs,
   getTXsWeek,
-  getBetEvents
+  getListEvents
 };

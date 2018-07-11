@@ -23,7 +23,7 @@ router.get('/tx', blockex.getTXs);
 router.get('/tx/latest', blockex.getTXLatest);
 router.get('/tx/week', blockex.getTXsWeek());
 router.get('/tx/:hash', blockex.getTX);
-router.get('/bet/events', blockex.getBetEvents);
+router.get('/bet/listevents', blockex.getListEvents);
 
 // Iquidus Explorer routes.
 router.get('/getdifficulty', iquidus.getdifficulty);

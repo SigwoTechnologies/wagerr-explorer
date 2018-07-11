@@ -17,7 +17,7 @@ import { PAGINATION_PAGE_SIZE } from '../constants'
 
 class BetEvent extends Component {
   static propTypes = {
-    getBetEvents: PropTypes.func.isRequired
+    getListEvents: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -63,7 +63,7 @@ class BetEvent extends Component {
 
       this.debounce = setTimeout(() => {
         this.props
-          .getBetEvents({
+          .getListEvents({
             limit: this.state.size,
             skip: (this.state.page - 1) * this.state.size
           })
@@ -133,7 +133,7 @@ class BetEvent extends Component {
 }
 
 const mapDispatch = dispatch => ({
-  getBetEvents: query => Actions.getBetEvents(query)
+  getListEvents: query => Actions.getListEvents(query)
 })
 
 export default connect(null, mapDispatch)(BetEvent)
