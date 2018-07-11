@@ -101,6 +101,27 @@ const APIdata = [
     ]
   },
   {
+    heading: 'Betting API',
+    subHeading: 'Return data from local indexes',
+    calls: [
+      {
+        name: 'getBetEvents',
+        info: 'Returns all the bet events or bet event with specific id with query string eventId',
+        path: '/api/bet/events?eventId=%23061'
+      },
+      {
+        name: 'getBetActions',
+        info: 'Returns all the bet actions or bet action with specific id with query string eventId',
+        path: '/api/bet/actions?eventId=%23061'
+      },
+      {
+        name: 'getBetResults',
+        info: 'Returns all the bet results or bet result with specific id with query string eventId',
+        path: '/api/bet/results?eventId=%23061'
+      }
+    ]
+  },
+  {
     heading: 'Extended API',
     subHeading: 'Return data from local indexes',
     calls: [
