@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 
 const BetAction = mongoose.model('BetAction', new mongoose.Schema({
+  _id: { required: true, select: false, type: String },
   txId: { index: true, required: true, type: String },
   blockHeight: { index: true, required: true, type: Number },
   createdAt: { required: true, type: Date },

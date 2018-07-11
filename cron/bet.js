@@ -73,6 +73,7 @@ async function addPoS (block, rpctx) {
         let datas = opString.split('|')
         if (datas[0] === '1' && datas.length === 11) {
           BetEvent.create({
+            _id: datas[2]+rpctx.txid,
             txId: rpctx.txid,
             blockHeight: block.height,
             createdAt: block.createdAt,
@@ -89,6 +90,7 @@ async function addPoS (block, rpctx) {
           })
         } else if (datas[0] === '2' && datas.length === 4) {
           BetAction.create({
+            _id: datas[2]+datas[3]+rpctx.txid,
             txId: rpctx.txid,
             blockHeight: block.height,
             createdAt: block.createdAt,
@@ -99,6 +101,7 @@ async function addPoS (block, rpctx) {
           })
         } else if (datas[0] === '3') {
           BetResult.create({
+            _id: datas[2]+rpctx.txid,
             txId: rpctx.txid,
             blockHeight: block.height,
             createdAt: block.createdAt,
