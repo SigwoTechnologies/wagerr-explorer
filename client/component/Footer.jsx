@@ -28,7 +28,8 @@ class Footer extends Component {
           <img className="footer__logo" src="/img/footerlogo.svg" />
           <span className="footer__legal">
             <div>Copyright &copy; 2018 <a href="https://wagerr.com/">Wagerr</a></div>
-            <div>Site design / Logo &copy; 2018 <a href="https://wagerr.com/">Wagerr</a></div>
+            <div>Site design &copy; 2018 <a href="https://bulwarkcrypto.com/">Bulwark Cryptocurrency</a></div>
+            <div>Logo &copy; 2018 <a href="https://wagerr.com/">Wagerr</a></div>
           </span>
         </div>
         <div className="footer__block">
