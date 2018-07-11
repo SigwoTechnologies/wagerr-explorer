@@ -13,6 +13,9 @@ const Rich = require('../../model/rich');
 const TX = require('../../model/tx');
 const UTXO = require('../../model/utxo');
 const ListEvent = require('../../model/listevent');
+const BetEvent = require('../../model/betevent');
+const BetAction = require('../../model/betaction');
+const BetResult = require('../../model/betresult');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -541,6 +544,64 @@ const getListEvents = async (req, res) => {
   }
 };
 
+const getBetEvents = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    if (req.query.eventId) {
+      const total = await BetEvent.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
+      const events = await BetEvent.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    } else {
+      const total = await BetEvent.find().sort({createdAt: 1}).count()
+      const events = await BetEvent.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    }
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
+const getBetActions = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    if (req.query.eventId) {
+      const total = await BetAction.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
+      const events = await BetAction.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    } else {
+      const total = await BetAction.find().sort({createdAt: 1}).count()
+      const events = await BetAction.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
+const getBetResults = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    if (req.query.eventId) {
+      const total = await BetResult.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
+      const events = await BetResult.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    } else {
+      const total = await BetResult.find().sort({createdAt: 1}).count()
+      const events = await BetResult.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    }
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
 module.exports =  {
   getAddress,
   getAvgBlockTime,
@@ -560,5 +621,8 @@ module.exports =  {
   getTX,
   getTXs,
   getTXsWeek,
-  getListEvents
+  getListEvents,
+  getBetEvents,
+  getBetActions,
+  getBetResults
 };
