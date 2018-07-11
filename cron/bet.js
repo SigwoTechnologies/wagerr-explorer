@@ -126,6 +126,7 @@ async function syncBlocksForBet (start, stop, clean = false) {
     // await TX.remove({ blockHeight: { $gte: start, $lte: stop } });
     // await UTXO.remove({ blockHeight: { $gte: start, $lte: stop } });
   }
+  rpc.timeout(10000) // 10 secs
 
   for (let height = start; height <= stop; height++) {
     const hash = await rpc.call('getblockhash', [height])
