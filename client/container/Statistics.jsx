@@ -17,7 +17,8 @@ class Statistics extends Component {
     coin: PropTypes.object.isRequired,
     // Dispatch
     getCoins: PropTypes.func.isRequired,
-    getTXs: PropTypes.func.isRequired
+    getTXs: PropTypes.func.isRequired,
+    getBetActions: PropTypes.func.isRequired
   };
 
   constructor(props) {
@@ -34,13 +35,15 @@ class Statistics extends Component {
   componentDidMount() {
     Promise.all([
         this.props.getCoins(),
-        this.props.getTXs()
+        this.props.getTXs(),
+        this.props.getBetActions(),
       ])
       .then((res) => {
         this.setState({
           coins: res[0], // 7 days at 5 min = 2016 coins
           loading: false,
-          txs: res[1]
+          txs: res[1],
+          betActions: res[2],
         });
       });
   };
@@ -57,6 +60,12 @@ class Statistics extends Component {
       tTX += tx.total;
     });
     const avgTX = ((tTX / 7) / 24) / this.state.txs.length;
+
+    let tBetActions = 0;
+    this.state.betActions.forEach((action) => {
+      tBetActions += action.total;
+    });
+    const avgBetActions = ((tBetActions / 7) / 24) / this.state.betActions.length;
 
     // Setup graph data objects.
     const hashes = new Map();
@@ -115,6 +124,10 @@ class Statistics extends Component {
       txs.set(moment(t._id, 'YYYY-MM-DD').format('MMM DD'), t.total);
     });
 
+    const betActions = new Map();
+    this.state.betActions.forEach((action) => {
+      betActions.set(moment(action._id, 'YYYY-MM-DD').format('MMM DD'), action.total);
+    });
     // Get the current day of the month.
     const day = (<small>{ moment().format('MMM DD') }</small>);
 
@@ -174,6 +187,18 @@ class Statistics extends Component {
                   labels={ Array.from(mns.keys()).slice(1, -1) } />
               </div>
             </div>
+            <div className="col-md-12 col-lg-6">
+              <h3>Bet Actions Last 7 Days</h3>
+              <h4>{ numeral(tBetActions).format('0,0') } { day }</h4>
+              <h5>Average: { numeral(avgBetActions).format('0,0') } Per Hour</h5>
+              <div>
+                <GraphLineFull
+                  color="#1991eb"
+                  data={ Array.from(betActions.values()) }
+                  height="420px"
+                  labels={ Array.from(betActions.keys()) } />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -183,6 +208,7 @@ class Statistics extends Component {
 
 const mapDispatch = dispatch => ({
   getCoins: () => Actions.getCoinsWeek(dispatch),
+  getBetActions: () => Actions.getBetActionsWeek(dispatch),
   getTXs: () => Actions.getTXsWeek(dispatch)
 });
 
