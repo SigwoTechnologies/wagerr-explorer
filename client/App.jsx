@@ -24,6 +24,7 @@ import Peer from './container/Peer';
 import Statistics from './container/Statistics';
 import Top100 from './container/Top100';
 import TX from './container/TX';
+import BetEventList from './container/BetEventList';
 import BetEvent from './container/BetEvent';
 
 // Layout
@@ -114,9 +115,13 @@ class App extends Component {
     this.setState({ searches: searchHistory.del(term) });
   };
 
+  isBetEventId = (s) => {
+    return typeof(s) === 'string' && s.indexOf('#') === 0 && s.length === 4;
+  };
+
   handleSearch = (term) => {
     // If term doesn't match then ignore.
-    if (!isTX(term) && !isBlock(term) && !isAddress(term)) {
+    if (!isTX(term) && !isBlock(term) && !isAddress(term) && !this.isBetEventId(term)) {
       return;
     }
 
@@ -127,6 +132,8 @@ class App extends Component {
     let path = '/#/';
     if (isAddress(term)) {
       document.location.href = `/#/address/${ term }`;
+    } else if (this.isBetEventId(term)) {
+      document.location.href = `/#/bet/event/${ encodeURIComponent(term) }`;
     } else if (!isNaN(term)) {
       document.location.href = `/#/block/${ term }`;
     } else {
@@ -168,12 +175,13 @@ class App extends Component {
                   <Route exact path="/coin" component={ CoinInfo } />
                   <Route exact path="/faq" component={ FAQ } />
                   <Route exact path="/masternode" component={ Masternode } />
-                  <Route exact path="/betevents" component={ BetEvent } />
+                  <Route exact path="/betevents" component={ BetEventList } />
                   <Route exact path="/movement" component={ Movement } />
                   <Route exact path="/peer" component={ Peer } />
                   <Route exact path="/statistics" component={ Statistics } />
                   <Route exact path="/top" component={ Top100 } />
                   <Route exact path="/tx/:hash" component={ TX } />
+                    <Route exact path="/bet/event/:eventId" component={ BetEvent } />
                   <Route component={ Error404 } />
                 </Switch>
               </div>

@@ -191,6 +191,21 @@ export const getBetActionsWeek = () => {
   });
 };
 
+export const getBetEvents = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('betevents', resolve, reject, query);
+  });
+};
+export const getBetActions = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('betactions', resolve, reject, query);
+  });
+};
+export const getBetResults = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('betresults', resolve, reject, query);
+  });
+};
 export default {
   getAddress,
   getBlock,
@@ -207,6 +222,9 @@ export default {
   setTXs,
   getListEvents,
   getBetActionsWeek,
+  getBetEvents,
+  getBetActions,
+  getBetResults,
   setWatch,
   removeWatch
 };
