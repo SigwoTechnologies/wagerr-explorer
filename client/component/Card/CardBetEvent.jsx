@@ -30,15 +30,15 @@ const CardBetEvent = ({betEvent}) => {
       </div>
       <div className="card__row">
         <span className="card__label">Home Odds:</span>
-        <span className="card__result">{betEvent.homeOdds / 10000}</span>
+        <span className="card__result">{betEvent.homeOdds > 10000 ? betEvent.homeOdds / 10000 : betEvent.homeOdds}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Draw Odds:</span>
-        <span className="card__result">{betEvent.drawOdds / 10000}</span>
+        <span className="card__result">{betEvent.drawOdds > 10000 ? betEvent.drawOdds / 10000 : betEvent.drawOdds}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Away Odds:</span>
-        <span className="card__result">{betEvent.awayOdds / 10000}</span>
+        <span className="card__result">{betEvent.awayOdds > 10000 ? betEvent.awayOdds / 10000 : betEvent.awayOdds}</span>
       </div>
       <div className="card__row">
         <span className="card__label">TxId:</span>

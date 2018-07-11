@@ -104,7 +104,7 @@ class BetEventList extends Component {
           select={select}
           title="Bet Events"/>
         <Table
-          className={"table--for-betevents"}
+          className={'table--for-betevents'}
           cols={this.state.cols}
           data={sortBy(this.state.events.map((event) => {
             return {
@@ -119,9 +119,9 @@ class BetEventList extends Component {
               round: event.info,
               homeTeam: event.homeTeam,
               awayTeam: event.awayTeam,
-              homeOdds: event.homeOdds,
-              drawOdds: event.drawOdds,
-              awayOdds: event.awayOdds,
+              homeOdds: event.homeOdds > 10000 ? event.homeOdds / 10000 : event.homeOdds,
+              drawOdds: event.drawOdds > 10000 ? event.drawOdds / 10000 : event.drawOdds,
+              awayOdds: event.awayOdds > 10000 ? event.awayOdds / 10000 : event.awayOdds,
               txId: (
                 <Link to={`/tx/${ event.txId }`}>
                   {event.txId}
