@@ -570,12 +570,12 @@ const getBetActions = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const total = await BetAction.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
-      const events = await BetAction.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const actions = await BetAction.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
       const total = await BetAction.find().sort({createdAt: 1}).count()
-      const events = await BetAction.find().skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const actions = await BetAction.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
   } catch (err) {
     console.log(err)
@@ -589,12 +589,12 @@ const getBetResults = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const total = await BetResult.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
-      const events = await BetResult.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const results = await BetResult.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
       const total = await BetResult.find().sort({createdAt: 1}).count()
-      const events = await BetResult.find().skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const results = await BetResult.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
 
   } catch (err) {
