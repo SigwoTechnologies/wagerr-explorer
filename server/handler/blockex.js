@@ -544,13 +544,22 @@ const getListEvents = async (req, res) => {
   }
 };
 
+const getEventId = (str) => {
+  if (str.indexOf('#') === -1 && str.indexOf('#')) {
+    return '#'+str
+  } else {
+    return str
+  }
+}
+
 const getBetEvents = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
-      const total = await BetEvent.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
-      const events = await BetEvent.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      const eventId = getEventId(req.query.eventId)
+      const total = await BetEvent.find({eventId: eventId}).sort({createdAt: 1}).count()
+      const events = await BetEvent.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
       const total = await BetEvent.find().sort({createdAt: 1}).count()
@@ -569,8 +578,9 @@ const getBetActions = async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
-      const total = await BetAction.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
-      const actions = await BetAction.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      const eventId = getEventId(req.query.eventId)
+      const total = await BetAction.find({eventId: eventId}).sort({createdAt: 1}).count()
+      const actions = await BetAction.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
       const total = await BetAction.find().sort({createdAt: 1}).count()
@@ -588,8 +598,9 @@ const getBetResults = async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
-      const total = await BetResult.find({eventId: req.query.eventId}).sort({createdAt: 1}).count()
-      const results = await BetResult.find({eventId: req.query.eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      const eventId = getEventId(req.query.eventId)
+      const total = await BetResult.find({eventId: eventId}).sort({createdAt: 1}).count()
+      const results = await BetResult.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
       const total = await BetResult.find().sort({createdAt: 1}).count()
