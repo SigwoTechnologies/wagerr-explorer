@@ -25,6 +25,12 @@ const CardBetResult = ({betResult}) => {
                 </Link>
             </span>
       </div>
+      <div className="card__row">
+        <span className="card__label">Payout Block:</span>
+        <span className="card__result">
+          <Link to={`/block/${betResult.blockHeight+1}`}>{betResult.blockHeight+1}</Link>
+            </span>
+      </div>
     </Card>
   } else {
     return <Card title="Bet Result" className="card--status">
