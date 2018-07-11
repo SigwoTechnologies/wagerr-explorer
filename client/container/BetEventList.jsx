@@ -17,7 +17,7 @@ import { PAGINATION_PAGE_SIZE } from '../constants'
 
 class BetEventList extends Component {
   static propTypes = {
-    getListEvents: PropTypes.func.isRequired
+    getAllBetEvents: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -26,6 +26,7 @@ class BetEventList extends Component {
     this.state = {
       cols: [
         {key: 'time', title: 'Time'},
+        {key: 'eventId', title: 'Id'},
         {key: 'name', title: 'Name'},
         {key: 'round', title: 'Round'},
         {key: 'homeTeam', title: 'Home'},
@@ -45,7 +46,7 @@ class BetEventList extends Component {
   };
 
   componentDidMount () {
-    this.getBetEvents()
+    this.getAllBetEvents()
   };
 
   componentWillUnmount () {
@@ -55,7 +56,7 @@ class BetEventList extends Component {
     }
   };
 
-  getBetEvents = () => {
+  getAllBetEvents = () => {
     this.setState({loading: true}, () => {
       if (this.debounce) {
         clearTimeout(this.debounce)
@@ -63,11 +64,12 @@ class BetEventList extends Component {
 
       this.debounce = setTimeout(() => {
         this.props
-          .getListEvents({
+          .getAllBetEvents({
             limit: this.state.size,
             skip: (this.state.page - 1) * this.state.size
           })
           .then(({events, pages}) => {
+            console.log(events)
             if (this.debounce) {
               this.setState({events, pages, loading: false})
             }
@@ -77,9 +79,9 @@ class BetEventList extends Component {
     })
   }
 
-  handlePage = page => this.setState({page}, this.getBetEvents)
+  handlePage = page => this.setState({page}, this.getAllBetEvents)
 
-  handleSize = size => this.setState({size, page: 1}, this.getBetEvents)
+  handleSize = size => this.setState({size, page: 1}, this.getAllBetEvents)
 
   render () {
     if (!!this.state.error) {
@@ -102,25 +104,31 @@ class BetEventList extends Component {
           select={select}
           title="Bet Events"/>
         <Table
+          className={"table--for-betevents"}
           cols={this.state.cols}
           data={sortBy(this.state.events.map((event) => {
             return {
               ...event,
-              time: moment.unix(parseInt(event.starting)).utc().format('MMM Do YYYY, HH:mm:ss'),
-              name: event.name,
-              round: event.round,
-              homeTeam: event.teams[0].name,
-              awayTeam: event.teams[1].name,
-              homeOdds: parseInt(event.teams[0].odds)/10000,
-              drawOdds: parseInt(event.teams[2].odds)/10000,
-              awayOdds: parseInt(event.teams[1].odds)/10000,
+              time: dateFormat(event.createdAt),
+              eventId: (
+                <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
+                  {event.eventId}
+                </Link>
+              ),
+              name: event.league,
+              round: event.info,
+              homeTeam: event.homeTeam,
+              awayTeam: event.awayTeam,
+              homeOdds: event.homeOdds,
+              drawOdds: event.drawOdds,
+              awayOdds: event.awayOdds,
               txId: (
                 <Link to={`/tx/${ event.txId }`}>
                   {event.txId}
                 </Link>
               ),
             }
-          }), ['id'])}/>
+          }), ['time']).reverse()}/>
         <Pagination
           current={this.state.page}
           className="float-right"
@@ -133,7 +141,7 @@ class BetEventList extends Component {
 }
 
 const mapDispatch = dispatch => ({
-  getListEvents: query => Actions.getListEvents(query)
+  getAllBetEvents: query => Actions.getAllBetEvents(query)
 })
 
 export default connect(null, mapDispatch)(BetEventList)

@@ -109,4 +109,13 @@
 			}
 		}
 	}
+
+	&--for-betevents {
+		td {
+			min-width: 30px;
+		}
+		th {
+			min-width: 30px;
+		}
+	}
 }
