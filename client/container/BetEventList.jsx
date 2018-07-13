@@ -25,7 +25,8 @@ class BetEventList extends Component {
     this.debounce = null
     this.state = {
       cols: [
-        {key: 'time', title: 'Time'},
+        {key: 'block', title: 'Block'},
+        {key: 'start', title: 'Start'},
         {key: 'eventId', title: 'Id'},
         {key: 'name', title: 'Name'},
         {key: 'round', title: 'Round'},
@@ -109,7 +110,8 @@ class BetEventList extends Component {
           data={sortBy(this.state.events.map((event) => {
             return {
               ...event,
-              time: dateFormat(event.createdAt),
+              block:  (<Link to={ `/block/${ event.blockHeight }` }>{ event.blockHeight }</Link>),
+              start: moment.unix(event.timeStamp).format("MM/DD/YYYY HH:mm:ss"),
               eventId: (
                 <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
                   {event.eventId}
@@ -128,7 +130,7 @@ class BetEventList extends Component {
                 </Link>
               ),
             }
-          }), ['time']).reverse()}/>
+          }), ['block']).reverse()}/>
         <Pagination
           current={this.state.page}
           className="float-right"
