@@ -663,6 +663,21 @@ const getBetActioinsWeek = () => {
   };
 };
 
+const getBetEventInfo = async (req, res) => {
+  try {
+    const eventId = getEventId(req.params.eventId)
+    await Block.findOne({hash: req.params.hash})
+    const event = await BetEvent.findOne({eventId: eventId}).sort({createdAt: -1})
+    const homeBetNum = await BetAction.find({eventId: eventId, betChoose: event.homeTeam}).count()
+    const awayBetNum = await BetAction.find({eventId: eventId, betChoose: event.awayTeam}).count()
+    const drawBetNum = await BetAction.find({eventId: eventId, betChoose: 'DRW'}).count()
+    res.json({event, homeBetNum: homeBetNum, awayBetNum: awayBetNum, drawBetNum: drawBetNum})
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
 module.exports =  {
   getAddress,
   getAvgBlockTime,
@@ -686,5 +701,6 @@ module.exports =  {
   getBetEvents,
   getBetActions,
   getBetResults,
-  getBetActioinsWeek
+  getBetActioinsWeek,
+  getBetEventInfo
 };

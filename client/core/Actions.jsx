@@ -210,6 +210,11 @@ export const getBetResults = (query) => {
     return getFromWorker('betresults', resolve, reject, query);
   });
 };
+export const getBetEventInfo = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('beteventinfo', resolve, reject, query);
+  });
+};
 export default {
   getAddress,
   getBlock,
@@ -230,6 +235,7 @@ export default {
   getBetEvents,
   getBetActions,
   getBetResults,
+  getBetEventInfo,
   setWatch,
   removeWatch
 };

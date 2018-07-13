@@ -4,47 +4,47 @@ import { Link } from 'react-router-dom'
 import Card from './Card'
 import { dateFormat } from '../../../lib/date'
 
-const CardBetEvent = ({betEvent}) => {
+const CardBetEvent = ({eventInfo}) => {
 
-  if (betEvent) {
+  if (eventInfo) {
     return <Card title="Bet Event" className="card--status">
       <div className="card__row">
         <span className="card__label">Time:</span>
-        {dateFormat(betEvent.start)}
+        {dateFormat(eventInfo.event.start)}
       </div>
       <div className="card__row">
         <span className="card__label">League:</span>
-        {betEvent.league} {betEvent.info}
+        {eventInfo.event.league} {eventInfo.event.info}
       </div>
       <div className="card__row">
         <span className="card__label">Home Team:</span>
         <span className="card__result">
-               {betEvent.homeTeam}
+               {eventInfo.event.homeTeam}
             </span>
       </div>
       <div className="card__row">
         <span className="card__label">Away Team:</span>
         <span className="card__result">
-                {betEvent.awayTeam}
+                {eventInfo.event.awayTeam}
           </span>
       </div>
       <div className="card__row">
-        <span className="card__label">Home Odds:</span>
-        <span className="card__result">{betEvent.homeOdds > 10000 ? betEvent.homeOdds / 10000 : betEvent.homeOdds}</span>
+        <span className="card__label">Home Bet:</span>
+        <span className="card__result">{eventInfo.homeBetNum} ({eventInfo.event.homeOdds > 10000 ? eventInfo.event.homeOdds / 10000 : eventInfo.event.homeOdds})</span>
       </div>
       <div className="card__row">
-        <span className="card__label">Draw Odds:</span>
-        <span className="card__result">{betEvent.drawOdds > 10000 ? betEvent.drawOdds / 10000 : betEvent.drawOdds}</span>
+        <span className="card__label">Draw Bet:</span>
+        <span className="card__result">{eventInfo.drawBetNum} ({eventInfo.event.drawOdds > 10000 ? eventInfo.event.drawOdds / 10000 : eventInfo.event.drawOdds})</span>
       </div>
       <div className="card__row">
-        <span className="card__label">Away Odds:</span>
-        <span className="card__result">{betEvent.awayOdds > 10000 ? betEvent.awayOdds / 10000 : betEvent.awayOdds}</span>
+        <span className="card__label">Away Bet:</span>
+        <span className="card__result">{eventInfo.awayBetNum} ({eventInfo.event.awayOdds > 10000 ? eventInfo.event.awayOdds / 10000 : eventInfo.event.awayOdds})</span>
       </div>
       <div className="card__row">
         <span className="card__label">TxId:</span>
         <span className="card__result">
-               <Link to={`/tx/${ betEvent.txId }`}>
-                  {betEvent.txId}
+               <Link to={`/tx/${ eventInfo.event.txId }`}>
+                  {eventInfo.event.txId}
                 </Link>
             </span>
       </div>
@@ -60,7 +60,7 @@ const CardBetEvent = ({betEvent}) => {
 }
 
 CardBetEvent.propTypes = {
-  betEvent: PropTypes.object
+  eventInfo: PropTypes.object
 }
 
 export default CardBetEvent

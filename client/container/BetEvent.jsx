@@ -8,7 +8,7 @@ import CardExchanges from '../component/Card/CardExchanges'
 import CardLinks from '../component/Card/CardLinks'
 import CardROI from '../component/Card/CardROI'
 import HorizontalRule from '../component/HorizontalRule'
-import Actions from '../core/Actions'
+import Actions, { getBetEventInfo } from '../core/Actions'
 import numeral from 'numeral'
 import { dateFormat } from '../../lib/date'
 import Table from '../component/Table'
@@ -23,7 +23,7 @@ import CardBetResult from '../component/Card/CardBetResult'
 class BetEvent extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
-    getBetEvents: PropTypes.func.isRequired,
+    getBetEventInfo: PropTypes.func.isRequired,
     getBetActions: PropTypes.func.isRequired,
     getBetResults: PropTypes.func.isRequired,
   }
@@ -32,7 +32,7 @@ class BetEvent extends Component {
     super(props)
     this.state = {
       eventId: '',
-      betEvents: [],
+      eventInfo: [],
       betActions: [],
       betResults: [],
       loading: true,
@@ -75,12 +75,12 @@ class BetEvent extends Component {
   getBetData = () => {
     this.setState({loading: true}, () => {
       Promise.all([
-        this.props.getBetEvents(this.state.eventId),
+        this.props.getBetEventInfo(this.state.eventId),
         this.props.getBetActions(this.state.eventId),
         this.props.getBetResults(this.state.eventId),
       ]).then((res) => {
         this.setState({
-          betEvents: res[0].events, // 7 days at 5 min = 2016 coins
+          eventInfo: res[0], // 7 days at 5 min = 2016 coins
           betActions: res[1].actions,
           betResults: res[2].results,
           loading: false,
@@ -101,7 +101,7 @@ class BetEvent extends Component {
         <HorizontalRule title="Bet Event Info"/>
         <div className="row">
           <div className="col-sm-12 col-md-6">
-            <CardBetEvent betEvent={this.state.betEvents[0]}/>
+            <CardBetEvent eventInfo={this.state.eventInfo}/>
           </div>
           <div className="col-sm-12 col-md-6">
             <CardBetResult betResult={this.state.betResults[0]}/>
@@ -133,7 +133,7 @@ class BetEvent extends Component {
 }
 
 const mapDispatch = dispatch => ({
-  getBetEvents: query => Actions.getBetEvents(query),
+  getBetEventInfo: query => Actions.getBetEventInfo(query),
   getBetActions: query => Actions.getBetActions(query),
   getBetResults: query => Actions.getBetResults(query)
 })
