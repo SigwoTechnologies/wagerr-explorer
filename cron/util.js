@@ -3,6 +3,7 @@ require('babel-polyfill');
 const { rpc } = require('../lib/cron');
 const TX = require('../model/tx');
 const UTXO = require('../model/utxo');
+const STXO = require('../model/stxo');
 
 function hexToString(hexx) {
   var hex = hexx.toString()//force conversion
@@ -16,12 +17,13 @@ function hexToString(hexx) {
  * Process the inputs for the tx.
  * @param {Object} rpctx The rpc tx object.
  */
-async function vin(rpctx) {
+async function vin(rpctx, blockHeight) {
   // Setup the input list for the transaction.
   const txin = [];
   if (rpctx.vin) {
+    let stxo = [];
     const txIds = new Set();
-    rpctx.vin.forEach((vin) => {
+    for (const vin of rpctx.vin) {
       txin.push({
         coinbase: vin.coinbase,
         sequence: vin.sequence,
@@ -29,10 +31,34 @@ async function vin(rpctx) {
         vout: vin.vout
       });
 
-      txIds.add(`${ vin.txid }:${ vin.vout }`);
-    });
+      txIds.add(`${ vin.txid }:${ vin.vout }`)
+      let connectedTx = await TX.findOne({txId: vin.txid})
+      if (connectedTx) {
+        const from = {
+          blockHeight,
+          address: connectedTx.vout[vin.vout].address,
+          n: vin.vout,
+          value: connectedTx.vout[vin.vout].value
+        }
 
-    // Remove unspent transactions.
+        stxo.push({
+          ...from,
+          _id: `${ connectedTx.txId }:${ vin.vout }`,
+          txId: rpctx.txid
+        })
+      }
+
+    }
+
+    // Insert spent transactions.
+    if (stxo.length !== 0) {
+      try {
+        await STXO.insertMany(stxo);
+      }catch (e) {
+        console.log(e)
+      }
+    }
+    // Remove spent transactions.
     if (txIds.size) {
       await UTXO.remove({ _id: { $in: Array.from(txIds) } });
     }
@@ -95,7 +121,7 @@ async function addPoS(block, rpctx) {
   if (rpctx.vin[0].coinbase && rpctx.vout[0].value === 0)
     return;
 
-  const txin = await vin(rpctx);
+  const txin = await vin(rpctx, block.height);
   const txout = await vout(rpctx, block.height);
 
   await TX.create({
@@ -116,7 +142,7 @@ async function addPoS(block, rpctx) {
  * @param {Object} rpctx The rpc object from the node.
  */
 async function addPoW(block, rpctx) {
-  const txin = await vin(rpctx);
+  const txin = await vin(rpctx, block.height);
   const txout = await vout(rpctx, block.height);
 
   await TX.create({

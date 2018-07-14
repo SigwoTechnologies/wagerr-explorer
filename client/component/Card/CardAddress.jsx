@@ -12,7 +12,8 @@ export default class CardAddress extends Component {
     balance: 0.0,
     received: 0.0,
     txs: [],
-    utxo: []
+    utxo: [],
+    stxo: []
   };
 
   static propTypes = {
@@ -20,7 +21,8 @@ export default class CardAddress extends Component {
     balance: PropTypes.number.isRequired,
     received: PropTypes.number.isRequired,
     txs: PropTypes.array.isRequired,
-    utxo: PropTypes.array.isRequired
+    utxo: PropTypes.array.isRequired,
+    stxo: PropTypes.array.isRequired
   };
 
   componentDidMount() {
