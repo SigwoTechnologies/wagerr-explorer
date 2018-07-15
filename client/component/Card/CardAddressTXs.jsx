@@ -46,27 +46,26 @@ export default class CardAddressTXs extends Component {
       <Table
         cols={ this.state.cols }
         data={ this.props.txs.map((tx) => {
-          let amount = 0.0;
-          let isSpent = spentTXs.has(`${ tx.txId }`);
-          if (isSpent){
-            this.props.stxo.forEach((stx) => {
-              if (stx.txId === tx.txId) {
-                amount += stx.value;
-              }
-            });
-          } else{
-            tx.vout.forEach((vout) => {
-              if (vout.address === this.props.address) {
-                amount += vout.value;
-              }
-            });
-          }
+          let inAmount = 0.0;
+          let outAmount = 0.0;
+          this.props.stxo.forEach((stx) => {
+            if (stx.txId === tx.txId) {
+              inAmount += stx.value;
+            }
+          });
+          tx.vout.forEach((vout) => {
+            if (vout.address === this.props.address) {
+              outAmount += vout.value;
+            }
+          });
+          let isSpent = inAmount > outAmount
+          let amount = outAmount - inAmount
           return ({
             ...tx,
             amount: (
               <span
                 className={ `badge badge-${ isSpent ? 'danger' : 'success' }` }>
-                { isSpent ? '-' : ''}{ numeral(amount).format('0,0.0000') } WGR
+                { numeral(amount).format('0,0.0000') } WGR
               </span>
             ),
             createdAt: dateFormat(tx.createdAt),
