@@ -116,7 +116,7 @@ class App extends Component {
   };
 
   isBetEventId = (s) => {
-    return typeof(s) === 'string' && s.indexOf('#') === 0 && s.length === 4;
+    return typeof(s) === 'string' && s.length === 4 && isNaN(s);
   };
 
   handleSearch = (term) => {

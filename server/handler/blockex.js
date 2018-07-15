@@ -565,20 +565,12 @@ const getListEvents = async (req, res) => {
   }
 };
 
-const getEventId = (str) => {
-  if (str.indexOf('#') === -1 && str.indexOf('#')) {
-    return '#'+str
-  } else {
-    return str
-  }
-}
-
 const getBetEvents = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
-      const eventId = getEventId(req.query.eventId)
+      const eventId = req.query.eventId
       const total = await BetEvent.find({eventId: eventId}).sort({createdAt: 1}).count()
       const events = await BetEvent.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
@@ -599,7 +591,7 @@ const getBetActions = async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
-      const eventId = getEventId(req.query.eventId)
+      const eventId = req.query.eventId
       const total = await BetAction.find({eventId: eventId}).sort({createdAt: 1}).count()
       const actions = await BetAction.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
@@ -619,7 +611,7 @@ const getBetResults = async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
-      const eventId = getEventId(req.query.eventId)
+      const eventId = req.query.eventId
       const total = await BetResult.find({eventId: eventId}).sort({createdAt: 1}).count()
       const results = await BetResult.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
@@ -686,8 +678,7 @@ const getBetActioinsWeek = () => {
 
 const getBetEventInfo = async (req, res) => {
   try {
-    const eventId = getEventId(req.params.eventId)
-    await Block.findOne({hash: req.params.hash})
+    const eventId = req.params.eventId
     const event = await BetEvent.findOne({eventId: eventId}).sort({createdAt: -1})
     const homeBetNum = await BetAction.find({eventId: eventId, betChoose: event.homeTeam}).count()
     const awayBetNum = await BetAction.find({eventId: eventId, betChoose: event.awayTeam}).count()

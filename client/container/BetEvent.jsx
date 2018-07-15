@@ -48,7 +48,7 @@ class BetEvent extends Component {
 
   componentDidMount () {
     this.setState({
-      eventId: this.getEventId(this.props.match.params.eventId), // 7 days at 5 min = 2016 coins
+      eventId: this.props.match.params.eventId,
     })
     this.getBetData()
   };
@@ -57,20 +57,11 @@ class BetEvent extends Component {
     const {params: {eventId}} = this.props.match
     if (prevProps.match.params.eventId !== eventId) {
       this.setState({
-        eventId: this.getEventId(this.props.match.params.eventId), // 7 days at 5 min = 2016 coins
+        eventId: this.props.match.params.eventId,
       })
       this.getBetData()
     }
   };
-
-  getEventId (strEventId) {
-    if (strEventId.indexOf('#') === -1 && strEventId.indexOf('%23') === -1) {
-      return '%23' + strEventId
-    } else {
-      return strEventId
-    }
-
-  }
 
   getBetData = () => {
     this.setState({loading: true}, () => {
