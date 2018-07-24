@@ -105,7 +105,11 @@ async function vout(rpctx, blockHeight) {
 
     // Insert unspent transactions.
     if (utxo.length) {
-      await UTXO.insertMany(utxo);
+      try {
+        await UTXO.insertMany(utxo);
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
   return txout;
