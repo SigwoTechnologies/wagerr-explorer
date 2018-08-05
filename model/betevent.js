@@ -14,7 +14,7 @@ const BetEvent = mongoose.model('BetEvent', new mongoose.Schema({
   eventId: { index: true,  required: true, type: String },
   timeStamp: { index: true,  required: true, type: String },
   league: { required: true, type: String },
-  info: { required: true, type: String },
+  info: { type: String },
   homeTeam: {  required: true, type: String },
   awayTeam: {  required: true, type: String },
   homeOdds: { required: true, type: String },
