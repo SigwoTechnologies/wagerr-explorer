@@ -1,6 +1,7 @@
 
 const express = require('express');
 const blockex = require('../handler/blockex');
+const faucet = require('../handler/faucet');
 const iquidus = require('../handler/iquidus');
 
 const router = express.Router();
@@ -29,6 +30,9 @@ router.get('/bet/actions', blockex.getBetActions);
 router.get('/bet/results', blockex.getBetResults);
 router.get('/bet/event/:eventId/info', blockex.getBetEventInfo);
 router.get('/bet/action/week', blockex.getBetActioinsWeek());
+
+//faucet
+router.get('/faucet/donate', faucet.donate);
 
 // Iquidus Explorer routes.
 router.get('/getdifficulty', iquidus.getdifficulty);

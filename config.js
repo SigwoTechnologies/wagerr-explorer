@@ -23,6 +23,11 @@ const config = {
   'freegeoip': {
     'api': 'http://geoip.nekudo.com/api/'
   },
+  'faucet':{
+    'wait_time': 1440,
+    'percent': 0.02,
+    'limit': 500
+  },
   'rpc': {
     'host': '127.0.0.1',
     'port': '55005',
