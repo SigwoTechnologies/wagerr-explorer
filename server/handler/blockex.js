@@ -677,13 +677,20 @@ const getBetActioinsWeek = () => {
 };
 
 const getBetEventInfo = async (req, res) => {
+  const eventId = req.params.eventId
+  let result
   try {
-    const eventId = req.params.eventId
-    const event = await BetEvent.findOne({eventId: eventId}).sort({createdAt: -1})
-    const homeBetNum = await BetAction.find({eventId: eventId, betChoose: event.homeTeam}).count()
-    const awayBetNum = await BetAction.find({eventId: eventId, betChoose: event.awayTeam}).count()
-    const drawBetNum = await BetAction.find({eventId: eventId, betChoose: 'DRW'}).count()
-    res.json({event, homeBetNum: homeBetNum, awayBetNum: awayBetNum, drawBetNum: drawBetNum})
+    result = await BetResult.findOne({eventId: eventId}).sort({createdAt: 1})
+  }catch (e) {
+    console.log("Bet Event Not Publish")
+  }
+
+  try {
+    const events = await BetEvent.find({eventId: eventId}).sort({createdAt: 1})
+    const homeBets = await BetAction.find({eventId: eventId, betChoose: events[0].homeTeam})
+    const awayBets = await BetAction.find({eventId: eventId, betChoose: events[0].awayTeam})
+    const drawBets = await BetAction.find({eventId: eventId, betChoose: 'DRW'})
+    res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,result})
   } catch (err) {
     console.log(err)
     res.status(500).send(err.message || err)

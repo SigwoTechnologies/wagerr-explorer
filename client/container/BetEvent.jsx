@@ -95,7 +95,7 @@ class BetEvent extends Component {
             <CardBetEvent eventInfo={this.state.eventInfo}/>
           </div>
           <div className="col-sm-12 col-md-6">
-            <CardBetResult betResult={this.state.betResults[0]}/>
+            <CardBetResult eventInfo={this.state.eventInfo}/>
           </div>
         </div>
         <div className="row">
