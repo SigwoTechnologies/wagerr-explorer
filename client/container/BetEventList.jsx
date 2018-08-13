@@ -110,17 +110,21 @@ class BetEventList extends Component {
           data={sortBy(this.state.events.map((event) => {
             return {
               ...event,
-              block:  (<Link to={ `/block/${ event.blockHeight }` }>{ event.blockHeight }</Link>),
-              start: moment.unix(event.timeStamp).format("MM/DD/YYYY HH:mm:ss"),
+              block: (<Link to={`/block/${ event.blockHeight }`}>{event.blockHeight}</Link>),
+              start: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
+                {moment.unix(event.timeStamp).format('MM/DD/YYYY HH:mm:ss')} </Link>
+              ,
               eventId: (
                 <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
                   {event.eventId}
                 </Link>
               ),
-              name: event.league,
-              round: event.info,
-              homeTeam: event.homeTeam,
-              awayTeam: event.awayTeam,
+              name: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
+                {event.league}</Link>,
+              round: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
+                {event.info}</Link>,
+              homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>{event.homeTeam}</Link>,
+              awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>{event.awayTeam}</Link>,
               homeOdds: event.homeOdds > 10000 ? event.homeOdds / 10000 : event.homeOdds,
               drawOdds: event.drawOdds > 10000 ? event.drawOdds / 10000 : event.drawOdds,
               awayOdds: event.awayOdds > 10000 ? event.awayOdds / 10000 : event.awayOdds,
