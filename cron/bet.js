@@ -41,7 +41,11 @@ async function addPoS (block, rpctx) {
       }
       rpctx.vout.forEach((vout) => {
         var address
-        if (vout.scriptPubKey.type === 'nonstandard') {
+        if (vout.scriptPubKey.type == 'nulldata') {
+          address = "OP_RETURN "+hexToString(vout.scriptPubKey.asm.substring(10))
+        }else if (vout.scriptPubKey.type == 'zerocoinmint') {
+          address = 'ZERO_COIN_MINT'
+        } else if (vout.scriptPubKey.type == 'nonstandard') {
           address = 'NON_STANDARD'
         } else {
           address = vout.scriptPubKey.addresses[0]
