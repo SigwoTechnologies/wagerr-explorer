@@ -678,9 +678,9 @@ const getBetActioinsWeek = () => {
 
 const getBetEventInfo = async (req, res) => {
   const eventId = req.params.eventId
-  let result
+  let results
   try {
-    result = await BetResult.findOne({eventId: eventId}).sort({createdAt: 1})
+    results = await BetResult.find({eventId: eventId}).sort({createdAt: 1})
   }catch (e) {
     console.log("Bet Event Not Publish")
   }
@@ -690,7 +690,7 @@ const getBetEventInfo = async (req, res) => {
     const homeBets = await BetAction.find({eventId: eventId, betChoose: events[0].homeTeam})
     const awayBets = await BetAction.find({eventId: eventId, betChoose: events[0].awayTeam})
     const drawBets = await BetAction.find({eventId: eventId, betChoose: 'DRW'})
-    res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,result})
+    res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
   } catch (err) {
     console.log(err)
     res.status(500).send(err.message || err)

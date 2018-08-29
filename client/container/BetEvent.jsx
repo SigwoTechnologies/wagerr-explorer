@@ -24,8 +24,7 @@ class BetEvent extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     getBetEventInfo: PropTypes.func.isRequired,
-    getBetActions: PropTypes.func.isRequired,
-    getBetResults: PropTypes.func.isRequired,
+    getBetActions: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -34,7 +33,6 @@ class BetEvent extends Component {
       eventId: '',
       eventInfo: [],
       betActions: [],
-      betResults: [],
       loading: true,
       error: null,
       cols: [
@@ -67,13 +65,11 @@ class BetEvent extends Component {
     this.setState({loading: true}, () => {
       Promise.all([
         this.props.getBetEventInfo(this.state.eventId),
-        this.props.getBetActions(this.state.eventId),
-        this.props.getBetResults(this.state.eventId),
+        this.props.getBetActions(this.state.eventId)
       ]).then((res) => {
         this.setState({
           eventInfo: res[0], // 7 days at 5 min = 2016 coins
           betActions: res[1].actions,
-          betResults: res[2].results,
           loading: false,
         })
       })
@@ -125,8 +121,7 @@ class BetEvent extends Component {
 
 const mapDispatch = dispatch => ({
   getBetEventInfo: query => Actions.getBetEventInfo(query),
-  getBetActions: query => Actions.getBetActions(query),
-  getBetResults: query => Actions.getBetResults(query)
+  getBetActions: query => Actions.getBetActions(query)
 })
 
 export default connect(null, mapDispatch)(BetEvent)

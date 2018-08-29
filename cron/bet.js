@@ -113,6 +113,16 @@ async function addPoS (block, rpctx) {
             result: datas[3],
             opString: opString,
           })
+        } else if (datas[0] === '4'){
+          BetResult.create({
+            _id: datas[2]+rpctx.txid,
+            txId: rpctx.txid,
+            blockHeight: block.height,
+            createdAt: block.createdAt,
+            eventId: datas[2],
+            result: 'REFUND '+datas[3],
+            opString: opString,
+          })
         }
       }
     })
