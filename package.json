@@ -17,6 +17,7 @@
     "cron:listevent": "node ./cron/listevent.js >> ./tmp/listevent.log",
     "cron:rich": "node ./cron/rich.js >> ./tmp/rich.log",
     "start:api": "NODE_ENV=production node ./server/index.js",
+    "db:clean": "node ./cron/clear-db.js >> ./tmp/clear-db.log",
     "start:maint": "NODE_ENV=production node ./server/maintenance.js",
     "start:web": "webpack-dev-server --progress --colors",
     "test:api": "mocha --compilers js:babel-core/register --timeout 2000 ./test/server/api",

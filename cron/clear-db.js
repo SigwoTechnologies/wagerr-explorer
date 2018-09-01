@@ -10,6 +10,12 @@ const Peer = require('../model/peer');
 const Rich = require('../model/rich');
 const TX = require('../model/tx');
 const UTXO = require('../model/utxo');
+const BetAction = require('../model/betaction');
+const BetEvent = require('../model/betevent');
+const BetPayout = require('../model/betpayout');
+const BetResult = require('../model/betresult');
+const ListEvent = require('../model/listevent');
+const STXO = require('../model/stxo');
 
 /**
  * Clear database.
@@ -22,6 +28,12 @@ async function clearDatabase() {
   await Rich.remove({});
   await TX.remove({});
   await UTXO.remove({});
+  await BetAction.remove({});
+  await BetEvent.remove({});
+  await BetPayout.remove({});
+  await BetResult.remove({});
+  await ListEvent.remove({});
+  await STXO.remove({});
 }
 
 /**
@@ -38,6 +50,8 @@ async function update() {
     locker.lock('rich');
     locker.lock('tx');
     locker.lock('utxo');
+    locker.lock('bet');
+    locker.lock('listevent');
     await clearDatabase();
   } catch(err) {
     console.log(err);
@@ -51,6 +65,8 @@ async function update() {
       locker.unlock('rich');
       locker.unlock('tx');
       locker.unlock('utxo');
+      locker.unlock('bet');
+      locker.unlock('listevent');
     } catch(err) {
       console.log(err);
       code = 1;
