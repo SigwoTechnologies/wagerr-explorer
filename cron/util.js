@@ -24,11 +24,13 @@ async function vin(rpctx, blockHeight) {
     let stxo = [];
     const txIds = new Set();
     for (const vin of rpctx.vin) {
+      const isZcSpend = vin.scriptSig.asm === "OP_ZEROCOINSPEND"
       txin.push({
         coinbase: vin.coinbase,
         sequence: vin.sequence,
         txId: vin.txid,
-        vout: vin.vout
+        vout: vin.vout,
+        isZcSpend: isZcSpend
       });
 
       txIds.add(`${ vin.txid }:${ vin.vout }`)
