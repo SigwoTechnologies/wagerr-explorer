@@ -24,7 +24,10 @@ async function vin(rpctx, blockHeight) {
     let stxo = [];
     const txIds = new Set();
     for (const vin of rpctx.vin) {
-      const isZcSpend = vin.scriptSig.asm === "OP_ZEROCOINSPEND"
+      let isZcSpend = false
+      if (vin.scriptSig){
+        isZcSpend = vin.scriptSig.asm === "OP_ZEROCOINSPEND"
+      }
       txin.push({
         coinbase: vin.coinbase,
         sequence: vin.sequence,
