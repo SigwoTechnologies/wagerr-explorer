@@ -4,7 +4,7 @@
  */
 const config = {
   'api': {
-    'host': 'https://explorer2.wagerr.com',
+    'host': 'https://explorer.wagerr.com',
     'port': '8087',
     'prefix': '/api',
     'timeout': '5s'
@@ -30,13 +30,13 @@ const config = {
   },
   'rpc': {
     'host': '127.0.0.1',
-    'port': '55005',
+    'port': '55003',
     'user': 'wagerr',
     'pass': 'this',
     'timeout': 8000, // 8 seconds
   },
   'coin':{
-    'testnet':true,
+    'testnet':false,
   }
 };
 
