@@ -7,7 +7,7 @@ const config = {
     'host': 'https://explorer.wagerr.com',
     'port': '8087',
     'prefix': '/api',
-    'timeout': '5s'
+    'timeout': '10s'
   },
   'coinMarketCap': {
     'api': 'http://api.coinmarketcap.com/v1/ticker/',
