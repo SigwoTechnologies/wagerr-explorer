@@ -25,45 +25,49 @@ const BetResult = require('../../model/betresult');
  */
 const getAddress = async (req, res) => {
   try {
-    const utxo = await UTXO
+
+    const response = await Promise.all([await UTXO
       .aggregate([
-          { $match: { address: req.params.hash } },
-          { $sort: { blockHeight: -1 } }
+        {$match: {address: req.params.hash}},
+        {$sort: {blockHeight: -1}}
       ])
       .allowDiskUse(true)
-      .exec();
-    const stxo = await STXO
+      .exec(), STXO
       .aggregate([
-        { $match: { address: req.params.hash } },
-        { $sort: { blockHeight: -1 } }
+        {$match: {address: req.params.hash}},
+        {$sort: {blockHeight: -1}}
       ])
       .allowDiskUse(true)
-      .exec();
+      .exec(), await TX
+      .aggregate([
+        {$match: {'vout.address': req.params.hash}},
+        {$sort: {blockHeight: -1}}
+      ])
+      .allowDiskUse(true)
+      .exec()])
+    const utxo = response[0]
+    const stxo = response[1]
+    const receivedTxs = response[2]
+
     const targetTxs = stxo.map(tx => `${ tx.txId }`)
     const txs = await TX
       .aggregate([
-        {$match: {$or: [{'vout.address': req.params.hash},{txId:{ $in: targetTxs }}]}},
-        { $sort: { blockHeight: -1 } }
+        {$match: {$or: [{'vout.address': req.params.hash}, {txId: {$in: targetTxs}}]}},
+        {$sort: {blockHeight: -1}}
       ])
       .allowDiskUse(true)
-      .exec();
-    const receivedTxs = await TX
-      .aggregate([
-        { $match: { 'vout.address': req.params.hash } },
-        { $sort: { blockHeight: -1 } }
-      ])
-      .allowDiskUse(true)
-      .exec();
-    const balance = utxo.reduce((acc, tx) => acc + tx.value, 0.0);
+      .exec()
+
+    const balance = utxo.reduce((acc, tx) => acc + tx.value, 0.0)
     const received = receivedTxs.reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
       if (t.address === req.params.hash) {
         return a + t.value
       } else {
         return a
       }
-    }, 0.0), 0.0);
+    }, 0.0), 0.0)
 
-    res.json({ balance, received, txs, utxo, stxo });
+    res.json({balance, received, txs, utxo, stxo });
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);
