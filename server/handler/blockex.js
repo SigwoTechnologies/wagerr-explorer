@@ -51,7 +51,7 @@ const getAddress = async (req, res) => {
       }
     }, 0.0), 0.0)
 
-    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD' && !vi.coinbase).reduce((acc, tx) => acc - tx.vin.reduce((a, t) => {
+    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD').reduce((acc, tx) => acc - tx.vin.reduce((a, t) => {
         if (t.address === req.params.hash) {
           return a + t.value
         } else {
