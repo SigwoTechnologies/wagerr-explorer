@@ -20,7 +20,7 @@ export default class MenuDesktop extends Component {
     super(props);
 
     this.state = {
-      isOpen: false
+      isOpen: true
     }
   }
 
