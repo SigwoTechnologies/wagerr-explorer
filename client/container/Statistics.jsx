@@ -70,6 +70,7 @@ class Statistics extends Component {
     // Setup graph data objects.
     const hashes = new Map();
     const mns = new Map();
+    const supplies = new Map();
     const prices = new Map();
     this.state.coins.forEach((c, idx) => {
       const k = moment(c.createdAt).format('MMM DD');
@@ -86,6 +87,12 @@ class Statistics extends Component {
         mns.set(k, c.mnsOn);
       }
 
+      if (supplies.has(k)) {
+        supplies.set(k, supplies.get(k) + c.supply);
+      } else {
+        supplies.set(k, c.supply);
+      }
+
       if (prices.has(k)) {
         prices.set(k, prices.get(k) + c.usd);
       } else {
@@ -95,7 +102,7 @@ class Statistics extends Component {
 
     // Generate averages for each key in each map.
     const l = (24 * 60) / 5; // How many 5 min intervals in a day.
-    let avgHash, avgMN, avgPrice = 0.0;
+    let avgHash, avgMN, avgSupply, avgPrice = 0.0;
     let hashLabel = 'H/s';
     hashes.forEach((v, k) => {
       const { hash, label } = this.formatNetHash(v / l);
@@ -107,12 +114,17 @@ class Statistics extends Component {
       avgMN += v / l;
       mns.set(k, numeral(v / l).format('0,0'));
     });
+    supplies.forEach((v, k) => {
+      avgSupply += v / l;
+      supplies.set(k, numeral(v / l).format('0,0'));
+    });
     prices.forEach((v, k) => {
       avgPrice += v / l;
       prices.set(k, numeral(v / l).format('0,0.00'));
     });
     avgHash = avgHash / hashes.size;
     avgMN = avgMN / mns.size;
+    avgSupply = avgSupply / supplies.size;
     avgPrice = avgPrice / prices.size;
 
     // Get the current hash format and label.
@@ -197,6 +209,17 @@ class Statistics extends Component {
                   data={ Array.from(betActions.values()) }
                   height="420px"
                   labels={ Array.from(betActions.keys()) } />
+              </div>
+            </div>
+            <div className="col-md-12 col-lg-6">
+              <h3>Supply Change Last 7 Days</h3>
+              <h4>{ numeral(this.props.coin.supply).format('0,0.0000') } { day }</h4>
+              <div>
+                <GraphLineFull
+                  color="#1991eb"
+                  data={ Array.from(supplies.values()).slice(1, -1) }
+                  height="420px"
+                  labels={ Array.from(supplies.keys()).slice(1, -1) } />
               </div>
             </div>
           </div>
