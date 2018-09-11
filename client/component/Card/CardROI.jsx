@@ -14,7 +14,7 @@ const CardROI = ({ coin }) => {
 
   return (
     <Card>
-      <div className="mb-5">
+      <div className="mb-3">
         <div className="h3">
           { coin.mnsOn } / { mns }
         </div>
@@ -22,7 +22,7 @@ const CardROI = ({ coin }) => {
           Active/Total Masternodes
         </div>
       </div>
-      <div className="mb-5">
+      <div className="mb-3">
         <div className="h3">
           { numeral(roi).format('0,0.0000') }%
         </div>
@@ -30,7 +30,23 @@ const CardROI = ({ coin }) => {
           Estimated ROI
         </div>
       </div>
-      <div className="mb-5">
+      <div className="mb-3">
+        <div className="h3">
+          { numeral(coin.supply ? coin.supply : 0.0).format('0,0.0000') } WGR
+        </div>
+        <div className="h5">
+          Coin Supply (Total)
+        </div>
+      </div>
+      <div className="mb-3">
+        <div className="h3">
+          { numeral(coin.supply ? coin.supply - (mns * mncoins) : 0.0).format('0,0.0000') } WGR
+        </div>
+        <div className="h5">
+          Coin Supply (Circulating)
+        </div>
+      </div>
+      <div className="mb-3">
         <div className="h3">
           { numeral(coin.cap * coin.btc).format('0,0.0000') } BTC
         </div>
@@ -38,7 +54,7 @@ const CardROI = ({ coin }) => {
           Market Cap BTC
         </div>
       </div>
-      <div className="mb-5">
+      <div className="mb-3">
         <div className="h3">
           { numeral(coin.cap).format('$0,0.00') }
         </div>
@@ -46,7 +62,7 @@ const CardROI = ({ coin }) => {
           Market Cap USD
         </div>
       </div>
-      <div className="mb-5">
+      <div className="mb-3">
         <div className="h3">
           { numeral(mns * mncoins).format('0,0.0000') } WGR
         </div>
@@ -54,7 +70,7 @@ const CardROI = ({ coin }) => {
           Coins Locked
         </div>
       </div>
-      <div className="mb-5">
+      <div className="mb-3">
         <div className="h3">
           { numeral(mncoins * coin.btc).format('0,0.0000') } BTC / { numeral(mncoins * coin.usd).format('$0,0.00') }
         </div>

@@ -48,7 +48,8 @@ class CoinSummary extends Component {
                   avgMNTime={ coin.avgMNTime?coin.avgMNTime:0 }
                   blocks={ height }
                   peers={ coin.peers }
-                  status={ coin.status } />
+                  status={ coin.status }
+                  supply={ coin.supply } />
               </div>
               <div className="col-md-12 col-lg-6">
                 <CardNetworkSummary
