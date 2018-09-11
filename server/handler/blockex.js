@@ -25,41 +25,16 @@ const BetResult = require('../../model/betresult');
  */
 const getAddress = async (req, res) => {
   try {
-
-    const response = await Promise.all([await UTXO
-      .aggregate([
-        {$match: {address: req.params.hash}},
-        {$sort: {blockHeight: -1}}
-      ])
-      .allowDiskUse(true)
-      .exec(), STXO
-      .aggregate([
-        {$match: {address: req.params.hash}},
-        {$sort: {blockHeight: -1}}
-      ])
-      .allowDiskUse(true)
-      .exec(), await TX
-      .aggregate([
-        {$match: {'vout.address': req.params.hash}},
-        {$sort: {blockHeight: -1}}
-      ])
-      .allowDiskUse(true)
-      .exec()])
-    const utxo = response[0]
-    const stxo = response[1]
-    const receivedTxs = response[2]
-
-    const targetTxs = stxo.map(tx => `${ tx.txId }`)
     const txs = await TX
       .aggregate([
-        {$match: {$or: [{'vout.address': req.params.hash}, {txId: {$in: targetTxs}}]}},
+        {$match: {$or: [{'vout.address': req.params.hash},{'vin.address': req.params.hash}]}},
         {$sort: {blockHeight: -1}}
       ])
       .allowDiskUse(true)
       .exec()
 
-    const balance = utxo.reduce((acc, tx) => acc + tx.value, 0.0)
-    const received = receivedTxs.reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
+    const sent = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
+      .reduce((acc, tx) => acc + tx.vin.reduce((a, t) => {
       if (t.address === req.params.hash) {
         return a + t.value
       } else {
@@ -67,7 +42,30 @@ const getAddress = async (req, res) => {
       }
     }, 0.0), 0.0)
 
-    res.json({balance, received, txs, utxo, stxo });
+    const received = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
+      .reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
+      if (t.address === req.params.hash) {
+        return a + t.value
+      } else {
+        return a
+      }
+    }, 0.0), 0.0)
+
+    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD' && !vi.coinbase).reduce((acc, tx) => acc - tx.vin.reduce((a, t) => {
+        if (t.address === req.params.hash) {
+          return a + t.value
+        } else {
+          return a
+        }
+      }, 0.0) + tx.vout.reduce((a, t) => {
+      if (t.address === req.params.hash) {
+        return a + t.value
+      } else {
+        return a
+      }
+    }, 0.0), 0.0)
+
+    res.json({balance:(received + staked - sent), sent, staked, received, txs });
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);

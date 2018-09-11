@@ -11,16 +11,12 @@ import Table from '../Table';
 export default class CardAddressTXs extends Component {
   static defaultProps = {
     address: '',
-    txs: [],
-    utxo: [],
-    stxo: []
+    txs: []
   };
 
   static propTypes = {
     address: PropTypes.string.isRequired,
-    txs: PropTypes.array.isRequired,
-    utxo: PropTypes.array.isRequired,
-    stxo: PropTypes.array.isRequired
+    txs: PropTypes.array.isRequired
   };
 
   constructor(props) {
@@ -35,12 +31,6 @@ export default class CardAddressTXs extends Component {
   };
 
   render() {
-    const unspentTXs = new Set(
-      this.props.utxo.map(tx => `${ tx.txId }:${ tx.n }`)
-    );
-    const spentTXs = new Set(
-      this.props.stxo.map(tx => `${ tx.txId }`)
-    );
     return (
       <div className="animated fadeIn">
       <Table
@@ -48,9 +38,9 @@ export default class CardAddressTXs extends Component {
         data={ this.props.txs.map((tx) => {
           let inAmount = 0.0;
           let outAmount = 0.0;
-          this.props.stxo.forEach((stx) => {
-            if (stx.txId === tx.txId) {
-              inAmount += stx.value;
+          tx.vin.forEach((vin) => {
+            if (vin.address && vin.address === this.props.address) {
+              inAmount += vin.value;
             }
           });
           tx.vout.forEach((vout) => {

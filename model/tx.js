@@ -11,6 +11,8 @@ const TXIn = new mongoose.Schema({
   coinbase: { type: String },
   sequence: { type: Number },
   txId: { type: String },
+  address: { type: String },
+  value: { type: Number },
   isZcSpend:{ type: Boolean },
   vout: { type: Number }
 });

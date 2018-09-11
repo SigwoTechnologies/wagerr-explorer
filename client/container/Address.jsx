@@ -24,15 +24,15 @@ class Address extends Component {
     this.state = {
       address: '',
       balance: 0.0,
+      staked: 0.0,
+      sent: 0.0,
       received: 0.0,
       error: null,
       loading: true,
       pages: 0,
       page: 1,
       size: 10,
-      txs: [],
-      utxo: [],
-      stxo: []
+      txs: []
     };
   };
 
@@ -52,14 +52,14 @@ class Address extends Component {
       const address = this.props.match.params.hash;
       this.props
         .getAddress({ address })
-        .then(({ balance, received, txs, utxo, stxo }) => {
+        .then(({ balance, sent, staked, received, txs }) => {
           this.setState({
             address,
             balance,
+            sent,
+            staked,
             received,
             txs,
-            utxo,
-            stxo,
             loading: false,
             pages: Math.ceil(txs.length / this.state.size)
           });
@@ -99,17 +99,15 @@ class Address extends Component {
         <CardAddress
           address={ this.state.address }
           balance={ this.state.balance }
+          sent={ this.state.sent }
+          staked={ this.state.staked }
           received={ this.state.received }
           txs={ this.state.txs }
-          utxo={ this.state.utxo }
-          stxo={ this.state.stxo }
         />
         <HorizontalRule select={ select } title="Wallet Transactions" />
         <CardAddressTXs
           address={ this.state.address }
-          txs={ this.state.txs.slice(start, end) }
-          utxo={ this.state.utxo }
-          stxo={ this.state.stxo }/>
+          txs={ this.state.txs.slice(start, end) }/>
         <Pagination
           current={ this.state.page }
           className="float-right"

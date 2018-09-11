@@ -28,15 +28,6 @@ async function vin(rpctx, blockHeight) {
       if (vin.scriptSig){
         isZcSpend = vin.scriptSig.asm === "OP_ZEROCOINSPEND"
       }
-      txin.push({
-        coinbase: vin.coinbase,
-        sequence: vin.sequence,
-        txId: vin.txid,
-        vout: vin.vout,
-        isZcSpend: isZcSpend
-      });
-
-      txIds.add(`${ vin.txid }:${ vin.vout }`)
       let connectedTx = await TX.findOne({txId: vin.txid})
       if (connectedTx) {
         const from = {
@@ -51,8 +42,26 @@ async function vin(rpctx, blockHeight) {
           _id: `${ connectedTx.txId }:${ vin.vout }`,
           txId: rpctx.txid
         })
-      }
 
+        txin.push({
+          coinbase: vin.coinbase,
+          sequence: vin.sequence,
+          txId: vin.txid,
+          vout: vin.vout,
+          address: connectedTx.vout[vin.vout].address,
+          value: connectedTx.vout[vin.vout].value,
+          isZcSpend: isZcSpend
+        })
+      } else {
+        txin.push({
+          coinbase: vin.coinbase,
+          sequence: vin.sequence,
+          txId: vin.txid,
+          vout: vin.vout,
+          isZcSpend: isZcSpend
+        });
+      }
+      txIds.add(`${ vin.txid }:${ vin.vout }`)
     }
 
     // Insert spent transactions.
