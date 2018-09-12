@@ -21,7 +21,7 @@ const config = {
     'pass': 'wagerr'
   },
   'freegeoip': {
-    'api': 'http://geoip.nekudo.com/api/'
+    'api': 'https://extreme-ip-lookup.com/json/'
   },
   'faucet':{
     'wait_time': 1440,

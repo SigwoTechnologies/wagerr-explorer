@@ -30,15 +30,15 @@ async function syncPeer() {
 
     const p = new Peer({
       _id: parts[0],
-      country: geoip.country.name,
-      countryCode: geoip.country.code,
+      country: geoip.country,
+      countryCode: geoip.countryCode,
       createdAt: date,
       ip: parts[0],
-      lat: geoip.location.latitude,
-      lon: geoip.location.longitude,
+      lat: geoip.lat,
+      lon: geoip.lon,
       port: parts[1] ? parts[1] : 0,
-      subver: peer.subver?peer.subver:'Unknown',
-      timeZone: geoip.location.time_zone,
+      subver: peer.subver,
+      timeZone: geoip.region,
       ver: peer.version
     });
 
