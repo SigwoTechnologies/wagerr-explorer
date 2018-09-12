@@ -101,9 +101,12 @@ const getnetworkhashps = async (req, res) => {
 const getmoneysupply = async (req, res) => {
   try {
     const results = await UTXO.aggregate([
+      {$match: {address: {$ne: 'ZERO_COIN_MINT'}}},
       { $group: { _id: 'supply', total: { $sum: '$value' } } }
     ]);
-    res.json(results.length ? results[0].total : 0);
+    const info = await rpc.call('getinfo');
+
+    res.json(results.length ? results[0].total + info.zWGRsupply.total : 0);
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);

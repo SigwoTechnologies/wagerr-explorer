@@ -387,10 +387,13 @@ const getSupply = async (req, res) => {
     let t = 0; // Total supply.
 
     const utxo = await UTXO.aggregate([
+      {$match: {address: {$ne: 'ZERO_COIN_MINT'}}},
       { $group: { _id: 'supply', total: { $sum: '$value' } } }
     ]);
 
-    t = utxo[0].total;
+    const info = await rpc.call('getinfo');
+
+    t = utxo[0].total + info.zWGRsupply.total;
     c = t;
 
     res.json({ c, t });
