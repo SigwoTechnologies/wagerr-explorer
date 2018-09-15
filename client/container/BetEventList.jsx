@@ -105,7 +105,7 @@ class BetEventList extends Component {
           select={select}
           title="Bet Events"/>
         <Table
-          className={'table--for-betevents'}
+          className={'table-responsive table--for-betevents'}
           cols={this.state.cols}
           data={sortBy(this.state.events.map((event) => {
             return {
