@@ -66,3 +66,6 @@ typings/
 .vscode/
 
 .idea
+/public/*.js
+/public/*.gz
+/public/*.html
