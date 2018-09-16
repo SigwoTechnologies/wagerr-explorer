@@ -33,17 +33,17 @@ const CardBetEvent = ({eventInfo}) => {
           </span>
       </div>
       <div className="card__row">
-        <span className="card__label">Home Bet:</span>
+        <span className="card__label">Home Bet Num:</span>
         <span
           className="card__result">{eventInfo.homeBets.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Home Bet Amount:</span>
         <span className="card__result"> <span className={`badge badge-danger`}>
-                -{numeral(homeBetAmount).format('0,0.0000')}</span></span>
+                {numeral(homeBetAmount).format('0,0.0000')}</span></span>
       </div>
       <div className="card__row">
-        <span className="card__label">Draw Bet:</span>
+        <span className="card__label">Draw Bet Num:</span>
         <span
           className="card__result">{eventInfo.drawBets.length}</span>
       </div>
@@ -51,17 +51,17 @@ const CardBetEvent = ({eventInfo}) => {
         <span className="card__label">Draw Bet Amount:</span>
         <span className="card__result">
            <span className={`badge badge-danger`}>
-                -{numeral(drawBetAmount).format('0,0.0000')}</span></span>
+                {numeral(drawBetAmount).format('0,0.0000')}</span></span>
       </div>
       <div className="card__row">
-        <span className="card__label">Away Bet:</span>
+        <span className="card__label">Away Bet Num:</span>
         <span
           className="card__result">{eventInfo.awayBets.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Away Bet Amount:</span>
         <span className="card__result"><span className={`badge badge-danger`}>
-               -{numeral(awayBetAmount).format('0,0.0000')}</span>
+               {numeral(awayBetAmount).format('0,0.0000')}</span>
           </span>
       </div>
     </Card>
