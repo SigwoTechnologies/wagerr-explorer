@@ -64,14 +64,6 @@ const CardBetEvent = ({eventInfo}) => {
                -{numeral(awayBetAmount).format('0,0.0000')}</span>
           </span>
       </div>
-      <div className="card__row">
-        <span className="card__label">TxId:</span>
-        <span className="card__result">
-               <Link to={`/tx/${ eventInfo.events[0].txId }`}>
-                  {eventInfo.events[0].txId}
-                </Link>
-            </span>
-      </div>
     </Card>
   } else {
     return <Card title="Bet Event" className="card--status">

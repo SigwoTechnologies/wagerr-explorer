@@ -12,6 +12,7 @@ import HorizontalRule from '../component/HorizontalRule'
 import Pagination from '../component/Pagination'
 import Table from '../component/Table'
 import Select from '../component/Select'
+import _ from 'lodash'
 
 import { PAGINATION_PAGE_SIZE } from '../constants'
 
@@ -25,9 +26,8 @@ class BetEventList extends Component {
     this.debounce = null
     this.state = {
       cols: [
-        {key: 'block', title: 'Block'},
         {key: 'start', title: 'Start'},
-        {key: 'eventId', title: 'Id'},
+        {key: 'event', title: 'Id'},
         {key: 'name', title: 'Name'},
         {key: 'round', title: 'Round'},
         {key: 'homeTeam', title: 'Home'},
@@ -35,7 +35,7 @@ class BetEventList extends Component {
         {key: 'homeOdds', title: '1'},
         {key: 'drawOdds', title: 'x'},
         {key: 'awayOdds', title: '2'},
-        {key: 'txId', title: 'TX ID'},
+        {key: 'seeDetail', title: 'Detail'},
       ],
       error: null,
       loading: true,
@@ -107,14 +107,13 @@ class BetEventList extends Component {
         <Table
           className={'table-responsive table--for-betevents'}
           cols={this.state.cols}
-          data={sortBy(this.state.events.map((event) => {
+          data={_.uniqBy(sortBy(this.state.events.map((event) => {
             return {
               ...event,
-              block: (<Link to={`/block/${ event.blockHeight }`}>{event.blockHeight}</Link>),
               start: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
                 {moment.unix(event.timeStamp).format('MM/DD/YYYY HH:mm:ss')} </Link>
               ,
-              eventId: (
+              event: (
                 <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
                   {event.eventId}
                 </Link>
@@ -125,16 +124,12 @@ class BetEventList extends Component {
                 {event.info}</Link>,
               homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>{event.homeTeam}</Link>,
               awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>{event.awayTeam}</Link>,
-              homeOdds: event.homeOdds > 10000 ? event.homeOdds / 10000 : event.homeOdds,
-              drawOdds: event.drawOdds > 10000 ? event.drawOdds / 10000 : event.drawOdds,
-              awayOdds: event.awayOdds > 10000 ? event.awayOdds / 10000 : event.awayOdds,
-              txId: (
-                <Link to={`/tx/${ event.txId }`}>
-                  {event.txId}
-                </Link>
-              ),
+              homeOdds: event.homeOdds / 10000,
+              drawOdds: event.drawOdds / 10000,
+              awayOdds: event.awayOdds / 10000,
+              seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>See Detail</Link>
             }
-          }), ['block']).reverse()}/>
+          }), ['timeStamp']).reverse(), 'eventId')}/>
         <Pagination
           current={this.state.page}
           className="float-right"

@@ -41,6 +41,13 @@ class BetEvent extends Component {
         {key: 'odds', title: 'Odds'},
         {key: 'value', title: 'Value'},
         {key: 'txId', title: 'TX ID'}
+      ],
+      oddsCols: [
+        {key: 'createdAt', title: 'Time'},
+        {key: 'homeOdds', title: 'Home Odds'},
+        {key: 'drawOdds', title: 'Draw Odds'},
+        {key: 'awayOdds', title: 'Away Odds'},
+        {key: 'txId', title: 'TX ID'}
       ]
     }
   };
@@ -105,6 +112,25 @@ class BetEvent extends Component {
           </div>
           <div className="col-sm-12 col-md-6">
             <CardBetResult eventInfo={this.state.eventInfo}/>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-12 col-md-12">
+            <Table
+              cols={this.state.oddsCols}
+              data={sortBy(this.state.eventInfo.events.map((event) => {
+                return {
+                  ...event,
+                  createdAt: date24Format(event.createdAt),
+                  homeOdds: event.homeOdds / 10000,
+                  drawOdds: event.drawOdds / 10000,
+                  awayOdds: event.awayOdds / 10000,
+                  txId: (
+                    <Link to={`/tx/${ event.txId }`}>{event.txId}</Link>
+                  )
+                }
+              }), ['createdAt'])}
+            />
           </div>
         </div>
         <div className="row">
