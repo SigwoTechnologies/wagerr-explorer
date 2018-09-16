@@ -10,7 +10,7 @@ import CardROI from '../component/Card/CardROI'
 import HorizontalRule from '../component/HorizontalRule'
 import Actions, { getBetEventInfo } from '../core/Actions'
 import numeral from 'numeral'
-import { dateFormat } from '../../lib/date'
+import { date24Format, dateFormat } from '../../lib/date'
 import Table from '../component/Table'
 import { Link } from 'react-router-dom'
 import sortBy from 'lodash/sortBy'
@@ -38,6 +38,7 @@ class BetEvent extends Component {
       cols: [
         {key: 'createdAt', title: 'Time'},
         {key: 'bet', title: 'Bet'},
+        {key: 'odds', title: 'Odds'},
         {key: 'value', title: 'Value'},
         {key: 'txId', title: 'TX ID'}
       ]
@@ -67,6 +68,17 @@ class BetEvent extends Component {
         this.props.getBetEventInfo(this.state.eventId),
         this.props.getBetActions(this.state.eventId)
       ]).then((res) => {
+        sortBy(res[0].events,['blockHeight']).forEach(event =>{
+          res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
+            action =>{
+              if (action.betChoose === event.homeTeam) {
+                action.odds = event.homeOdds / 10000
+              }else if (action.betChoose === event.awayTeam) {
+                action.odds = event.awayOdds / 10000
+              } else{
+                action.odds = event.drawOdds / 10000
+              }
+            })
         this.setState({
           eventInfo: res[0], // 7 days at 5 min = 2016 coins
           betActions: res[1].actions,
@@ -75,7 +87,7 @@ class BetEvent extends Component {
       })
 
     })
-  }
+  })}
 
   render () {
     if (!!this.state.error) {
@@ -83,6 +95,7 @@ class BetEvent extends Component {
     } else if (this.state.loading) {
       return this.renderLoading()
     }
+
     return (
       <div>
         <HorizontalRule title="Bet Event Info"/>
@@ -101,8 +114,9 @@ class BetEvent extends Component {
               data={sortBy(this.state.betActions.map((action) => {
                 return {
                   ...action,
-                  createdAt: dateFormat(action.createdAt),
+                  createdAt: date24Format(action.createdAt),
                   bet: action.betChoose,
+                  odds: action.odds,
                   value: action.betValue
                     ? (<span
                       className="badge badge-danger">-{numeral(action.betValue).format('0,0.0000')} WGR</span>) : '',

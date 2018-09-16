@@ -35,7 +35,7 @@ const CardBetEvent = ({eventInfo}) => {
       <div className="card__row">
         <span className="card__label">Home Bet:</span>
         <span
-          className="card__result">{eventInfo.homeBets.length} ({eventInfo.events[0].homeOdds > 10000 ? eventInfo.events[0].homeOdds / 10000 : eventInfo.events[0].homeOdds})</span>
+          className="card__result">{eventInfo.homeBets.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Home Bet Amount:</span>
@@ -45,7 +45,7 @@ const CardBetEvent = ({eventInfo}) => {
       <div className="card__row">
         <span className="card__label">Draw Bet:</span>
         <span
-          className="card__result">{eventInfo.drawBets.length} ({eventInfo.events[0].drawOdds > 10000 ? eventInfo.events[0].drawOdds / 10000 : eventInfo.events[0].drawOdds})</span>
+          className="card__result">{eventInfo.drawBets.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Draw Bet Amount:</span>
@@ -56,7 +56,7 @@ const CardBetEvent = ({eventInfo}) => {
       <div className="card__row">
         <span className="card__label">Away Bet:</span>
         <span
-          className="card__result">{eventInfo.awayBets.length} ({eventInfo.events[0].awayOdds > 10000 ? eventInfo.events[0].awayOdds / 10000 : eventInfo.events[0].awayOdds})</span>
+          className="card__result">{eventInfo.awayBets.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">Away Bet Amount:</span>
