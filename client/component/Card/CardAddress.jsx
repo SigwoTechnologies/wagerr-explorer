@@ -1,6 +1,5 @@
 
 import Component from '../../core/Component';
-import { dateFormat } from '../../../lib/date';
 import numeral from 'numeral';
 import PropTypes from 'prop-types';
 import qrcode from 'qrcode';

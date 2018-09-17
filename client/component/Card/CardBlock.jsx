@@ -1,6 +1,6 @@
 
 import Component from '../../core/Component';
-import { dateFormat } from '../../../lib/date';
+import { date24Format } from '../../../lib/date';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -54,7 +54,7 @@ export default class CardBlock extends Component {
         <div className="card__row">
           <span className="card__label">Timestamp:</span>
           <span className="card__result">
-            { dateFormat(this.props.block.createdAt) }
+            { date24Format(this.props.block.createdAt) }
           </span>
         </div>
       </div>

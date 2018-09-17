@@ -1,6 +1,6 @@
 
 import Component from '../../core/Component';
-import { dateFormat } from '../../../lib/date';
+import { date24Format } from '../../../lib/date';
 import { Link } from 'react-router-dom';
 import numeral from 'numeral';
 import PropTypes from 'prop-types';
@@ -58,7 +58,7 @@ export default class CardAddressTXs extends Component {
                 { numeral(amount).format('0,0.0000') } WGR
               </span>
             ),
-            createdAt: dateFormat(tx.createdAt),
+            createdAt: date24Format(tx.createdAt),
             txId: (
               <Link to={ `/tx/${ tx.txId }` }>{ tx.txId }</Link>
             )

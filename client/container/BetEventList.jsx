@@ -1,7 +1,6 @@
 import Actions from '../core/Actions'
 import Component from '../core/Component'
 import { connect } from 'react-redux'
-import { dateFormat } from '../../lib/date'
 import { Link } from 'react-router-dom'
 import moment from 'moment'
 import PropTypes from 'prop-types'
@@ -15,6 +14,7 @@ import Select from '../component/Select'
 import _ from 'lodash'
 
 import { PAGINATION_PAGE_SIZE } from '../constants'
+import { timeStamp24Format } from '../../lib/date'
 
 class BetEventList extends Component {
   static propTypes = {
@@ -111,7 +111,7 @@ class BetEventList extends Component {
             return {
               ...event,
               start: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
-                {moment.unix(event.timeStamp).format('MM/DD/YYYY HH:mm:ss')} </Link>
+                {timeStamp24Format(event.timeStamp)} </Link>
               ,
               event: (
                 <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>

@@ -2,7 +2,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Card from './Card'
-import { dateFormat } from '../../../lib/date'
 import { Link } from 'react-router-dom'
 import numeral from 'numeral'
 

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import Card from './Card'
-import { dateFormat } from '../../../lib/date'
+import { timeStamp24Format } from '../../../lib/date'
 import numeral from 'numeral'
 
 const CardBetEvent = ({eventInfo}) => {
@@ -14,7 +14,7 @@ const CardBetEvent = ({eventInfo}) => {
     return <Card title="Bet Event" className="card--status">
       <div className="card__row">
         <span className="card__label">Time:</span>
-        {dateFormat(eventInfo.events[0].start)}
+        {timeStamp24Format(eventInfo.events[0].timeStamp)}
       </div>
       <div className="card__row">
         <span className="card__label">League:</span>

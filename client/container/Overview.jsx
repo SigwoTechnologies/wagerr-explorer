@@ -2,7 +2,7 @@
 import Actions from '../core/Actions';
 import Component from '../core/Component';
 import { connect } from 'react-redux';
-import { dateFormat } from '../../lib/date';
+import { date24Format } from '../../lib/date';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import numeral from 'numeral';
@@ -46,7 +46,7 @@ class Overview extends Component {
         ...tx,
         age: diffSeconds < 60 ? `${ diffSeconds } seconds` : createdAt.fromNow(true),
         blockHeight: (<Link to={ `/block/${ tx.blockHeight }` }>{ tx.blockHeight }</Link>),
-        createdAt: dateFormat(tx.createdAt),
+        createdAt: date24Format(tx.createdAt),
         recipients: tx.vout.length,
         txId: (<Link to={ `/tx/${ tx.txId }` }>{ tx.txId }</Link>),
         vout: numeral(blockValue).format('0,0.0000')

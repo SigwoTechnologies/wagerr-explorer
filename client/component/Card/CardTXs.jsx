@@ -1,6 +1,6 @@
 
 import Component from '../../core/Component';
-import { dateFormat } from '../../../lib/date';
+import { date24Format } from '../../../lib/date';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
 import numeral from 'numeral';
@@ -47,7 +47,7 @@ export default class CardTXs extends Component {
                 { tx.blockHeight }
               </Link>
             ),
-            createdAt: dateFormat(tx.createdAt),
+            createdAt: date24Format(tx.createdAt),
             txId: (
               <Link to={ `/tx/${ tx.txId }` }>
                 { tx.txId }
