@@ -23,6 +23,7 @@ async function syncCoin() {
   const nethashps = await rpc.call('getnetworkhashps');
   const utxo = await UTXO.aggregate([
     {$match: {address: {$ne: 'ZERO_COIN_MINT'}}},
+    {$match: {address: {$not: /OP_RETURN/}}},
     {$group: {_id: 'supply', total: {$sum: '$value'}}}
   ])
 
