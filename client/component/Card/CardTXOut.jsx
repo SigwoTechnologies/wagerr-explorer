@@ -5,7 +5,7 @@ import moment from 'moment';
 import numeral from 'numeral';
 import PropTypes from 'prop-types';
 import React from 'react';
-
+import config from '../../../config'
 import Table from '../Table';
 
 export default class CardTXOut extends Component {
@@ -36,14 +36,25 @@ export default class CardTXOut extends Component {
           address:
             (tx.address.indexOf('OP_RETURN') !== -1) ?
               <span>{tx.address}</span>
-              :<Link to={`/address/${ tx.address }`}>{tx.address}</Link>
+              : <Link to={`/address/${ tx.address }`}>{tx.address}</Link>
           ,
           value: (
-            <span className="badge badge-success">
-              { numeral(tx.value).format('0,0.0000') } WGR
+            (tx.address === config.coin.oracle_payout_address) ?
+              <span>  <span className="badge badge-success">Oracle</span>
+              <span className="badge badge-success">
+              {numeral(tx.value).format('0,0.0000')} WGR
+            </span></span>
+              : (tx.address === config.coin.dev_payout_address) ?
+              <span>  <span className="badge badge-success">Dev</span>
+              <span className="badge badge-success">
+              {numeral(tx.value).format('0,0.0000')} WGR
+            </span></span>
+              :
+              <span className="badge badge-success">
+              {numeral(tx.value).format('0,0.0000')} WGR
             </span>
           )
-        })) } />
+        }))}/>
     );
   };
 }

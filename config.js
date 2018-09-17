@@ -37,6 +37,8 @@ const config = {
   },
   'coin':{
     'testnet':false,
+    'oracle_payout_address':'WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2',
+    'dev_payout_address':'Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe',
   }
 };
 
