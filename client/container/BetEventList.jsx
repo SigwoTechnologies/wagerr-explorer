@@ -129,6 +129,30 @@ class BetEventList extends Component {
                 }
               }
             }
+            let homeOdds = (event.events[event.events.length -1].homeOdds / 10000)
+            let drawOdds = (event.events[event.events.length -1].drawOdds / 10000)
+            let awayOdds = (event.events[event.events.length -1].awayOdds / 10000)
+            if (event.events.length > 1) {
+              const lastHomeOdds = (event.events[event.events.length - 2].homeOdds / 10000)
+              const lastDrawOdds = (event.events[event.events.length - 2].drawOdds / 10000)
+              const lastAwayOdds = (event.events[event.events.length - 2].awayOdds / 10000)
+              if (homeOdds > lastHomeOdds) {
+                homeOdds = homeOdds + ' ↑'
+              } else if (homeOdds < lastHomeOdds) {
+                homeOdds = homeOdds + ' ↓'
+              }
+              if (drawOdds > lastDrawOdds) {
+                drawOdds = drawOdds + ' ↑'
+              } else if (drawOdds < lastDrawOdds) {
+                drawOdds = drawOdds + ' ↓'
+              }
+              if (awayOdds > lastAwayOdds) {
+                awayOdds = awayOdds + ' ↑'
+              } else if (awayOdds < lastAwayOdds) {
+                awayOdds = awayOdds + ' ↓'
+              }
+            }
+
             return {
               ...event,
               start: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
@@ -145,9 +169,9 @@ class BetEventList extends Component {
                 {event.events[0].info}</Link>,
               homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].homeTeam}</Link>,
               awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].awayTeam}</Link>,
-              homeOdds: event.events[event.events.length -1].homeOdds / 10000,
-              drawOdds: event.events[event.events.length -1].drawOdds / 10000,
-              awayOdds: event.events[event.events.length -1].awayOdds / 10000,
+              homeOdds: homeOdds,
+              drawOdds: drawOdds,
+              awayOdds: awayOdds,
               betNum: betNum,
               betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.0000') }</span>,
               betStatus: betStatus,
