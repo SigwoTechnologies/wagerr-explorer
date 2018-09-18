@@ -134,9 +134,14 @@ async function update () {
   try {
     const info = await rpc.call('getinfo')
     const betEvent = await BetEvent.findOne().sort({blockHeight: -1})
+    const betAction = await BetAction.findOne().sort({blockHeight: -1})
+    const betResult = await BetResult.findOne().sort({blockHeight: -1})
 
     let clean = true // Always clear for now.
-    let dbHeight = betEvent && betEvent.blockHeight ? betEvent.blockHeight : 1
+    let dbEventHeight = betEvent && betEvent.blockHeight ? betEvent.blockHeight : 1
+    let dbActionHeight = betAction && betAction.blockHeight ? betAction.blockHeight : 1
+    let dbResultHeight = betResult && betResult.blockHeight ? betResult.blockHeight : 1
+    let dbHeight = [dbEventHeight, dbActionHeight, dbResultHeight].sort().reverse()[0]
     let rpcHeight = info.blocks
 
     // If heights provided then use them instead.
