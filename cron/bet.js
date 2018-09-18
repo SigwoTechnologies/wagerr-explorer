@@ -6,7 +6,6 @@ const locker = require('../lib/locker')
 const util = require('./util')
 // Models.
 const Block = require('../model/block')
-const BetPayout = require('../model/betpayout')
 const BetAction = require('../model/betaction')
 const BetEvent = require('../model/betevent')
 const BetResult = require('../model/betresult')
@@ -21,56 +20,8 @@ function hexToString (hexx) {
 
 async function addPoS (block, rpctx) {
   // We will ignore the empty PoS txs.
-
   // Setup the outputs for the transaction.
   if (rpctx.vout) {
-    if (rpctx.vout[0].scriptPubKey.type === 'nonstandard' && rpctx.vout.length > 3) {
-      const txin = []
-      const txout = []
-      if (rpctx.vin) {
-        const txIds = new Set()
-        rpctx.vin.forEach((vin) => {
-          txin.push({
-            coinbase: vin.coinbase,
-            sequence: vin.sequence,
-            txId: vin.txid,
-            vout: vin.vout
-          })
-          txIds.add(`${ vin.txid }:${ vin.vout }`)
-        })
-      }
-      rpctx.vout.forEach((vout) => {
-        var address
-        if (vout.scriptPubKey.type == 'nulldata') {
-          address = "OP_RETURN "+hexToString(vout.scriptPubKey.asm.substring(10))
-        }else if (vout.scriptPubKey.type == 'zerocoinmint') {
-          address = 'ZERO_COIN_MINT'
-        } else if (vout.scriptPubKey.type == 'nonstandard') {
-          address = 'NON_STANDARD'
-        } else {
-          address = vout.scriptPubKey.addresses[0]
-        }
-        let blockHeight = block.height
-        const to = {
-          blockHeight,
-          address: address,
-          n: vout.n,
-          value: vout.value
-        }
-        txout.push(to)
-      })
-      BetPayout.create({
-        _id: rpctx.txid,
-        blockHash: block.hash,
-        blockHeight: block.height,
-        createdAt: block.createdAt,
-        txId: rpctx.txid,
-        version: rpctx.version,
-        vin: txin,
-        vout: txout
-      })
-      return
-    }
     rpctx.vout.forEach((vout) => {
       if (vout.scriptPubKey.type === 'nulldata') {
         let opString = hexToString(vout.scriptPubKey.asm.substring(10))
@@ -138,7 +89,6 @@ async function syncBlocksForBet (start, stop, clean = false) {
   if (clean) {
     await BetAction.remove({ height: { $gte: start, $lte: stop } });
     await BetEvent.remove({ blockHeight: { $gte: start, $lte: stop } });
-    await BetPayout.remove({ blockHeight: { $gte: start, $lte: stop } });
     await BetResult.remove({ blockHeight: { $gte: start, $lte: stop } });
   }
   rpc.timeout(10000) // 10 secs
