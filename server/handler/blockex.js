@@ -704,6 +704,59 @@ const getBetEventInfo = async (req, res) => {
   }
 }
 
+const getBetEventsInfo = async (req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+  try {
+    const total = await BetEvent.aggregate([
+      {
+        $group: {
+          _id: '$eventId',
+        },
+      }, {
+        $count: 'count'
+      }])
+    console.log(total)
+    const result = await BetEvent.aggregate([
+      {
+        $group: {
+          _id: '$eventId',
+          events: {
+            $push: '$$ROOT'
+          },
+        },
+      },
+      {
+        $sort: {
+          events: -1
+        }
+      }, {
+        $skip: skip
+      }, {
+        $limit: limit
+      }, {
+        $lookup: {
+          from: 'betactions',
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'actions'
+        }
+      }, {
+        $lookup: {
+          from: 'betresults',
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'results'
+        }
+      }
+    ])
+    res.json({data:result, pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count/ limit)})
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
 module.exports =  {
   getAddress,
   getAvgBlockTime,
@@ -728,5 +781,6 @@ module.exports =  {
   getBetActions,
   getBetResults,
   getBetActioinsWeek,
-  getBetEventInfo
+  getBetEventInfo,
+  getBetEventsInfo
 };

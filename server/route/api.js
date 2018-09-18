@@ -29,6 +29,7 @@ router.get('/bet/events', blockex.getBetEvents);
 router.get('/bet/actions', blockex.getBetActions);
 router.get('/bet/results', blockex.getBetResults);
 router.get('/bet/event/:eventId/info', blockex.getBetEventInfo);
+router.get('/bet/events/info', blockex.getBetEventsInfo);
 router.get('/bet/action/week', blockex.getBetActioinsWeek());
 
 //faucet

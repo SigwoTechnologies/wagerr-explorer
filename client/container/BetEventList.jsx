@@ -15,10 +15,11 @@ import _ from 'lodash'
 
 import { PAGINATION_PAGE_SIZE } from '../constants'
 import { timeStamp24Format } from '../../lib/date'
+import numeral from 'numeral'
 
 class BetEventList extends Component {
   static propTypes = {
-    getAllBetEvents: PropTypes.func.isRequired
+    getBetEventsInfo: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -35,6 +36,9 @@ class BetEventList extends Component {
         {key: 'homeOdds', title: '1'},
         {key: 'drawOdds', title: 'x'},
         {key: 'awayOdds', title: '2'},
+        {key: 'betNum', title: 'Bet Num'},
+        {key: 'betAmount', title: 'Bet Amount'},
+        {key: 'betStatus', title: 'Bet Status'},
         {key: 'seeDetail', title: 'Detail'},
       ],
       error: null,
@@ -47,7 +51,7 @@ class BetEventList extends Component {
   };
 
   componentDidMount () {
-    this.getAllBetEvents()
+    this.getBetEventsInfo()
   };
 
   componentWillUnmount () {
@@ -57,7 +61,7 @@ class BetEventList extends Component {
     }
   };
 
-  getAllBetEvents = () => {
+  getBetEventsInfo = () => {
     this.setState({loading: true}, () => {
       if (this.debounce) {
         clearTimeout(this.debounce)
@@ -65,14 +69,13 @@ class BetEventList extends Component {
 
       this.debounce = setTimeout(() => {
         this.props
-          .getAllBetEvents({
+          .getBetEventsInfo({
             limit: this.state.size,
             skip: (this.state.page - 1) * this.state.size
           })
-          .then(({events, pages}) => {
-            console.log(events)
+          .then(({data, pages}) => {
             if (this.debounce) {
-              this.setState({events, pages, loading: false})
+              this.setState({events:data, pages, loading: false})
             }
           })
           .catch(error => this.setState({error, loading: false}))
@@ -80,9 +83,9 @@ class BetEventList extends Component {
     })
   }
 
-  handlePage = page => this.setState({page}, this.getAllBetEvents)
+  handlePage = page => this.setState({page}, this.getBetEventsInfo)
 
-  handleSize = size => this.setState({size, page: 1}, this.getAllBetEvents)
+  handleSize = size => this.setState({size, page: 1}, this.getBetEventsInfo)
 
   render () {
     if (!!this.state.error) {
@@ -107,29 +110,50 @@ class BetEventList extends Component {
         <Table
           className={'table-responsive table--for-betevents'}
           cols={this.state.cols}
-          data={_.uniqBy(sortBy(this.state.events.map((event) => {
+          data={this.state.events.map((event) => {
+            const betNum = event.actions.length
+            const betAmount = event.actions.reduce((acc, action) => {
+                  return acc+ action.betValue
+              },0.0
+            )
+            let betStatus = 'OPEN'
+            if (event.events[0].timeStamp*1000 + 20 * 60 * 1000< Date.now()) {
+              betStatus = 'WAITING FOR START'
+              if (event.events[0].timeStamp*1000< Date.now()) {
+                betStatus = 'STARTED'
+                if (event.results.length === 0) {
+                  betStatus = <span className={ `badge badge-warning` }>{'WAITING FOR ORACLE'}</span>
+                }
+                if (event.results.length > 0) {
+                  betStatus = <span className={ `badge badge-info` }>{event.results[0].result}</span>
+                }
+              }
+            }
             return {
               ...event,
-              start: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
-                {timeStamp24Format(event.timeStamp)} </Link>
+              start: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+                {timeStamp24Format(event.events[0].timeStamp)} </Link>
               ,
               event: (
-                <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
-                  {event.eventId}
+                <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+                  {event.events[0].eventId}
                 </Link>
               ),
-              name: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
-                {event.league}</Link>,
-              round: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>
-                {event.info}</Link>,
-              homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>{event.homeTeam}</Link>,
-              awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>{event.awayTeam}</Link>,
-              homeOdds: event.homeOdds / 10000,
-              drawOdds: event.drawOdds / 10000,
-              awayOdds: event.awayOdds / 10000,
-              seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.eventId) }`}>See Detail</Link>
+              name: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+                {event.events[0].league}</Link>,
+              round: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+                {event.events[0].info}</Link>,
+              homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].homeTeam}</Link>,
+              awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].awayTeam}</Link>,
+              homeOdds: event.events[0].homeOdds / 10000,
+              drawOdds: event.events[0].drawOdds / 10000,
+              awayOdds: event.events[0].awayOdds / 10000,
+              betNum: betNum,
+              betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.0000') }</span>,
+              betStatus: betStatus,
+              seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>See Detail</Link>
             }
-          }), ['timeStamp']).reverse(), 'eventId')}/>
+          })}/>
         <Pagination
           current={this.state.page}
           className="float-right"
@@ -142,7 +166,7 @@ class BetEventList extends Component {
 }
 
 const mapDispatch = dispatch => ({
-  getAllBetEvents: query => Actions.getAllBetEvents(query)
+  getBetEventsInfo: query => Actions.getBetEventsInfo(query)
 })
 
 export default connect(null, mapDispatch)(BetEventList)
