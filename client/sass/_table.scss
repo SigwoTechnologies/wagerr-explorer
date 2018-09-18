@@ -110,6 +110,18 @@
 	}
 
 	&--for-betevents {
+		tr:nth-child(even) {
+			color: $gray-dark;
+
+			td, a, a:visited {
+				color: $gray-dark;
+
+				&:hover {
+					color: $wgreen;
+				}
+			}
+		}
+
 		td {
 			min-width: 50px;
 		}
