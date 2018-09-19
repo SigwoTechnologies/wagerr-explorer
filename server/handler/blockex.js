@@ -716,7 +716,6 @@ const getBetEventsInfo = async (req, res) => {
       }, {
         $count: 'count'
       }])
-    console.log(total)
     const result = await BetEvent.aggregate([
       {
         $group: {
@@ -727,8 +726,15 @@ const getBetEventsInfo = async (req, res) => {
         },
       },
       {
+        $project: {
+          _id: '$_id',
+          events: '$events',
+          timeStamp: {$arrayElemAt: [ "$events.timeStamp", 0 ]}
+        }
+      },
+      {
         $sort: {
-          events: -1
+          timeStamp: -1
         }
       }, {
         $skip: skip
