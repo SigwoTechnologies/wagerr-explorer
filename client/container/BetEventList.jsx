@@ -110,7 +110,7 @@ class BetEventList extends Component {
         <Table
           className={'table-responsive table--for-betevents'}
           cols={this.state.cols}
-          data={this.state.events.map((event) => {
+          data={sortBy(this.state.events.map((event) => {
             const betNum = event.actions.length
             const betAmount = event.actions.reduce((acc, action) => {
                   return acc+ action.betValue
@@ -177,7 +177,7 @@ class BetEventList extends Component {
               betStatus: betStatus,
               seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>See Detail</Link>
             }
-          })}/>
+          }),['timeStamp'])}/>
         <Pagination
           current={this.state.page}
           className="float-right"
