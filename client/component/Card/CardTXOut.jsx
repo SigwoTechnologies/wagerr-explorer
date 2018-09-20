@@ -35,7 +35,7 @@ export default class CardTXOut extends Component {
           ...tx,
           address:
             (tx.address.indexOf('OP_RETURN') !== -1) ?
-              <span>{tx.address}</span>
+              <Link to={`/bet/event/${ encodeURIComponent(tx.address.split('|')[2]) }`}>{tx.address}</Link>
               : <Link to={`/address/${ tx.address }`}>{tx.address}</Link>
           ,
           value: (
