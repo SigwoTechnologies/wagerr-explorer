@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import PropTypes from 'prop-types';
 import qrcode from 'qrcode';
 import React from 'react';
+import config from '../../../config'
 
 export default class CardAddress extends Component {
   static defaultProps = {
@@ -52,7 +53,7 @@ export default class CardAddress extends Component {
           <div className="card--address">
             <div className="card__row">
               <span className="card__label card--address-wallet">
-                Wallet Address:
+                {this.props.address === config.coin.oracle_payout_address ? 'Oracle Wallet Address:' : 'Wallet Address:'}
               </span>
               <span className="card__result card--address-hash">
                 { this.props.address }
