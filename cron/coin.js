@@ -1,4 +1,4 @@
-
+const TX = require('../model/tx');
 require('babel-polyfill');
 const config = require('../config');
 const { exit, rpc } = require('../lib/cron');
@@ -27,6 +27,35 @@ async function syncCoin() {
     {$group: {_id: 'supply', total: {$sum: '$value'}}}
   ])
 
+  const lastSentFromOracle = (await TX.find({'vin.address': config.coin.oracle_payout_address})
+    .sort({blockHeight: -1})
+    .limit(1).exec())[0]
+
+  const oracleTxs = await TX
+    .aggregate([
+      {
+        $match: {
+          $and: [
+            {'blockHeight': {$gt: lastSentFromOracle.blockHeight}},
+            {'vout.address': config.coin.oracle_payout_address}
+          ]
+        }
+      },
+      {$sort: {blockHeight: -1}}
+    ])
+    .allowDiskUse(true)
+    .exec()
+
+  const payout = oracleTxs.reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
+      if (t.address === config.coin.oracle_payout_address) {
+        return a + t.value
+      } else {
+        return a
+      }
+    }, 0.0), 0.0)
+
+  const payoutPerSecond = payout / (moment().unix() - moment(lastSentFromOracle.createdAt).unix())
+
   let market = await fetch(url);
   if (Array.isArray(market)) {
     market = market.length ? market[0] : {};
@@ -44,7 +73,8 @@ async function syncCoin() {
     peers: info.connections,
     status: 'Online',
     supply: utxo[0].total + info.zWGRsupply.total,
-    usd: market.price_usd
+    usd: market.price_usd,
+    oracleProfitPerSecond: payoutPerSecond
   });
 
   await coin.save();

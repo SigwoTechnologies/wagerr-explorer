@@ -57,6 +57,14 @@
 		}
 	}
 
+	&__label-small {
+		padding-right: 10px;
+
+		@include media-breakpoint-up(md) {
+			min-width: 100px;
+		}
+	}
+
 	&__badge {
 
 		/*Bootstrap override*/

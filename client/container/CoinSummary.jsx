@@ -13,6 +13,7 @@ import CardNetworkSummary from '../component/Card/CardNetworkSummary';
 import CardPoS from '../component/Card/CardPoS';
 import CardStatus from '../component/Card/CardStatus';
 import WatchList from '../component/WatchList';
+import CardOracleProfit from '../component/Card/CardOracleProfit'
 
 class CoinSummary extends Component {
   static propTypes = {
@@ -52,11 +53,11 @@ class CoinSummary extends Component {
                   supply={ coin.supply } />
               </div>
               <div className="col-md-12 col-lg-6">
-                <CardNetworkSummary
-                  difficulty={ coin.diff }
-                  hashps={ coin.netHash }
-                  xAxis={ this.props.coins.map(c => c.createdAt) }
-                  yAxis={ this.props.coins.map(c => c.diff ? c.diff : 0.0) } />
+                <CardOracleProfit
+                  oracleProfitPerSecond={coin.oracleProfitPerSecond}
+                  online={ coin.mnsOn }
+                  btc={ coin.btc }
+                  usd={ coin.usd }/>
               </div>
             </div>
             <div className="row">
