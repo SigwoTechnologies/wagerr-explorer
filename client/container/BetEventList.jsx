@@ -173,7 +173,7 @@ class BetEventList extends Component {
               drawOdds: drawOdds,
               awayOdds: awayOdds,
               betNum: betNum,
-              betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.0000') }</span>,
+              betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.00') }</span>,
               betStatus: betStatus,
               seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>See Detail</Link>
             }

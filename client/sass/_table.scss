@@ -121,12 +121,19 @@
 				}
 			}
 		}
-
+		td:first-child {
+			text-align: left;
+		}
+		th:first-child {
+			text-align: left;
+		}
 		td {
 			min-width: 50px;
+			text-align: right;
 		}
 		th {
 			min-width: 50px;
+			text-align: right;
 		}
 	}
 }
