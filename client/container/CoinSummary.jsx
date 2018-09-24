@@ -14,6 +14,7 @@ import CardPoS from '../component/Card/CardPoS';
 import CardStatus from '../component/Card/CardStatus';
 import WatchList from '../component/WatchList';
 import CardOracleProfit from '../component/Card/CardOracleProfit'
+import CardBetStatus from '../component/Card/CardBetStatus'
 
 class CoinSummary extends Component {
   static propTypes = {
@@ -49,6 +50,7 @@ class CoinSummary extends Component {
                   avgMNTime={ coin.avgMNTime?coin.avgMNTime:0 }
                   blocks={ height }
                   peers={ coin.peers }
+                  online={ coin.mnsOn }
                   status={ coin.status }
                   supply={ coin.supply } />
               </div>
@@ -69,11 +71,7 @@ class CoinSummary extends Component {
                   yAxis={ this.props.coins.map(c => c.usd ? c.usd : 0.0) } />
               </div>
               <div className="col-md-12 col-lg-6">
-                <CardMasternodeSummary
-                  offline={ coin.mnsOff }
-                  online={ coin.mnsOn }
-                  xAxis={ this.props.coins.map(c => c.createdAt) }
-                  yAxis={ this.props.coins.map(c => c.mnsOn ? c.mnsOn : 0.0) } />
+                <CardBetStatus totalBet={coin.totalBet} totalBurn={coin.totalBurn}/>
               </div>
             </div>
           </div>

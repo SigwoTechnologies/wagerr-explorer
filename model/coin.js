@@ -20,6 +20,8 @@ const Coin = mongoose.model('Coin', new mongoose.Schema({
   status: { required: true, type: String },
   supply: { required: true, type: Number },
   usd: { required: true, type: Number },
+  totalBet: { type: Number },
+  totalBurn: { type: Number },
   oracleProfitPerSecond: { type: Number }
 }, { versionKey: false }), 'coins');
 

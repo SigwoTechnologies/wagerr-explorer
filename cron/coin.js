@@ -8,6 +8,8 @@ const moment = require('moment');
 // Models.
 const Coin = require('../model/coin');
 const UTXO = require('../model/utxo');
+const BetResult = require('../model/betresult');
+const BetAction = require('../model/betaction');
 
 /**
  * Get the coin related information including things
@@ -56,6 +58,50 @@ async function syncCoin() {
 
   const payoutPerSecond = payout / (moment().unix() - moment(lastSentFromOracle.createdAt).unix())
 
+  const result = await BetResult.aggregate([
+    {
+      $group: {
+        _id: '$eventId',
+        results: {
+          $push: '$$ROOT'
+        },
+      },
+    },
+    {
+      $project: {
+        _id: '$_id',
+        result: {$arrayElemAt: [ "$results.result", 0 ]}
+      }
+    },
+    {
+      $lookup: {
+        from: 'betactions',
+        let: { 'id': '$_id'},
+        pipeline: [
+          {$match:
+              { $and:
+                  [ {$expr: {$eq: ["$eventId", "$$id"]}},
+                  ]
+              }}
+        ],
+        as: 'actions'
+      }
+    }
+  ])
+  let totalBet = (await BetAction.aggregate([
+    {
+      $group:
+        {_id: null, total: {$sum: '$betValue'}},
+    }
+  ]))[0].total
+  let totalBurn =  0;
+  result.forEach(result =>{
+    result.actions.forEach(action =>{
+      if (action.betChoose !== result.result) {
+        totalBurn += action.betValue
+      }
+    })
+  })
   let market = await fetch(url);
   if (Array.isArray(market)) {
     market = market.length ? market[0] : {};
@@ -74,6 +120,8 @@ async function syncCoin() {
     status: 'Online',
     supply: utxo[0].total + info.zWGRsupply.total,
     usd: market.price_usd,
+    totalBet: totalBet,
+    totalBurn: totalBurn,
     oracleProfitPerSecond: payoutPerSecond
   });
 

@@ -12,6 +12,7 @@ export default class CardStatus extends Component {
   static defaultProps = {
     avgBlockTime: 90,
     avgMNTime: 24,
+    online: 0,
     blocks: 0,
     peers: 0,
     status: 'Offline',
@@ -24,6 +25,7 @@ export default class CardStatus extends Component {
     blocks: PropTypes.number.isRequired,
     peers: PropTypes.number.isRequired,
     status: PropTypes.string.isRequired,
+    online: PropTypes.number.isRequired,
     supply: PropTypes.number.isRequired
   };
 
@@ -76,6 +78,10 @@ export default class CardStatus extends Component {
           <span className="card__result">
             <Link to="/peer">{ this.props.peers }</Link>
           </span>
+        </div>
+        <div className="card__row">
+          <span className="card__label">Masternode Online:</span>
+          <span className="card__result">{ this.props.online }</span>
         </div>
         <div className="card__row">
           <span className="card__label">Avg. Block Time:</span>
