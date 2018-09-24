@@ -12,12 +12,12 @@ import numeral from 'numeral'
 export default class CardBetStatus extends Component {
   static defaultProps = {
     totalBet: 0,
-    totalBurn: 0.0
+    totalMint: 0.0
   };
 
   static propTypes = {
     totalBet: PropTypes.number.isRequired,
-    totalBurn: PropTypes.number.isRequired
+    totalMint: PropTypes.number.isRequired
   };
 
   render() {
@@ -30,8 +30,8 @@ export default class CardBetStatus extends Component {
           <span>{numeral(this.props.totalBet).format('0,0.0000')} WGR</span>
         </div>
         <div className="card__row">
-          <span className="card__label-small">TOTAL BURN:</span>
-          <span>{numeral(this.props.totalBurn).format('0,0.0000')} WGR</span>
+          <span className="card__label-small">TOTAL MINT:</span>
+          <span>{numeral(this.props.totalMint).format('0,0.0000')} WGR</span>
         </div>
       </Card>
       </div>

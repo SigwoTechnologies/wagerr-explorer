@@ -21,7 +21,7 @@ const Coin = mongoose.model('Coin', new mongoose.Schema({
   supply: { required: true, type: Number },
   usd: { required: true, type: Number },
   totalBet: { type: Number },
-  totalBurn: { type: Number },
+  totalMint: { type: Number },
   oracleProfitPerSecond: { type: Number }
 }, { versionKey: false }), 'coins');
 

@@ -71,7 +71,7 @@ class CoinSummary extends Component {
                   yAxis={ this.props.coins.map(c => c.usd ? c.usd : 0.0) } />
               </div>
               <div className="col-md-12 col-lg-6">
-                <CardBetStatus totalBet={coin.totalBet} totalBurn={coin.totalBurn}/>
+                <CardBetStatus totalBet={coin.totalBet} totalMint={coin.totalMint}/>
               </div>
             </div>
           </div>

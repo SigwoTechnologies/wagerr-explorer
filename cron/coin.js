@@ -70,7 +70,16 @@ async function syncCoin() {
     {
       $project: {
         _id: '$_id',
-        result: {$arrayElemAt: [ "$results.result", 0 ]}
+        result: {$arrayElemAt: [ "$results.result", 0 ]},
+        blockHeight: {$arrayElemAt: [ "$results.blockHeight", 0 ]}
+      }
+    },
+    {
+      $project: {
+        _id: '$_id',
+        result: '$result',
+        blockHeight: '$blockHeight',
+        payoutBlockHeight:  { $add: [ "$blockHeight",1 ] }
       }
     },
     {
@@ -86,21 +95,31 @@ async function syncCoin() {
         ],
         as: 'actions'
       }
+    },
+    {
+      $lookup: {
+        from: 'txs',
+        let: { 'payoutBlockHeight': '$payoutBlockHeight'},
+        pipeline: [
+          {$match:
+              { $and:
+                  [ {$expr: {$eq: ["$blockHeight", "$$payoutBlockHeight"]}},
+                  ]
+              }}
+        ],
+        as: 'payouttxs'
+      }
     }
   ])
-  let totalBet = (await BetAction.aggregate([
-    {
-      $group:
-        {_id: null, total: {$sum: '$betValue'}},
-    }
-  ]))[0].total
-  let totalBurn =  0;
-  result.forEach(result =>{
-    result.actions.forEach(action =>{
-      if (action.betChoose !== result.result) {
-        totalBurn += action.betValue
-      }
+  let totalBet = 0;
+  let totalMint = 0;
+  result.forEach(result => {
+    result.actions.forEach(action => {
+      totalBet += action.betValue
     })
+    for (let i = 2; i < result.payouttxs[0].vout.length; i++) {
+      totalMint += result.payouttxs[0].vout[i].value
+    }
   })
   let market = await fetch(url);
   if (Array.isArray(market)) {
@@ -121,7 +140,7 @@ async function syncCoin() {
     supply: utxo[0].total + info.zWGRsupply.total,
     usd: market.price_usd,
     totalBet: totalBet,
-    totalBurn: totalBurn,
+    totalMint: totalMint,
     oracleProfitPerSecond: payoutPerSecond
   });
 
