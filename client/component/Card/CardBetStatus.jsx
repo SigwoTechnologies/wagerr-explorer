@@ -33,6 +33,10 @@ export default class CardBetStatus extends Component {
           <span className="card__label-small">TOTAL MINT:</span>
           <span>{numeral(this.props.totalMint).format('0,0.0000')} WGR</span>
         </div>
+        <div className="card__row">
+          <span className="card__label-small">NET SUPPLY CHANGE:</span>
+          <span>{numeral(this.props.totalMint - this.props.totalBet).format('0,0.0000')} WGR</span>
+        </div>
       </Card>
       </div>
     );
