@@ -1,0 +1,53 @@
+{
+  "common": {
+  },
+  "overview": {
+    "latestBlocks":"最近的区块"
+  },
+  "betEventList": {
+    "title": "投注事件",
+    "start": "开始时间",
+    "eventId": "Id",
+    "name": "名字",
+    "round": "轮次",
+    "homeTeam": "主",
+    "awayTeam": "客",
+    "betNum": "投注数",
+    "betAmount": "投注量",
+    "betStatus": "投注状态",
+    "detail": "详情",
+    "open": "开放投注",
+    "waitForStart": "等待开始",
+    "started": "已开始",
+    "waitingForOracle": "等待预言机结果",
+    "seeDetail": "详情"
+  },
+  "betEvent": {
+    "time": "时间",
+    "bet": "投注",
+    "odds": "赔率",
+    "value": "投注额",
+    "txId": "交易ID",
+    "homeOdds": "主赔率",
+    "drawOdds": "平赔率",
+    "awayOdds": "客赔率",
+    "betEvent": "投注事件",
+    "league": "联赛",
+    "homeTeam": "主队",
+    "awayTeam": "客队",
+    "homeBetNum": "主队投注量",
+    "homeBetAmount": "主队投注额",
+    "drawBetNum": "平投注量",
+    "drawBetAmount": "平投注量",
+    "awayBetNum": "客队投注量",
+    "awayBetAmount": "客队投注额",
+    "cantFindEvent": "找不到事件",
+    "betResult": "投注结果",
+    "result": "结果",
+    "payoutBlock": "支付块",
+    "betAmount": "投注总额",
+    "payoutAmount": "支付总额",
+    "supplyChange": "供应量变化",
+    "waitingForOracle": "等待预言机结果"
+  }
+}

@@ -6,6 +6,8 @@ import React from 'react';
 import moment from 'moment';
 
 import Icon from './Icon';
+import { compose } from 'redux'
+import { translate } from 'react-i18next'
 
 /**
  * Will use material icons to render.
@@ -18,9 +20,15 @@ class Footer extends Component {
   };
 
   render() {
+    const { t, i18n } = this.props;
+
+    const handleLocaleChange = event => {
+        i18n.changeLanguage(event.target.value );
+    }
     const coin = this.props.coins && this.props.coins.length ? this.props.coins[0] : { status: 'offline', blocks: 0 };
     const blocks = this.props.txs && this.props.txs.length ? this.props.txs[0].blockHeight : coin.blocks;
     const statusColor = (coin.status && coin.status.toLowerCase() === 'online') ? 'green' : 'red';
+    const selected = i18n.language;
 
     return (
       <div className="footer">
@@ -34,6 +42,16 @@ class Footer extends Component {
         </div>
         <div className="footer__block">
           <div className="footer__data-wrapper">
+            <div className="footer__data-block">
+              <p className="footer__data-title">Locale</p>
+              <p>
+                <select className="footer__locale-select"  value={selected} onChange={event => handleLocaleChange(event)}>
+                  <option value={'en'} data-content='English'>English</option>
+                  <option value={'zh'} data-content='Chinese'>Chinese</option>
+                  <option value={'kr'} data-content='Korean'>Korean</option>
+                </select>
+              </p>
+            </div>
             <div className="footer__data-block">
               <p className="footer__data-title">Status</p>
               <p>
@@ -89,4 +107,7 @@ const mapState = state => ({
   txs: state.txs,
 });
 
-export default connect(mapState)(Footer);
+export default compose(
+  translate('footer'),
+  connect(mapState)
+)(Footer);

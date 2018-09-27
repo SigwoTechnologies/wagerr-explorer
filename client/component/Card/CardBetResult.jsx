@@ -4,8 +4,10 @@ import React from 'react'
 import Card from './Card'
 import { Link } from 'react-router-dom'
 import numeral from 'numeral'
+import { compose } from 'redux'
+import { translate } from 'react-i18next'
 
-const CardBetResult = ({eventInfo}) => {
+const CardBetResult = ({eventInfo, t}) => {
   if (eventInfo.results.length !== 0) {
     const results = eventInfo.results
     const homeBetAmount = eventInfo.homeBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
@@ -26,16 +28,16 @@ const CardBetResult = ({eventInfo}) => {
     const betAmount = homeBetAmount + awayBetAmount + drawBetAmount
     const payoutAmount = (winningBetAmount * winningOdds - (winningBetAmount * winningOdds - winningBetAmount) * 0.06)
     const supplyChange = payoutAmount - betAmount
-    return <Card title="Bet Result" className="card--status">
+    return <Card title={t('betResult')} className="card--status">
       {results.map((resultItem) => <div key={resultItem.txId}>
         <div className="card__row">
-          <span className="card__label">Result:</span>
+          <span className="card__label">{t('result')}:</span>
           <span className="card__result">
                {resultItem.result}
             </span>
         </div>
         <div className="card__row">
-          <span className="card__label">TxId:</span>
+          <span className="card__label">{t('txId')}:</span>
           <span className="card__result">
         <Link to={`/tx/${ resultItem.txId}`}>
       {resultItem.txId}
@@ -43,7 +45,7 @@ const CardBetResult = ({eventInfo}) => {
         </span>
         </div>
         <div className="card__row">
-          <span className="card__label">Payout Block:</span>
+          <span className="card__label">{t('payoutBlock')}:</span>
           <span className="card__result">
         <Link to={`/block/${resultItem.blockHeight + 1}`}>{resultItem.blockHeight + 1}</Link>
         </span>
@@ -52,21 +54,21 @@ const CardBetResult = ({eventInfo}) => {
 
 
       <div className="card__row">
-        <span className="card__label">Bet Amount:</span>
+        <span className="card__label">{t('betAmount')}:</span>
         <span className="card__result">
           <span className={`badge badge-danger`}>
             {numeral(betAmount).format('0,0.0000')}</span>
         </span>
       </div>
       <div className="card__row">
-        <span className="card__label">Payout Amount:</span>
+        <span className="card__label">{t('payoutAmount')}:</span>
         <span className="card__result">
           <span className={`badge badge-success`}>
             {numeral(payoutAmount).format('0,0.0000')}</span>
         </span>
       </div>
       <div className="card__row">
-        <span className="card__label">Supply Change:</span>
+        <span className="card__label">{t('supplyChange')}:</span>
         <span className="card__result">
         <span className={`badge badge-${ supplyChange < 0 ? 'danger' : 'success' }`}>
                 {numeral(supplyChange).format('0,0.0000')}
@@ -77,9 +79,9 @@ const CardBetResult = ({eventInfo}) => {
   } else {
     return <Card title="Bet Result" className="card--status">
       <div className="card__row">
-        <span className="card__label">Result:</span>
+        <span className="card__label">{t('result')}:</span>
         <span className="card__result">
-              Waiting For Oracle
+              {t('waitingForOracle')}
             </span>
       </div>
     </Card>
@@ -91,4 +93,6 @@ CardBetResult.propTypes = {
   eventInfo: PropTypes.object
 }
 
-export default CardBetResult
+export default compose(
+  translate('betEvent')
+)(CardBetResult);

@@ -16,6 +16,8 @@ import _ from 'lodash'
 import { PAGINATION_PAGE_SIZE } from '../constants'
 import { timeStamp24Format } from '../../lib/date'
 import numeral from 'numeral'
+import { compose } from 'redux'
+import { translate } from 'react-i18next'
 
 class BetEventList extends Component {
   static propTypes = {
@@ -24,23 +26,10 @@ class BetEventList extends Component {
 
   constructor (props) {
     super(props)
+    const { t } = props;
+
     this.debounce = null
     this.state = {
-      cols: [
-        {key: 'start', title: 'Start'},
-        {key: 'event', title: 'Id'},
-        {key: 'name', title: 'Name'},
-        {key: 'round', title: 'Round'},
-        {key: 'homeTeam', title: 'Home'},
-        {key: 'awayTeam', title: 'Away'},
-        {key: 'homeOdds', title: '1'},
-        {key: 'drawOdds', title: 'x'},
-        {key: 'awayOdds', title: '2'},
-        {key: 'betNum', title: 'Bet Num'},
-        {key: 'betAmount', title: 'Bet Amount'},
-        {key: 'betStatus', title: 'Bet Status'},
-        {key: 'seeDetail', title: 'Detail'},
-      ],
       error: null,
       loading: true,
       events: [],
@@ -88,6 +77,22 @@ class BetEventList extends Component {
   handleSize = size => this.setState({size, page: 1}, this.getBetEventsInfo)
 
   render () {
+    const { t } = this.props;
+    const cols = [
+      {key: 'start', title: t('start')},
+      {key: 'event', title: t('eventId')},
+      {key: 'name', title: t('name')},
+      {key: 'round', title: t('round')},
+      {key: 'homeTeam', title: t('homeTeam')},
+      {key: 'awayTeam', title: t('awayTeam')},
+      {key: 'homeOdds', title: '1'},
+      {key: 'drawOdds', title: 'x'},
+      {key: 'awayOdds', title: '2'},
+      {key: 'betNum', title: t('betNum')},
+      {key: 'betAmount', title: t('betAmount')},
+      {key: 'betStatus', title: t('betStatus')},
+      {key: 'seeDetail', title: t('detail')},
+    ]
     if (!!this.state.error) {
       return this.renderError(this.state.error)
     } else if (this.state.loading) {
@@ -106,23 +111,23 @@ class BetEventList extends Component {
       <div>
         <HorizontalRule
           select={select}
-          title="Bet Events"/>
+          title={t('title')}/>
         <Table
           className={'table-responsive table--for-betevents'}
-          cols={this.state.cols}
+          cols={cols}
           data={this.state.events.map((event) => {
             const betNum = event.actions.length
             const betAmount = event.actions.reduce((acc, action) => {
                   return acc+ action.betValue
               },0.0
             )
-            let betStatus = 'OPEN'
+            let betStatus = t('open')
             if (event.events[0].timeStamp*1000 + 20 * 60 * 1000< Date.now()) {
-              betStatus = 'WAITING FOR START'
+              betStatus = t('waitForStart')
               if (event.events[0].timeStamp*1000< Date.now()) {
-                betStatus = 'STARTED'
+                betStatus = t('started')
                 if (event.results.length === 0) {
-                  betStatus = <span className={ `badge badge-warning` }>{'WAITING FOR ORACLE'}</span>
+                  betStatus = <span className={ `badge badge-warning` }>{t('waitingForOracle')}</span>
                 }
                 if (event.results.length > 0) {
                   betStatus = <span className={ `badge badge-info` }>{event.results[0].result}</span>
@@ -175,7 +180,7 @@ class BetEventList extends Component {
               betNum: betNum,
               betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.00') }</span>,
               betStatus: betStatus,
-              seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>See Detail</Link>
+              seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{t('seeDetail')}</Link>
             }
           })}/>
         <Pagination
@@ -193,4 +198,7 @@ const mapDispatch = dispatch => ({
   getBetEventsInfo: query => Actions.getBetEventsInfo(query)
 })
 
-export default connect(null, mapDispatch)(BetEventList)
+export default compose(
+  connect(null, mapDispatch),
+  translate('betEventList'),
+)(BetEventList);

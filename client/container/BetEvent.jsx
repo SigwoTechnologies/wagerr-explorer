@@ -19,6 +19,8 @@ import config from '../../config'
 import Card from '../component/Card'
 import CardBetEvent from '../component/Card/CardBetEvent'
 import CardBetResult from '../component/Card/CardBetResult'
+import { compose } from 'redux'
+import { translate } from 'react-i18next'
 
 class BetEvent extends Component {
   static propTypes = {
@@ -29,26 +31,13 @@ class BetEvent extends Component {
 
   constructor (props) {
     super(props)
+
     this.state = {
       eventId: '',
       eventInfo: [],
       betActions: [],
       loading: true,
-      error: null,
-      cols: [
-        {key: 'createdAt', title: 'Time'},
-        {key: 'bet', title: 'Bet'},
-        {key: 'odds', title: 'Odds'},
-        {key: 'value', title: 'Value'},
-        {key: 'txId', title: 'TX ID'}
-      ],
-      oddsCols: [
-        {key: 'createdAt', title: 'Time'},
-        {key: 'homeOdds', title: 'Home Odds'},
-        {key: 'drawOdds', title: 'Draw Odds'},
-        {key: 'awayOdds', title: 'Away Odds'},
-        {key: 'txId', title: 'TX ID'}
-      ]
+      error: null
     }
   };
 
@@ -102,6 +91,22 @@ class BetEvent extends Component {
     } else if (this.state.loading) {
       return this.renderLoading()
     }
+    const { t } = this.props;
+
+    const cols = [
+      {key: 'createdAt', title: t('time')},
+      {key: 'bet', title: t('bet')},
+      {key: 'odds', title: t('odds')},
+      {key: 'value', title: t('value')},
+      {key: 'txId', title: t('txId')},
+    ]
+    const oddsCols = [
+      {key: 'createdAt', title: t('time')},
+      {key: 'homeOdds', title: t('homeOdds')},
+      {key: 'drawOdds', title: t('drawOdds')},
+      {key: 'awayOdds', title: t('awayOdds')},
+      {key: 'txId', title: t('txId')},
+    ]
 
     return (
       <div>
@@ -117,7 +122,7 @@ class BetEvent extends Component {
         <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
-              cols={this.state.oddsCols}
+              cols={oddsCols}
               data={sortBy(this.state.eventInfo.events.map((event) => {
                 return {
                   ...event,
@@ -136,7 +141,7 @@ class BetEvent extends Component {
         <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
-              cols={this.state.cols}
+              cols={cols}
               data={sortBy(this.state.betActions.map((action) => {
                 return {
                   ...action,
@@ -164,4 +169,7 @@ const mapDispatch = dispatch => ({
   getBetActions: query => Actions.getBetActions(query)
 })
 
-export default connect(null, mapDispatch)(BetEvent)
+export default compose(
+  translate('betEvent'),
+  connect(null, mapDispatch),
+)(BetEvent);

@@ -11,6 +11,8 @@ import React from 'react';
 
 import HorizontalRule from '../component/HorizontalRule';
 import Table from '../component/Table';
+import { compose } from 'redux'
+import { translate } from 'react-i18next';
 
 class Overview extends Component {
   static propTypes = {
@@ -33,6 +35,8 @@ class Overview extends Component {
   };
 
   render() {
+    const { t, i18n } = this.props;
+
     // Setup the list of transactions with age since created.
     const txs = this.props.txs.map(tx => {
       const createdAt = moment(tx.createdAt).utc();
@@ -55,7 +59,7 @@ class Overview extends Component {
 
     return (
       <div>
-        <HorizontalRule title="Latest Blocks" />
+        <HorizontalRule title={t('latestBlocks')} />
         <Table
           cols={ this.state.cols }
           data={ txs } />
@@ -72,4 +76,7 @@ const mapState = state => ({
   txs: state.txs
 });
 
-export default connect(mapState, mapDispatch)(Overview);
+export default compose(
+  translate('overview'),
+  connect(mapState, mapDispatch),
+)(Overview);

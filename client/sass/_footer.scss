@@ -41,6 +41,12 @@
 		text-transform: uppercase;
 	}
 
+	&__locale-select {
+		padding: 0;
+		margin: 0;
+		height: 20px;
+	}
+
 	&__legal {
 		font-size: .9em;
 		line-height: 2;
