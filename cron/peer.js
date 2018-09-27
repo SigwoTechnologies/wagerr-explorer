@@ -25,6 +25,10 @@ async function syncPeer() {
       return;
     }
 
+    if (!peer.subver) {
+      return
+    }
+
     const url = `${ config.freegeoip.api }${ parts[0] }`;
     let geoip = await fetch(url);
 
