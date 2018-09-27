@@ -1,4 +1,4 @@
-
+const _ = require('lodash')
 require('babel-polyfill');
 require('../lib/cron');
 const config = require('../config');
@@ -18,7 +18,7 @@ async function syncPeer() {
   const date = moment().utc().startOf('minute').toDate();
 
   const peers = await rpc.call('getpeerinfo');
-  const inserts = [];
+  let inserts = [];
   await forEach(peers, async (peer) => {
     const parts = peer.addr.split(':');
     if (parts[0].substr(0, 1) === '[') {
@@ -49,6 +49,7 @@ async function syncPeer() {
     inserts.push(p);
   });
 
+  inserts =  _.uniqBy(inserts, '_id');
   if (inserts.length) {
     await Peer.remove({});
     await Peer.insertMany(inserts);
