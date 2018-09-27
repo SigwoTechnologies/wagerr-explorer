@@ -4,6 +4,17 @@
   "overview": {
     "latestBlocks":"最近的区块"
   },
+  "menu":{
+    "overview": "总览",
+    "movement": "移动",
+    "top": "前100",
+    "masternode": "节点",
+    "betEvents": "投注事件",
+    "connections": "连接",
+    "statistics": "数据",
+    "coinInfo": "币信息",
+    "api": "接口"
+  },
   "betEventList": {
     "title": "投注事件",
     "start": "开始时间",

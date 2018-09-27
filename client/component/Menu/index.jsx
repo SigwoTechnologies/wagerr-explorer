@@ -6,7 +6,10 @@ import { withRouter } from 'react-router';
 
 import MenuDesktop from './MenuDesktop';
 import MenuMobile from './MenuMobile';
-import menuData from './menuData';
+import { compose } from 'redux'
+import { translate } from 'react-i18next'
+import connect from 'react-redux/es/connect/connect'
+import { genMenuData } from './menuData'
 
 
 class Menu extends Component {
@@ -15,14 +18,19 @@ class Menu extends Component {
   };
 
   render() {
+    const { t } = this.props;
+    const menuData = genMenuData(t)
     return (
       <div className="menu-wrapper">
-        <MenuMobile links={ menuData } onSearch={ this.props.onSearch } />
+        <MenuMobile links={menuData} onSearch={ this.props.onSearch } />
         <MenuDesktop links={ menuData } location={ this.props.location } />
       </div>
     )
   }
 }
 
-export default withRouter(Menu);
+export default compose(
+  translate('menu'),
+  withRouter
+)(Menu);
 

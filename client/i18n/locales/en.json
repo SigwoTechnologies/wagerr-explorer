@@ -4,6 +4,17 @@
   "overview": {
     "latestBlocks": "Latest Blocks"
   },
+  "menu":{
+    "overview": "Overview",
+    "movement": "Movement",
+    "top": "Top 100",
+    "masternode": "Masternode",
+    "betEvents": "Bet Events",
+    "connections": "Connections",
+    "statistics": "Statistics",
+    "coinInfo": "Coin Info",
+    "api": "API"
+  },
   "betEventList": {
     "title": "Bet Events",
     "start": "Start",
