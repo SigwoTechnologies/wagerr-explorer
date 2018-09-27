@@ -128,10 +128,12 @@
 			text-align: left;
 		}
 		td {
+			box-sizing: content-box;
 			min-width: 50px;
 			text-align: right;
 		}
 		th {
+			box-sizing: content-box;
 			min-width: 50px;
 			text-align: right;
 		}
