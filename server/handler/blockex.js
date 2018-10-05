@@ -1,3 +1,4 @@
+const { BigNumber } = require('bignumber.js')
 
 const chain = require('../../lib/blockchain');
 const { forEach } = require('p-iteration');
@@ -34,38 +35,41 @@ const getAddress = async (req, res) => {
       .exec()
 
     const sent = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
-      .reduce((acc, tx) => acc + tx.vin.reduce((a, t) => {
+      .reduce((acc, tx) => acc.plus(tx.vin.reduce((a, t) => {
       if (t.address === req.params.hash) {
-        return a + t.value
+        return a.plus(BigNumber(t.value))
       } else {
         return a
       }
-    }, 0.0), 0.0)
+    }, BigNumber(0.0))), BigNumber(0.0))
 
     const received = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
-      .reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
+      .reduce((acc, tx) => acc.plus(tx.vout.reduce((a, t) => {
       if (t.address === req.params.hash) {
-        return a + t.value
+        return a.plus(BigNumber(t.value))
       } else {
         return a
       }
-    }, 0.0), 0.0)
+    }, BigNumber(0.0))), BigNumber(0.0))
 
-    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD').reduce((acc, tx) => acc - tx.vin.reduce((a, t) => {
+    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD')
+      .reduce((acc, tx) => acc.minus(tx.vin.reduce((a, t) => {
         if (t.address === req.params.hash) {
-          return a + t.value
+          return a.plus(BigNumber(t.value))
         } else {
           return a
         }
-      }, 0.0) + tx.vout.reduce((a, t) => {
+      }, BigNumber(0.0))).plus(tx.vout.reduce((a, t) => {
       if (t.address === req.params.hash) {
-        return a + t.value
+        return a.plus(BigNumber(t.value))
       } else {
         return a
       }
-    }, 0.0), 0.0)
+    }, BigNumber(0.0))), BigNumber(0.0))
 
-    res.json({balance:(received + staked - sent), sent, staked, received, txs });
+    const balance = received.plus(staked).minus(sent)
+    res.json({balance:balance.toNumber(), sent:sent.toNumber(), staked:staked.toNumber(),
+      received:received.toNumber(), txs });
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);
