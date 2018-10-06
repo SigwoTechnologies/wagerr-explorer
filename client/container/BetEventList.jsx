@@ -64,6 +64,20 @@ class BetEventList extends Component {
           })
           .then(({data, pages}) => {
             if (this.debounce) {
+              data.map(item =>{
+                let totalBet = 0;
+                let totalMint = 0;
+                item.actions.forEach(action => {
+                  totalBet += action.betValue
+                })
+                if (item.payouttxs.length > 0) {
+                  for (let i = 2; i < item.payouttxs[0].vout.length; i++) {
+                    totalMint += item.payouttxs[0].vout[i].value
+                  }
+                }
+                item.totalBet = totalBet
+                item.totalMint = totalMint
+              })
               this.setState({events:data, pages, loading: false})
             }
           })
@@ -157,7 +171,6 @@ class BetEventList extends Component {
                 awayOdds = awayOdds + ' ↓'
               }
             }
-
             return {
               ...event,
               start: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
@@ -177,7 +190,9 @@ class BetEventList extends Component {
               homeOdds: homeOdds,
               drawOdds: drawOdds,
               awayOdds: awayOdds,
-              betNum: betNum,
+              betNum:         <span className={`badge badge-${ event.totalMint - event.totalBet < 0 ? 'danger' : 'success' }`}>
+                {numeral(event.totalMint - event.totalBet).format('0,0.00')}
+              </span>,
               betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.00') }</span>,
               betStatus: betStatus,
               seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{t('seeDetail')}</Link>

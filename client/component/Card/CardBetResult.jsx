@@ -10,24 +10,23 @@ import { translate } from 'react-i18next'
 const CardBetResult = ({eventInfo, t}) => {
   if (eventInfo.results.length !== 0) {
     const results = eventInfo.results
-    const homeBetAmount = eventInfo.homeBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    const awayBetAmount = eventInfo.awayBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    const drawBetAmount = eventInfo.drawBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    let winningBetAmount
-    let winningOdds
-    if (eventInfo.events[0].homeTeam === results[0].result) {
-      winningBetAmount = homeBetAmount
-      winningOdds = eventInfo.events[0].homeOdds / 10000
-    } else if (eventInfo.events[0].awayTeam === results[0].result) {
-      winningBetAmount = awayBetAmount
-      winningOdds = eventInfo.events[0].awayOdds / 10000
-    } else if ('DRW' === results[0].result) {
-      winningBetAmount = drawBetAmount
-      winningOdds = eventInfo.events[0].drawOdds / 10000
+    let totalBet = 0
+    let totalMint = 0
+    eventInfo.homeBets.forEach(action => {
+      totalBet += action.betValue
+    })
+    eventInfo.drawBets.forEach(action => {
+      totalBet += action.betValue
+    })
+    eventInfo.awayBets.forEach(action => {
+      totalBet += action.betValue
+    })
+    if (eventInfo.payouttxs.length > 0) {
+      for (let i = 2; i < eventInfo.payouttxs[0].vout.length; i++) {
+        totalMint += eventInfo.payouttxs[0].vout[i].value
+      }
     }
-    const betAmount = homeBetAmount + awayBetAmount + drawBetAmount
-    const payoutAmount = (winningBetAmount * winningOdds - (winningBetAmount * winningOdds - winningBetAmount) * 0.06)
-    const supplyChange = payoutAmount - betAmount
+    const supplyChange = totalBet -totalMint
     return <Card title={t('betResult')} className="card--status">
       {results.map((resultItem) => <div key={resultItem.txId}>
         <div className="card__row">
@@ -57,14 +56,14 @@ const CardBetResult = ({eventInfo, t}) => {
         <span className="card__label">{t('betAmount')}:</span>
         <span className="card__result">
           <span className={`badge badge-danger`}>
-            {numeral(betAmount).format('0,0.0000')}</span>
+            {numeral(totalBet).format('0,0.0000')}</span>
         </span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('payoutAmount')}:</span>
         <span className="card__result">
           <span className={`badge badge-success`}>
-            {numeral(payoutAmount).format('0,0.0000')}</span>
+            {numeral(totalMint).format('0,0.0000')}</span>
         </span>
       </div>
       <div className="card__row">
