@@ -102,7 +102,7 @@ class BetEventList extends Component {
       {key: 'homeOdds', title: '1'},
       {key: 'drawOdds', title: 'x'},
       {key: 'awayOdds', title: '2'},
-      {key: 'betNum', title: t('betNum')},
+      {key: 'supplyChange', title: t('supplyChange')},
       {key: 'betAmount', title: t('betAmount')},
       {key: 'betStatus', title: t('betStatus')},
       {key: 'seeDetail', title: t('detail')},
@@ -130,7 +130,6 @@ class BetEventList extends Component {
           className={'table-responsive table--for-betevents'}
           cols={cols}
           data={this.state.events.map((event) => {
-            const betNum = event.actions.length
             const betAmount = event.actions.reduce((acc, action) => {
                   return acc+ action.betValue
               },0.0
@@ -190,7 +189,7 @@ class BetEventList extends Component {
               homeOdds: homeOdds,
               drawOdds: drawOdds,
               awayOdds: awayOdds,
-              betNum:         <span className={`badge badge-${ event.totalMint - event.totalBet < 0 ? 'danger' : 'success' }`}>
+              supplyChange:         <span className={`badge badge-${ event.totalMint - event.totalBet < 0 ? 'danger' : 'success' }`}>
                 {numeral(event.totalMint - event.totalBet).format('0,0.00')}
               </span>,
               betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.00') }</span>,
