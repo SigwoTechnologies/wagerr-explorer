@@ -26,7 +26,7 @@ const CardBetResult = ({eventInfo, t}) => {
         totalMint += eventInfo.payouttxs[0].vout[i].value
       }
     }
-    const supplyChange = totalBet -totalMint
+    const supplyChange = totalMint - totalBet
     return <Card title={t('betResult')} className="card--status">
       {results.map((resultItem) => <div key={resultItem.txId}>
         <div className="card__row">
