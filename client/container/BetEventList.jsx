@@ -71,7 +71,11 @@ class BetEventList extends Component {
                   totalBet += action.betValue
                 })
                 if (item.payouttxs.length > 0) {
-                  for (let i = 2; i < item.payouttxs[0].vout.length; i++) {
+                  let startIndex = 2
+                  if (item.payouttxs[0].vout[1].address === item.payouttxs[0].vout[2].address) {
+                    startIndex = 3
+                  }
+                  for (let i = 2; i < item.payouttxs[0].vout.length - 1; i++) {
                     totalMint += item.payouttxs[0].vout[i].value
                   }
                 }

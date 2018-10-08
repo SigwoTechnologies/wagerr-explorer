@@ -22,7 +22,11 @@ const CardBetResult = ({eventInfo, t}) => {
       totalBet += action.betValue
     })
     if (eventInfo.payouttxs.length > 0) {
-      for (let i = 2; i < eventInfo.payouttxs[0].vout.length; i++) {
+      let startIndex = 2
+      if (eventInfo.payouttxs[0].vout[1].address === eventInfo.payouttxs[0].vout[2].address) {
+        startIndex = 3
+      }
+      for (let i = startIndex; i < eventInfo.payouttxs[0].vout.length - 1; i++) {
         totalMint += eventInfo.payouttxs[0].vout[i].value
       }
     }

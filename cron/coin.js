@@ -117,7 +117,11 @@ async function syncCoin() {
     result.actions.forEach(action => {
       totalBet += action.betValue
     })
-    for (let i = 2; i < result.payouttxs[0].vout.length; i++) {
+    let startIndex = 2
+    if (result.payouttxs[0].vout[1].address === result.payouttxs[0].vout[2].address) {
+      startIndex = 3
+    }
+    for (let i = startIndex; i < result.payouttxs[0].vout.length - 1; i++) {
       totalMint += result.payouttxs[0].vout[i].value
     }
   })
