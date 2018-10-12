@@ -32,31 +32,32 @@ async function syncCoin() {
   const lastSentFromOracle = (await TX.find({'vin.address': config.coin.oracle_payout_address})
     .sort({blockHeight: -1})
     .limit(1).exec())[0]
+  let payoutPerSecond = 0
+  if (lastSentFromOracle){
+    const oracleTxs = await TX
+      .aggregate([
+        {
+          $match: {
+            $and: [
+              {'blockHeight': {$gt: lastSentFromOracle.blockHeight}},
+              {'vout.address': config.coin.oracle_payout_address}
+            ]
+          }
+        },
+        {$sort: {blockHeight: -1}}
+      ])
+      .allowDiskUse(true)
+      .exec()
 
-  const oracleTxs = await TX
-    .aggregate([
-      {
-        $match: {
-          $and: [
-            {'blockHeight': {$gt: lastSentFromOracle.blockHeight}},
-            {'vout.address': config.coin.oracle_payout_address}
-          ]
-        }
-      },
-      {$sort: {blockHeight: -1}}
-    ])
-    .allowDiskUse(true)
-    .exec()
-
-  const payout = oracleTxs.reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
+    const payout = oracleTxs.reduce((acc, tx) => acc + tx.vout.reduce((a, t) => {
       if (t.address === config.coin.oracle_payout_address) {
         return a + t.value
       } else {
         return a
       }
     }, 0.0), 0.0)
-
-  const payoutPerSecond = payout / (moment().unix() - moment(lastSentFromOracle.createdAt).unix())
+    payoutPerSecond = payout / (moment().unix() - moment(lastSentFromOracle.createdAt).unix())
+  }
 
   const result = await BetResult.aggregate([
     {
