@@ -690,20 +690,17 @@ const getBetActioinsWeek = () => {
 const getBetEventInfo = async (req, res) => {
   const eventId = req.params.eventId
   let results
-  let payouttxs
   try {
     results = await BetResult.find({eventId: eventId}).sort({createdAt: 1})
-    payouttxs = await TX.find({blockHeight: results[0].blockHeight+1})
   }catch (e) {
     console.log("Bet Event Not Publish")
   }
-
   try {
     const events = await BetEvent.find({eventId: eventId}).sort({createdAt: 1})
     const homeBets = await BetAction.find({eventId: eventId, betChoose: events[0].homeTeam})
     const awayBets = await BetAction.find({eventId: eventId, betChoose: events[0].awayTeam})
     const drawBets = await BetAction.find({eventId: eventId, betChoose: 'DRW'})
-    res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results,payouttxs})
+    res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
   } catch (err) {
     console.log(err)
     res.status(500).send(err.message || err)
@@ -759,31 +756,6 @@ const getBetEventsInfo = async (req, res) => {
           localField: '_id',
           foreignField: 'eventId',
           as: 'results'
-        }
-      },
-      {
-        $project: {
-
-          _id: '$_id',
-          events: '$events',
-          timeStamp: '$timeStamp',
-          actions: '$actions',
-          results: '$results',
-          payoutBlockHeight: {$add: [{$arrayElemAt: ['$results.blockHeight', 0]}, 1]}
-        }
-      },
-      {
-        $lookup: {
-          from: 'txs',
-          let: { 'payoutBlockHeight': '$payoutBlockHeight'},
-          pipeline: [
-            {$match:
-                { $and:
-                    [ {$expr: {$eq: ["$blockHeight", "$$payoutBlockHeight"]}},
-                    ]
-                }}
-          ],
-          as: 'payouttxs'
         }
       }
     ])

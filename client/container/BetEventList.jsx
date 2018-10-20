@@ -70,14 +70,16 @@ class BetEventList extends Component {
                 item.actions.forEach(action => {
                   totalBet += action.betValue
                 })
-                if (item.payouttxs.length > 0) {
-                  let startIndex = 2
-                  if (item.payouttxs[0].vout[1].address === item.payouttxs[0].vout[2].address) {
-                    startIndex = 3
-                  }
-                  for (let i = 2; i < item.payouttxs[0].vout.length - 1; i++) {
-                    totalMint += item.payouttxs[0].vout[i].value
-                  }
+                if (item.results) {
+                  item.results.forEach(result =>{
+                    let startIndex = 2
+                    if (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address) {
+                      startIndex = 3
+                    }
+                    for (let i = 2; i < result.payoutTx.vout.length - 1; i++) {
+                      totalMint += result.payoutTx.vout[i].value
+                    }
+                  })
                 }
                 item.totalBet = totalBet
                 item.totalMint = totalMint
@@ -148,6 +150,9 @@ class BetEventList extends Component {
                 }
                 if (event.results.length > 0) {
                   betStatus = <span className={ `badge badge-info` }>{event.results[0].result}</span>
+                }
+                if (event.results.length > 1) {
+                  betStatus = <span className={ `badge badge-info` }>REFUND</span>
                 }
               }
             }

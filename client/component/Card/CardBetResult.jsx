@@ -21,14 +21,16 @@ const CardBetResult = ({eventInfo, t}) => {
     eventInfo.awayBets.forEach(action => {
       totalBet += action.betValue
     })
-    if (eventInfo.payouttxs.length > 0) {
-      let startIndex = 2
-      if (eventInfo.payouttxs[0].vout[1].address === eventInfo.payouttxs[0].vout[2].address) {
-        startIndex = 3
-      }
-      for (let i = startIndex; i < eventInfo.payouttxs[0].vout.length - 1; i++) {
-        totalMint += eventInfo.payouttxs[0].vout[i].value
-      }
+    if (eventInfo.results.length > 0) {
+      eventInfo.results.forEach(result =>{
+        let startIndex = 2
+        if (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address) {
+          startIndex = 3
+        }
+        for (let i = startIndex; i < result.payoutTx.vout.length - 1; i++) {
+          totalMint += result.payoutTx.vout[i].value
+        }
+      })
     }
     const supplyChange = totalMint - totalBet
     return <Card title={t('betResult')} className="card--status">

@@ -9,6 +9,7 @@ const Block = require('../model/block')
 const BetAction = require('../model/betaction')
 const BetEvent = require('../model/betevent')
 const BetResult = require('../model/betresult')
+const TX = require('../model/tx')
 
 function hexToString (hexx) {
   var hex = hexx.toString()//force conversion
@@ -22,7 +23,7 @@ async function addPoS (block, rpctx) {
   // We will ignore the empty PoS txs.
   // Setup the outputs for the transaction.
   if (rpctx.vout) {
-    rpctx.vout.forEach((vout) => {
+    rpctx.vout.forEach(async (vout) => {
       if (vout.scriptPubKey.type === 'nulldata') {
         let opString = hexToString(vout.scriptPubKey.asm.substring(10))
         let datas = opString.split('|')
@@ -55,6 +56,7 @@ async function addPoS (block, rpctx) {
             opString: opString,
           })
         } else if (datas[0] === '3') {
+          let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
           BetResult.create({
             _id: datas[2]+rpctx.txid,
             txId: rpctx.txid,
@@ -63,8 +65,10 @@ async function addPoS (block, rpctx) {
             eventId: datas[2],
             result: datas[3],
             opString: opString,
+            payoutTx: resultPayoutTxs[0]
           })
         } else if (datas[0] === '4'){
+          let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
           BetResult.create({
             _id: datas[2]+rpctx.txid,
             txId: rpctx.txid,
@@ -73,6 +77,7 @@ async function addPoS (block, rpctx) {
             eventId: datas[2],
             result: 'REFUND '+datas[3],
             opString: opString,
+            payoutTx: resultPayoutTxs[0]
           })
         }
       }
@@ -142,7 +147,8 @@ async function update () {
     let dbActionHeight = betAction && betAction.blockHeight ? betAction.blockHeight : 1
     let dbResultHeight = betResult && betResult.blockHeight ? betResult.blockHeight : 1
     let dbHeight = [dbEventHeight, dbActionHeight, dbResultHeight].sort().reverse()[0]
-    let rpcHeight = info.blocks
+    const block = await Block.findOne().sort({ height: -1});
+    let blockDbHeight = block && block.height ? block.height - 1: 1;
 
     // If heights provided then use them instead.
     if (!isNaN(process.argv[2])) {
@@ -151,11 +157,11 @@ async function update () {
     }
     if (!isNaN(process.argv[3])) {
       clean = true
-      rpcHeight = parseInt(process.argv[3], 10)
+      blockDbHeight = parseInt(process.argv[3], 10)
     }
-    console.log(dbHeight, rpcHeight, clean)
+    console.log(dbHeight, blockDbHeight, clean)
     // If nothing to do then exit.
-    if (dbHeight >= rpcHeight) {
+    if (dbHeight >= blockDbHeight) {
       return
     }
     // If starting from genesis skip.
@@ -164,7 +170,7 @@ async function update () {
     }
 
     locker.lock(type)
-    await syncBlocksForBet(dbHeight, rpcHeight, clean)
+    await syncBlocksForBet(dbHeight, blockDbHeight, clean)
   } catch (err) {
     console.log(err)
     code = 1
