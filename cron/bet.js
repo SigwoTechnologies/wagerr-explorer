@@ -55,7 +55,7 @@ async function addPoS (block, rpctx) {
             betValue: vout.value,
             opString: opString,
           })
-        } else if (datas[0] === '3') {
+        } else if (datas[0] === '3' && datas.length === 4) {
           let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
           BetResult.create({
             _id: datas[2]+rpctx.txid,
@@ -67,7 +67,7 @@ async function addPoS (block, rpctx) {
             opString: opString,
             payoutTx: resultPayoutTxs[0]
           })
-        } else if (datas[0] === '4'){
+        } else if (datas[0] === '4' && datas.length === 4){
           let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
           BetResult.create({
             _id: datas[2]+rpctx.txid,
