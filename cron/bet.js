@@ -92,7 +92,7 @@ async function addPoS (block, rpctx) {
  */
 async function syncBlocksForBet (start, stop, clean = false) {
   if (clean) {
-    await BetAction.remove({ height: { $gte: start, $lte: stop } });
+    await BetAction.remove({ blockHeight: { $gte: start, $lte: stop } });
     await BetEvent.remove({ blockHeight: { $gte: start, $lte: stop } });
     await BetResult.remove({ blockHeight: { $gte: start, $lte: stop } });
   }
