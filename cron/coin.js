@@ -17,8 +17,6 @@ const BetAction = require('../model/betaction');
  */
 async function syncCoin() {
   const date = moment().utc().startOf('minute').toDate();
-  // Setup the coinmarketcap.com api url.
-  const url = `${ config.coinMarketCap.api }${ config.coinMarketCap.ticker }`;
 
   const info = await rpc.call('getinfo');
   const masternodes = await rpc.call('getmasternodecount');
@@ -59,7 +57,7 @@ async function syncCoin() {
     payoutPerSecond = payout / (moment().unix() - moment(lastSentFromOracle.createdAt).unix())
   }
 
-  const result = await BetResult.aggregate([
+  const queryResults = await BetResult.aggregate([
     {
       $group: {
         _id: '$eventId',
@@ -69,73 +67,58 @@ async function syncCoin() {
       },
     },
     {
-      $project: {
-        _id: '$_id',
-        result: {$arrayElemAt: [ "$results.result", 0 ]},
-        blockHeight: {$arrayElemAt: [ "$results.blockHeight", 0 ]}
-      }
-    },
-    {
-      $project: {
-        _id: '$_id',
-        result: '$result',
-        blockHeight: '$blockHeight',
-        payoutBlockHeight:  { $add: [ "$blockHeight",1 ] }
-      }
-    },
-    {
       $lookup: {
         from: 'betactions',
-        let: { 'id': '$_id'},
-        pipeline: [
-          {$match:
-              { $and:
-                  [ {$expr: {$eq: ["$eventId", "$$id"]}},
-                  ]
-              }}
-        ],
+        localField: '_id',
+        foreignField: 'eventId',
         as: 'actions'
       }
-    },
-    {
+    }, {
       $lookup: {
-        from: 'txs',
-        let: { 'payoutBlockHeight': '$payoutBlockHeight'},
-        pipeline: [
-          {$match:
-              { $and:
-                  [ {$expr: {$eq: ["$blockHeight", "$$payoutBlockHeight"]}},
-                  ]
-              }}
-        ],
-        as: 'payouttxs'
+        from: 'betresults',
+        localField: '_id',
+        foreignField: 'eventId',
+        as: 'results'
       }
     }
   ])
+
   let totalBet = 0;
   let totalMint = 0;
-  result.forEach(result => {
-    result.actions.forEach(action => {
+  queryResults.forEach(queryResult => {
+    queryResult.actions.forEach(action => {
       totalBet += action.betValue
     })
     let startIndex = 2
-    if (result.payouttxs[0].vout[1].address === result.payouttxs[0].vout[2].address) {
+    if (queryResult.results[0].payoutTx.vout[1].address === queryResult.results[0].payoutTx.vout[2].address) {
       startIndex = 3
     }
-    for (let i = startIndex; i < result.payouttxs[0].vout.length - 1; i++) {
-      totalMint += result.payouttxs[0].vout[i].value
+    for (let i = startIndex; i < queryResult.results[0].payoutTx.vout.length - 1; i++) {
+      totalMint += queryResult.results[0].payoutTx.vout[i].value
     }
   })
-  let market = await fetch(url);
-  if (Array.isArray(market)) {
-    market = market.length ? market[0] : {};
+
+  // Setup the coinmarketcap.com api url.
+  const eurUrl = `https://api.coinmarketcap.com/v2/ticker/${ config.coinMarketCap.tickerId }/?convert=EUR`;
+  const btcUrl = `https://api.coinmarketcap.com/v2/ticker/${ config.coinMarketCap.tickerId }/?convert=BTC`;
+
+  let eurMarket = await fetch(eurUrl);
+  let btcMarket = await fetch(btcUrl);
+
+  if (eurMarket.data) {
+    eurMarket = eurMarket.data ? eurMarket.data : {};
+  }
+
+  if (btcMarket.data) {
+    btcMarket = btcMarket.data ? btcMarket.data : {};
   }
 
   const coin = new Coin({
-    cap: market.market_cap_usd,
+    cap: eurMarket.quotes.USD.market_cap,
+    capEur: eurMarket.quotes.EUR.market_cap,
     createdAt: date,
     blocks: info.blocks,
-    btc: market.price_btc,
+    btc: btcMarket.quotes.BTC.price,
     diff: info.difficulty,
     mnsOff: masternodes.total - masternodes.stable,
     mnsOn: masternodes.stable,
@@ -143,7 +126,8 @@ async function syncCoin() {
     peers: info.connections,
     status: 'Online',
     supply: utxo[0].total + info.zWGRsupply.total,
-    usd: market.price_usd,
+    usd: eurMarket.quotes.USD.price,
+    eur: eurMarket.quotes.EUR.price,
     totalBet: totalBet,
     totalMint: totalMint,
     oracleProfitPerSecond: payoutPerSecond

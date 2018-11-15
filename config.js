@@ -10,8 +10,7 @@ const config = {
     'timeout': '10s'
   },
   'coinMarketCap': {
-    'api': 'http://api.coinmarketcap.com/v1/ticker/',
-    'ticker': 'wagerr'
+    'tickerId': '1779'
   },
   'db': {
     'host': '127.0.0.1',

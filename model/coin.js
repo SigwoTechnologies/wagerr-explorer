@@ -11,6 +11,7 @@ const Coin = mongoose.model('Coin', new mongoose.Schema({
   blocks: { required: true, type: Number },
   btc: { required: true, type: Number },
   cap: { required: true, type: Number },
+  capEur: { required: true, type: Number },
   createdAt: { index: true, required: true, type: Date },
   diff: { required: true, type: Number },
   mnsOff: { required: true, type: Number },
@@ -20,6 +21,7 @@ const Coin = mongoose.model('Coin', new mongoose.Schema({
   status: { required: true, type: String },
   supply: { required: true, type: Number },
   usd: { required: true, type: Number },
+  eur: { required: true, type: Number },
   totalBet: { type: Number },
   totalMint: { type: Number },
   oracleProfitPerSecond: { type: Number }
