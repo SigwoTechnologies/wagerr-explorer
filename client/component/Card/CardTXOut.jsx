@@ -34,9 +34,9 @@ export default class CardTXOut extends Component {
         data={ this.props.txs.map(tx => ({
           ...tx,
           address:
-            (tx.address.indexOf('OP_RETURN') !== -1) ?
+            (tx.address.indexOf('OP_RETURN 1|') !== -1 || tx.address.indexOf('OP_RETURN 2|') !== -1 || tx.address.indexOf('OP_RETURN 3|') !== -1) ?
               <Link to={`/bet/event/${ encodeURIComponent(tx.address.split('|')[2]) }`}>{tx.address}</Link>
-              : <Link to={`/address/${ tx.address }`}>{tx.address}</Link>
+              :  (tx.address.indexOf('OP_RETURN') !== -1 ) ?  <span>{tx.address}</span> : <Link to={`/address/${ tx.address }`}>{tx.address}</Link>
           ,
           value: (
             (tx.address === config.coin.oracle_payout_address) ?
