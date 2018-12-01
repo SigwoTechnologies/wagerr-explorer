@@ -4,6 +4,7 @@ const { rpc } = require('../lib/cron');
 const TX = require('../model/tx');
 const UTXO = require('../model/utxo');
 const STXO = require('../model/stxo');
+const _ = require('lodash')
 
 function hexToString(hexx) {
   var hex = hexx.toString()//force conversion
@@ -93,7 +94,12 @@ async function vout(rpctx, blockHeight) {
     rpctx.vout.forEach((vout) => {
       var address;
       if (vout.scriptPubKey.type == 'nulldata') {
-        address = "OP_RETURN "+hexToString(vout.scriptPubKey.asm.substring(10))
+        if(_.startsWith(vout.scriptPubKey.asm, 'OP_RETURN 317c') || _.startsWith(vout.scriptPubKey.asm, 'OP_RETURN 327c')
+         || _.startsWith(vout.scriptPubKey.asm, 'OP_RETURN 337c')){
+          address = "OP_RETURN "+hexToString(vout.scriptPubKey.asm.substring(10))
+        }else{
+          address = "OP_RETURN "+vout.scriptPubKey.asm.substring(10)
+        }
       }else if (vout.scriptPubKey.type == 'zerocoinmint') {
         address = 'ZERO_COIN_MINT'
       } else if (vout.scriptPubKey.type == 'nonstandard') {
