@@ -1,3 +1,7 @@
+const _ =  require('lodash')
+
+const { getSubsidy } =  require('../../lib/blockchain')
+
 const { BigNumber } = require('bignumber.js')
 
 const chain = require('../../lib/blockchain');
@@ -18,6 +22,7 @@ const ListEvent = require('../../model/listevent');
 const BetEvent = require('../../model/betevent');
 const BetAction = require('../../model/betaction');
 const BetResult = require('../../model/betresult');
+const Proposal = require('../../model/proposal');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -766,6 +771,29 @@ const getBetEventsInfo = async (req, res) => {
   }
 }
 
+const getCurrentProposals = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    const total = await Proposal.find().sort({createdAt: -1}).count()
+    const pps = await Proposal.find().skip(skip).limit(limit).sort({createdAt: -1})
+    const block = await Block.findOne().sort({height: -1})
+    const coin = await Coin.findOne().sort({ createdAt: -1 })
+    let allocatedPps = _.filter(pps, function (o) { return o.alloted })
+    let totalAllocated = 0
+    if (allocatedPps.length > 0) {
+      totalAllocated = allocatedPps[0].totalBudgetAlloted
+    }
+    console.log(coin)
+    const nextSuperBlock = coin.nextSuperBlock
+    const totalBudget = ((getSubsidy(block.height) / 100) * 10) * 1440 * 30
+    res.json({pps,currentBlock: block.height, nextSuperBlock:nextSuperBlock,totalBudget:totalBudget,totalAllocated:totalAllocated, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
 module.exports =  {
   getAddress,
   getAvgBlockTime,
@@ -791,5 +819,6 @@ module.exports =  {
   getBetResults,
   getBetActioinsWeek,
   getBetEventInfo,
-  getBetEventsInfo
+  getBetEventsInfo,
+  getCurrentProposals
 };

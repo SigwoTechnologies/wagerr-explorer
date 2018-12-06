@@ -24,7 +24,8 @@ const Coin = mongoose.model('Coin', new mongoose.Schema({
   eur: { required: true, type: Number },
   totalBet: { type: Number },
   totalMint: { type: Number },
-  oracleProfitPerSecond: { type: Number }
+  oracleProfitPerSecond: { type: Number },
+  nextSuperBlock: {required: true, type: Number},
 }, { versionKey: false }), 'coins');
 
 module.exports =  Coin;

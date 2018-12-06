@@ -4,6 +4,7 @@ export const genMenuData = (t) => {
     {label: t('movement'), icon: '/img/movement.svg', href: '/movement'},
     {label: t('top'), icon: '/img/top100.svg', href: '/top'},
     {label: t('masternode'), icon: '/img/masternodes.svg', href: '/masternode'},
+    {label: t('governance'), icon: '/img/governance.svg', href: '/governance'},
     {label: t('betEvents'), icon: '/img/betevent.svg', href: '/betevents'},
     {label: t('connections'), icon: '/img/connections.svg', href: '/peer'},
     {label: t('statistics'), icon: ' /img/statistics.svg', href: '/statistics'},

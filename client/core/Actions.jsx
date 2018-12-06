@@ -210,6 +210,11 @@ export const getBetEventsInfo = (query) => {
     return getFromWorker('beteventsinfo', resolve, reject, query);
   });
 };
+export const getCurrentPPs = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('currentpps', resolve, reject, query);
+  });
+};
 export default {
   getAddress,
   getBlock,
@@ -231,6 +236,7 @@ export default {
   getBetResults,
   getBetEventInfo,
   getBetEventsInfo,
+  getCurrentPPs,
   setWatch,
   removeWatch
 };

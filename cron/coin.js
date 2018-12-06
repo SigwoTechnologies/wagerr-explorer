@@ -113,6 +113,8 @@ async function syncCoin() {
     btcMarket = btcMarket.data ? btcMarket.data : {};
   }
 
+  const nextSuperBlock = await rpc.call('getnextsuperblock')
+
   const coin = new Coin({
     cap: eurMarket.quotes.USD.market_cap,
     capEur: eurMarket.quotes.EUR.market_cap,
@@ -130,7 +132,8 @@ async function syncCoin() {
     eur: eurMarket.quotes.EUR.price,
     totalBet: totalBet,
     totalMint: totalMint,
-    oracleProfitPerSecond: payoutPerSecond
+    oracleProfitPerSecond: payoutPerSecond,
+    nextSuperBlock:nextSuperBlock
   });
 
   await coin.save();

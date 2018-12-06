@@ -26,6 +26,7 @@ import Top100 from './container/Top100';
 import TX from './container/TX';
 import BetEventList from './container/BetEventList';
 import BetEvent from './container/BetEvent';
+import Governance from './container/Governance';
 
 // Layout
 import CoinSummary from './container/CoinSummary';
@@ -174,6 +175,7 @@ class App extends Component {
                   <Route exact path="/block/:hash" component={ Block } />
                   <Route exact path="/coin" component={ CoinInfo } />
                   <Route exact path="/faq" component={ FAQ } />
+                  <Route exact path="/governance" component={ Governance } />
                   <Route exact path="/masternode" component={ Masternode } />
                   <Route exact path="/betevents" component={ BetEventList } />
                   <Route exact path="/movement" component={ Movement } />
