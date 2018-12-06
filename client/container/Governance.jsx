@@ -80,6 +80,7 @@ class Governance extends Component {
   }
   handlePage = page => this.setState({page}, this.getCurrentPPs)
   handleSize = size => this.setState({size, page: 1}, this.getCurrentPPs)
+  withHttp = url => !/^https?:\/\//i.test(url) ? `http://${url}` : url;
 
   render () {
     if (!!this.state.error) {
@@ -120,9 +121,7 @@ class Governance extends Component {
               status: ((pp.yeas - pp.nays) * 10 > pp.masternodeCount) ? <span
                 className="badge badge-success">Pass</span> : <span className="badge badge-danger">Fail</span>,
               votes: <span>{`Yes: ${pp.yeas}, No: ${pp.nays}`}</span>,
-              url: <Link to={`${pp.url}`}>
-                View
-              </Link>,
+              url: <a target="_blank" href={this.withHttp(pp.url)}>View</a>,
               totalPayment: <span>{`${pp.totalPayment} WGR`}</span>,
               payementPeriod: <span>{`${pp.monthlyPayment} WGR /month`}</span>
             }
