@@ -213,7 +213,7 @@ const getCoin = (req, res) => {
   Coin.findOne()
     .sort({ createdAt: -1 })
     .then((doc) => {
-      res.json(doc);
+      res.json({...doc._doc,wgr:'1.000000000'});
     })
     .catch((err) => {
       console.log(err);
