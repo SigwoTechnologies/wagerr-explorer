@@ -149,10 +149,18 @@ class BetEventList extends Component {
                   betStatus = <span className={ `badge badge-warning` }>{t('waitingForOracle')}</span>
                 }
                 if (event.results.length > 0) {
-                  betStatus = <span className={ `badge badge-info` }>{event.results[0].result}</span>
+                  for (const result of event.results) {
+                    if (result.result === event.events[0].homeTeam || result.result === event.events[0].awayTeam || result.result === 'DRW') {
+                      betStatus = <span className={`badge badge-info`}>{result.result}</span>
+                    }
+                  }
                 }
                 if (event.results.length > 1) {
-                  betStatus = <span className={ `badge badge-info` }>REFUND</span>
+                  for (const result of event.results) {
+                    if (result.result.indexOf('REFUND') !== -1) {
+                      betStatus = <span className={`badge badge-info`}>REFUND</span>
+                    }
+                  }
                 }
               }
             }
