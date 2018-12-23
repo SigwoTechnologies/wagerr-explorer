@@ -23,6 +23,7 @@ const BetEvent = require('../../model/betevent');
 const BetAction = require('../../model/betaction');
 const BetResult = require('../../model/betresult');
 const Proposal = require('../../model/proposal');
+const Statistic = require('../../model/statistic');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -794,6 +795,79 @@ const getCurrentProposals = async (req, res) => {
   }
 }
 
+const getStatisticPerWeek = () => {
+  // When does the cache expire.
+  // For now this is hard coded.
+  let cache = [];
+  let cutOff = moment().utc().add(1, 'hour').unix();
+  let loading = true;
+
+  // Aggregate the data and build the date list.
+  const getStatistic = async () => {
+    loading = true;
+
+    try {
+      const start = moment().utc().startOf('week').subtract(7, 'weeks').toDate();
+      const end = moment().utc().endOf('week').subtract(1, 'weeks').toDate();
+      const qry = [
+        // Select last 7 weeks of bets.
+        {$match: {createdAt: {$gt: start, $lt: end}}},
+        // Convert createdAt date field to date string.
+        {
+          $project: {
+            week: {
+              $dateToString:
+                {format: '%Y-%U', date: '$createdAt'}
+            },
+            date: {
+              $dateToString: {
+                format: '%Y-%m-%d',
+                date: '$createdAt'
+              }
+            },
+            totalBet: '$totalBet',
+            totalMint: '$totalMint'
+          }
+        },
+        // Group by date string and build total/sum.
+        {
+          $group: {
+            _id: '$week',
+            date: {$first: '$date'},
+            totalBet: {$first: '$totalBet'},
+            totalMint: {$first: '$totalMint'},
+
+          }
+        },
+        // Sort by _id/date field in ascending order (order -> newer)
+        {$sort: {_id: 1}}
+      ]
+
+      cache = await Statistic.aggregate(qry);
+      console.log(cache)
+      cutOff = moment().utc().add(90, 'seconds').unix();
+    } catch(err) {
+      console.log(err);
+    } finally {
+      loading = false;
+    }
+  };
+
+  // Load the initial cache.
+  getStatistic();
+
+  return async (req, res) => {
+    res.json(cache);
+
+    // If the cache has expired then go ahead
+    // and get a new one but return the current
+    // cache for this request.
+    if (!loading && cutOff <= moment().utc().unix()) {
+      await getStatistic();
+    }
+  };
+};
+
 module.exports =  {
   getAddress,
   getAvgBlockTime,
@@ -820,5 +894,6 @@ module.exports =  {
   getBetActioinsWeek,
   getBetEventInfo,
   getBetEventsInfo,
-  getCurrentProposals
+  getCurrentProposals,
+  getStatisticPerWeek
 };

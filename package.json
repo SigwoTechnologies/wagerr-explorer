@@ -15,6 +15,7 @@
     "cron:peer": "node ./cron/peer.js >> ./tmp/peer.log",
     "cron:bet": "node ./cron/bet.js >> ./tmp/bet.log",
     "cron:proposal": "node ./cron/proposal.js >> ./tmp/proposal.log",
+    "cron:statistic": "node ./cron/statistic.js >> ./tmp/statistic.log",
     "cron:listevent": "node ./cron/listevent.js >> ./tmp/listevent.log",
     "cron:rich": "node ./cron/rich.js >> ./tmp/rich.log",
     "start:api": "NODE_ENV=production node ./server/index.js",
