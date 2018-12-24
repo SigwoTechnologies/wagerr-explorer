@@ -89,13 +89,16 @@ async function syncCoin() {
     queryResult.actions.forEach(action => {
       totalBet += action.betValue
     })
-    let startIndex = 2
-    if (queryResult.results[0].payoutTx.vout[1].address === queryResult.results[0].payoutTx.vout[2].address) {
-      startIndex = 3
-    }
-    for (let i = startIndex; i < queryResult.results[0].payoutTx.vout.length - 1; i++) {
-      totalMint += queryResult.results[0].payoutTx.vout[i].value
-    }
+    queryResult.results.forEach(result => {
+      let startIndex = 2
+      if (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address) {
+        startIndex = 3
+      }
+      for (let i = startIndex; i < result.payoutTx.vout.length - 1; i++) {
+        totalMint += result.payoutTx.vout[i].value
+      }
+    })
+
   })
 
   // Setup the coinmarketcap.com api url.
