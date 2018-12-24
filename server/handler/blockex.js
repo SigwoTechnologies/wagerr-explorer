@@ -808,7 +808,7 @@ const getStatisticPerWeek = () => {
 
     try {
       const start = moment().utc().startOf('week').subtract(7, 'weeks').toDate();
-      const end = moment().utc().endOf('week').subtract(1, 'weeks').toDate();
+      const end = moment().utc().endOf('week').toDate();
       const qry = [
         // Select last 7 weeks of bets.
         {$match: {createdAt: {$gt: start, $lt: end}}},

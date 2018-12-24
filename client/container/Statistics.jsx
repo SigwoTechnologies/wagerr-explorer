@@ -145,6 +145,7 @@ class Statistics extends Component {
       betTotals.set(moment(bet.date, 'YYYY-MM-DD').format('MMM DD'), bet.totalBet);
     });
     const overallTotalBet = this.state.betPerWeek[this.state.betPerWeek.length - 1].totalBet
+    const overallTotalBetDate =  (<small>{ moment(this.state.betPerWeek[this.state.betPerWeek.length - 1].date, 'YYYY-MM-DD').format('MMM DD') }</small>);
 
     const betActions = new Map();
     this.state.betActions.forEach((action) => {
@@ -161,7 +162,7 @@ class Statistics extends Component {
           <div className="row">
             <div className="col-md-12 col-lg-12">
               <h3>Total Bets Last 7 Weeks</h3>
-              <h4>{ numeral(overallTotalBet).format('0,0') } { day }</h4>
+              <h4>{ numeral(overallTotalBet).format('0,0') } { overallTotalBetDate }</h4>
               <div>
                 <GraphLineFull
                   color="#1991eb"
