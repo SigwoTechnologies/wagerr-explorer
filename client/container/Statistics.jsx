@@ -18,7 +18,8 @@ class Statistics extends Component {
     // Dispatch
     getCoins: PropTypes.func.isRequired,
     getTXs: PropTypes.func.isRequired,
-    getBetActions: PropTypes.func.isRequired
+    getBetActions: PropTypes.func.isRequired,
+    getBetPerWeek: PropTypes.func.isRequired
   };
 
   constructor(props) {
@@ -28,7 +29,8 @@ class Statistics extends Component {
       coins: [],
       error: null,
       loading: true,
-      txs: []
+      txs: [],
+      betPerWeek: []
     };
   };
 
@@ -37,6 +39,7 @@ class Statistics extends Component {
         this.props.getCoins(),
         this.props.getTXs(),
         this.props.getBetActions(),
+        this.props.getBetPerWeek()
       ])
       .then((res) => {
         this.setState({
@@ -44,6 +47,7 @@ class Statistics extends Component {
           loading: false,
           txs: res[1],
           betActions: res[2],
+          betPerWeek: res[3]
         });
       });
   };
@@ -136,6 +140,12 @@ class Statistics extends Component {
       txs.set(moment(t._id, 'YYYY-MM-DD').format('MMM DD'), t.total);
     });
 
+    const betTotals = new Map();
+    this.state.betPerWeek.forEach((bet) => {
+      betTotals.set(moment(bet.date, 'YYYY-MM-DD').format('MMM DD'), bet.totalBet);
+    });
+    const overallTotalBet = this.state.betPerWeek[this.state.betPerWeek.length - 1].totalBet
+
     const betActions = new Map();
     this.state.betActions.forEach((action) => {
       betActions.set(moment(action._id, 'YYYY-MM-DD').format('MMM DD'), action.total);
@@ -149,6 +159,17 @@ class Statistics extends Component {
         { Array.from(hashes.keys()).slice(1, -1).length <= 6 && <Notification /> }
         <div>
           <div className="row">
+            <div className="col-md-12 col-lg-12">
+              <h3>Total Bets Last 7 Weeks</h3>
+              <h4>{ numeral(overallTotalBet).format('0,0') } { day }</h4>
+              <div>
+                <GraphLineFull
+                  color="#1991eb"
+                  data={ Array.from(betTotals.values()) }
+                  height="420px"
+                  labels={ Array.from(betTotals.keys()) } />
+              </div>
+            </div>
             <div className="col-md-12 col-lg-6">
               <h3>Network Hash Rate Last 7 Days</h3>
               <h4>{ numeral(netHash.hash).format('0,0.0000') } { netHash.label }/s { day }</h4>
@@ -232,7 +253,8 @@ class Statistics extends Component {
 const mapDispatch = dispatch => ({
   getCoins: () => Actions.getCoinsWeek(dispatch),
   getBetActions: () => Actions.getBetActionsWeek(dispatch),
-  getTXs: () => Actions.getTXsWeek(dispatch)
+  getTXs: () => Actions.getTXsWeek(dispatch),
+  getBetPerWeek: () => Actions.getBetPerWeek(dispatch)
 });
 
 const mapState = state => ({

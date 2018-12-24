@@ -215,6 +215,11 @@ export const getCurrentPPs = (query) => {
     return getFromWorker('currentpps', resolve, reject, query);
   });
 };
+export const getBetPerWeek = () => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('betperweek', resolve, reject);
+  });
+};
 export default {
   getAddress,
   getBlock,
@@ -237,6 +242,7 @@ export default {
   getBetEventInfo,
   getBetEventsInfo,
   getCurrentPPs,
+  getBetPerWeek,
   setWatch,
   removeWatch
 };
