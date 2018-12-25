@@ -9,7 +9,7 @@ import sortBy from 'lodash/sortBy'
 
 import HorizontalRule from '../component/HorizontalRule'
 import Pagination from '../component/Pagination'
-import Table from '../component/Table'
+import Table from '../component/SuperTable'
 import Select from '../component/Select'
 import _ from 'lodash'
 
