@@ -743,7 +743,8 @@ const getBetEventsInfo = async (req, res) => {
       },
       {
         $sort: {
-          timeStamp: -1
+          timeStamp: -1,
+          "_id": -1
         }
       }, {
         $skip: skip
