@@ -49,5 +49,6 @@ router.get('/getnetworkhashps', iquidus.getnetworkhashps);
 
 // Custom
 router.get('/custom/betstatus', custom.getBetStatus);
+router.get('/custom/supply', custom.getCustomSupply);
 
 module.exports =  router;
