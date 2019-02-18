@@ -703,8 +703,19 @@ const getBetEventInfo = async (req, res) => {
   }
   try {
     const events = await BetEvent.find({eventId: eventId}).sort({createdAt: 1})
-    const homeBets = await BetAction.find({eventId: eventId, betChoose: events[0].homeTeam})
-    const awayBets = await BetAction.find({eventId: eventId, betChoose: events[0].awayTeam})
+    const homeTeamNames = []
+    const awayTeamNames = []
+    events.forEach( event => {
+      if (homeTeamNames.indexOf(event.homeTeam) === -1) {
+        homeTeamNames.push(event.homeTeam)
+      }
+      if (awayTeamNames.indexOf(event.awayTeam) === -1) {
+        awayTeamNames.push(event.awayTeam)
+      }
+    })
+
+    const homeBets = await BetAction.find({eventId: eventId, betChoose: {$in:homeTeamNames}})
+    const awayBets = await BetAction.find({eventId: eventId, betChoose: {$in:awayTeamNames}})
     const drawBets = await BetAction.find({eventId: eventId, betChoose: 'DRW'})
     res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
   } catch (err) {
