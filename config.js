@@ -1,43 +1,42 @@
-
 /**
  * Global configuration object.
  */
 const config = {
-  'api': {
-    'host': 'https://explorer.wagerr.com',
-    'port': '8087',
-    'prefix': '/api',
-    'timeout': '10s'
+  api: {
+    host: process.env.SERVER_API_HOST,
+    port: process.env.SERVER_API_PORT || '8087',
+    prefix: '/api',
+    timeout: '10s'
   },
-  'coinMarketCap': {
-    'tickerId': '1779'
+  coinMarketCap: {
+    tickerId: '1779'
   },
-  'db': {
-    'host': '127.0.0.1',
-    'port': '27017',
-    'name': 'wagerrx',
-    'user': 'wagerr',
-    'pass': 'wagerr'
+  db: {
+    host: process.env.MONGODB_HOST,
+    port: process.env.MONGODB_PORT || '27017',
+    name:  process.env.MONGODB_DATABASE,
+    user:  process.env.MONGODB_USERNAME,
+    pass: process.env.MONGODB_PASSWORD
   },
-  'freegeoip': {
-    'api': 'https://extreme-ip-lookup.com/json/'
+  freegeoip: {
+    api: 'https://extreme-ip-lookup.com/json/'
   },
-  'faucet':{
-    'wait_time': 1440,
-    'percent': 0.02,
-    'limit': 500
+  faucet:{
+    wait_time: 1440,
+    percent: 0.02,
+    limit: 500
   },
-  'rpc': {
-    'host': '127.0.0.1',
-    'port': '55003',
-    'user': 'wagerr',
-    'pass': 'this',
-    'timeout': 8000, // 8 seconds
+  rpc: {
+    host: process.env.RPC_BIND || '127.0.0.1',
+    port: process.env.RPC_PORT || 8332,
+    user: process.env.RPC_USER,
+    pass: process.env.RPC_PASS,
+    timeout: 8000, // 8 seconds
   },
-  'coin':{
-    'testnet':false,
-    'oracle_payout_address':'WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2',
-    'dev_payout_address':'Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe',
+  coin:{
+    testnet: process.env.COIN_TESTNET || false,
+    oracle_payout_address: process.env.ORACLE_PAYOUT_ADDRESS,
+    dev_payout_address: process.env.DEV_PAYOUT_ADDRESS,
   }
 };
 

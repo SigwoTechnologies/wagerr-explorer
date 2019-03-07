@@ -11,7 +11,9 @@ const rpc = new RpcClient({
 var waitTime = config.faucet.wait_time // time in seconds until app refreshes ip limits
 var percent = config.faucet.percent
 // config redis
-var redisClient = redis.createClient()
+var redisClient = redis.createClient({
+  host: `${process.env.REDIS_HOST}`
+})
 redisClient.on('error', function (err) {
   console.log('Error: ' + err)
 })

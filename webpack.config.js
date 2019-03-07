@@ -48,6 +48,7 @@ module.exports = {
     compress: true,
     contentBase: path.resolve('public'),
     hot: true,
+    host: '0.0.0.0',
     port: 8081,
     publicPath: '/'
   },

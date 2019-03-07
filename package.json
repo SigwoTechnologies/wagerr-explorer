@@ -18,6 +18,7 @@
     "cron:statistic": "node ./cron/statistic.js >> ./tmp/statistic.log",
     "cron:listevent": "node ./cron/listevent.js >> ./tmp/listevent.log",
     "cron:rich": "node ./cron/rich.js >> ./tmp/rich.log",
+    "cron:rpc": "node ./cron/rpc-test.js >> ./tmp/rpc-test.log",
     "start:api": "NODE_ENV=production node ./server/index.js",
     "db:clean": "node ./cron/clear-db.js >> ./tmp/clear-db.log",
     "start:maint": "NODE_ENV=production node ./server/maintenance.js",

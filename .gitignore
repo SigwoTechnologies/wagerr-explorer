@@ -69,3 +69,5 @@ typings/
 /public/*.js
 /public/*.gz
 /public/*.html
+
+data
