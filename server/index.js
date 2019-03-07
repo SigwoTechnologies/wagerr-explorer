@@ -28,7 +28,6 @@ else {
   const db = require('../lib/db');
   const express = require('express');
   const mongoose = require('mongoose');
-  mongoose.set('useCreateIndex', true);
   // Application.
   const middleware = require('./lib/middleware');
   const router = require('./lib/router');
