@@ -45,7 +45,7 @@ else {
   router(app);
   // Start the server.
   app.listen(config.api.port, () => {
-    console.log(`BlocEx running on port ${ config.api.port }`);
+    console.log(`Wagerr Explorer running on port ${ config.api.port }`);
   });
 
   // Export for testing.
