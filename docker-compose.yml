@@ -6,12 +6,30 @@ networks:
 services:
   redis:
     image: redis
+    env_file: .env
     hostname: ${REDIS_HOST}
     networks:
       - dbnet
     ports:
         - "6376:6379"
     restart: always
+
+  rpcnode:
+    build: ./docker/node
+    env_file: .env
+    networks:
+      - dbnet
+    volumes:
+      - ./volumes/wagerr:/root/.wagerr
+      - ./docker/node/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+      - ./docker/node/start.sh:/usr/local/bin/start.sh
+      - ./docker/node/dev.sh:/usr/local/bin/dev.sh
+    ports:
+      - "55005:55005"
+      - "8332:8332"
+      - "55004:55004"
+    restart: always
+    command: start.sh
 
   mongo:
     image: mongo:latest
@@ -51,11 +69,13 @@ services:
       - redis:${REDIS_HOST}
     networks:
       - dbnet
+    volumes:
+      - ./docker/node/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+      - ./docker/node/start.sh:/usr/local/bin/start.sh
     ports:
       - "8087:8087"
       - "8081:8081"
-      - "55005:55005"
-      - "8332:8332"
+      - "9051:9051"
     restart: on-failure
     command: script/start.sh
     volumes:
