@@ -17,7 +17,7 @@ const Masternode = require('../model/masternode');
 async function syncMasternode() {
   const date = moment().utc().startOf('minute').toDate();
 
-  await Masternode.remove({});
+  await Masternode.deleteMany({});
 
   // Increase the timeout for masternode.
   rpc.timeout(10000); // 10 secs

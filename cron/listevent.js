@@ -16,7 +16,7 @@ const ListEvent = require('../model/listevent')
 async function syncListEvents () {
   const date = moment().utc().startOf('minute').toDate()
 
-  await ListEvent.remove({})
+  await ListEvent.deleteMany({})
 
   // Increase the timeout for listevents.
   rpc.timeout(10000) // 10 secs

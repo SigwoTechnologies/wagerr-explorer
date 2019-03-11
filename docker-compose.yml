@@ -20,7 +20,7 @@ services:
     networks:
       - dbnet
     volumes:
-      - ./volumes/wagerr:/root/.wagerr
+      - /root/wagerr:/root/.wagerr
       - ./docker/node/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
       - ./docker/node/start.sh:/usr/local/bin/start.sh
       - ./docker/node/dev.sh:/usr/local/bin/dev.sh
@@ -29,7 +29,7 @@ services:
       - "8332:8332"
       - "55004:55004"
     restart: always
-    command: start.sh
+    command: dev.sh
 
   mongo:
     image: mongo:latest

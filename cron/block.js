@@ -18,10 +18,10 @@ const STXO = require('../model/stxo');
  */
 async function syncBlocks(start, stop, clean = false) {
   if (clean) {
-    await Block.remove({ height: { $gte: start, $lte: stop } });
-    await TX.remove({ blockHeight: { $gte: start, $lte: stop } });
-    await UTXO.remove({ blockHeight: { $gte: start, $lte: stop } });
-    await STXO.remove({ blockHeight: { $gte: start, $lte: stop } });
+    await Block.deleteMany({ height: { $gte: start, $lte: stop } });
+    await TX.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
+    await UTXO.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
+    await STXO.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
   }
 
   for(let height = start; height <= stop; height++) {

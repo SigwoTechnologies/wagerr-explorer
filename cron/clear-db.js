@@ -21,19 +21,19 @@ const STXO = require('../model/stxo');
  * Clear database.
  */
 async function clearDatabase() {
-  await Block.remove({});
-  await Coin.remove({});
-  await Masternode.remove({});
-  await Peer.remove({});
-  await Rich.remove({});
-  await TX.remove({});
-  await UTXO.remove({});
-  await BetAction.remove({});
-  await BetEvent.remove({});
-  await BetPayout.remove({});
-  await BetResult.remove({});
-  await ListEvent.remove({});
-  await STXO.remove({});
+  await Block.deleteMany({});
+  await Coin.deleteMany({});
+  await Masternode.deleteMany({});
+  await Peer.deleteMany({});
+  await Rich.deleteMany({});
+  await TX.deleteMany({});
+  await UTXO.deleteMany({});
+  await BetAction.deleteMany({});
+  await BetEvent.deleteMany({});
+  await BetPayout.deleteMany({});
+  await BetResult.deleteMany({});
+  await ListEvent.deleteMany({});
+  await STXO.deleteMany({});
 }
 
 /**

@@ -18,7 +18,7 @@ const BetAction = require('../model/betaction')
  */
 async function syncBlocksForStatistic (start, stop, clean = false) {
   if (clean) {
-    await Statistic.remove({ blockHeight: { $gte: start, $lte: stop } });
+    await Statistic.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
   }
   rpc.timeout(10000) // 10 secs
 

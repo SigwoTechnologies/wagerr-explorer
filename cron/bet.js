@@ -92,9 +92,9 @@ async function addPoS (block, rpctx) {
  */
 async function syncBlocksForBet (start, stop, clean = false) {
   if (clean) {
-    await BetAction.remove({ blockHeight: { $gte: start, $lte: stop } });
-    await BetEvent.remove({ blockHeight: { $gte: start, $lte: stop } });
-    await BetResult.remove({ blockHeight: { $gte: start, $lte: stop } });
+    await BetAction.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
+    await BetEvent.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
+    await BetResult.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
   }
   rpc.timeout(10000) // 10 secs
 

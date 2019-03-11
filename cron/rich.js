@@ -11,7 +11,7 @@ const UTXO = require('../model/utxo');
  * unspent transactions.
  */
 async function syncRich() {
-  await Rich.remove({});
+  await Rich.deleteMany({});
 
   const addresses = await UTXO.aggregate([
     { $group: { _id: '$address', sum: { $sum: '$value' } } },

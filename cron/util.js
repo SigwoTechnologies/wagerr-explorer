@@ -75,7 +75,7 @@ async function vin(rpctx, blockHeight) {
     }
     // Remove spent transactions.
     if (txIds.size) {
-      await UTXO.remove({ _id: { $in: Array.from(txIds) } });
+      await UTXO.deleteMany({ _id: { $in: Array.from(txIds) } });
     }
   }
   return txin;

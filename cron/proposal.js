@@ -14,7 +14,7 @@ const TX = require('../model/tx')
 
 async function syncProposal () {
   const date = moment().utc().startOf('minute').toDate()
-  await Proposal.remove({})
+  await Proposal.deleteMany({})
   // Increase the timeout for Proposals.
   rpc.timeout(10000) // 10 secs
   const proposals = await rpc.call('getbudgetinfo')
