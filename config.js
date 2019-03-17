@@ -34,9 +34,9 @@ const config = {
     timeout: 8000, // 8 seconds
   },
   coin:{
-    testnet: process.env.COIN_TESTNET || false,
-    oracle_payout_address: process.env.ORACLE_PAYOUT_ADDRESS || 'WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2',
-    dev_payout_address: process.env.DEV_PAYOUT_ADDRESS || 'Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe',
+    testnet: process.env.COIN_TESTNET || true,
+    oracle_payout_address: process.env.ORACLE_PAYOUT_ADDRESS || 'TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP', // testnet address, replace with mainnet
+    dev_payout_address: process.env.DEV_PAYOUT_ADDRESS || 'TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY', // testnet address, replace with mainnet
   }
 };
 

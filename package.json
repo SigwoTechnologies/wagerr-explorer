@@ -27,7 +27,8 @@
     "test:file": "mocha --compilers js:babel-core/register --timeout 2000 ./test/server/file",
     "test:rpc": "mocha --compilers js:babel-core/register --timeout 2000 ./test/server/rpc",
     "test:server": "yarn run test:api && yarn run test:file && yarn run test:rpc",
-    "test:web": "mocha --compilers js:babel-core/register ./test/client"
+    "test:web": "mocha --compilers js:babel-core/register ./test/client",
+    "test:cron": "mocha --compilers js:babel-core/register ./test/cron"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",

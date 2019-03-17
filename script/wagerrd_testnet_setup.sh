@@ -23,11 +23,5 @@ txindex=1
 testnet=1
 enablezeromint=0
 staking=0
-addnode=35.189.104.248
-addnode=35.237.135.236
-addnode=35.237.49.54
-addnode=35.227.74.136
 EOL
 
-# Start node.
-wagerrd
