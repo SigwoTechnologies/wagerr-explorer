@@ -82,26 +82,35 @@ async function preOPCode(block, rpctx, vout) {
 
 async function saveOPTransaction(block, rpctx, vout, transaction) {
   if (transaction.txType === 'peerlessEvent') {
-    return BetEvent.create({
-      _id: transaction.eventId+rpctx.txid,
-      txId: rpctx.txid,
-      blockHeight: block.height,
-      createdAt: block.createdAt,
-      eventId: transaction.eventId,
-      timeStamp:  transaction.timestamp,
-      league:  transaction.tournament,
-      info:  `R${transaction.round}`,
-      homeTeam:  transaction.homeTeam,
-      awayTeam:  transaction.awayTeam,
-      homeOdds:  transaction.homeOdds,
-      awayOdds:  transaction.awayOdds,
-      drawOdds: transaction.drawOdds,
-      opString: opString,
-    })
+    let createResponse;
+    try {
+      createResponse = await BetEvent.create({
+        _id: transaction.eventId+rpctx.txid,
+        txId: rpctx.txid,
+        blockHeight: block.height,
+        createdAt: block.createdAt,
+        eventId: transaction.eventId,
+        timeStamp:  transaction.timestamp,
+        league:  transaction.tournament,
+        info:  `R${transaction.round}`,
+        homeTeam:  transaction.homeTeam,
+        awayTeam:  transaction.awayTeam,
+        homeOdds:  transaction.homeOdds,
+        awayOdds:  transaction.awayOdds,
+        drawOdds: transaction.drawOdds,
+        opString: transaction.opCode,
+        opCode: transaction.opCode,
+      });
+    } catch (e) {
+      console.log(e);
+      createResponse = e;
+    }
+
+    return createResponse
   }
 
   return Transaction.create({
-    _id: transaction.eventId+rpctx.txid,
+    _id: rpctx.txid,
     txId: rpctx.txid,
     blockHeight: block.height,
     createdAt: block.createdAt,

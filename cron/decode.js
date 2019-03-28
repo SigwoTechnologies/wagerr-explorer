@@ -1,6 +1,7 @@
 const methods = require('./methods')
 
 const Transaction = require('../model/transaction');
+const BetEvent = require('../model/betevent')
 
 const mockVoutValidation = async () => {
   const data = {
@@ -33,7 +34,7 @@ const getTransactionList = async () => {
   return { transactionList, count: res.length } ;
 };
 
-const exec = async () => {
+const getTransactionTypeCount = async () => {
 
   const lists = await getTransactionList();
   const transactionCount = {};
@@ -51,6 +52,14 @@ const exec = async () => {
   return transactionCount;
 };
 
+const exec = async () => {
+  const res = await BetEvent.find();
+
+  console.log(res);
+  console.log('End of list');
+  return res;
+};
 
 // mockVoutValidation();
-exec();
+// exec();
+getTransactionTypeCount()
