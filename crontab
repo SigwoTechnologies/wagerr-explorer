@@ -25,3 +25,4 @@
 */1 * * * * cd /explorer && /usr/local/bin/node ./cron/peer.js >> ./tmp/peer.log 2>&1
 */1 * * * * cd /explorer && /usr/local/bin/node ./cron/rich.js >> ./tmp/rich.log 2>&1
 */5 * * * * cd /explorer && /usr/local/bin/node ./cron/coin.js >> ./tmp/coin.log 2>&1
+*/1 * * * * cd /explorer && /usr/local/bin/node ./cron/bet.js >> ./tmp/coin.log 2>&1

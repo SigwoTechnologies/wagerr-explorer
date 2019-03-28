@@ -98,7 +98,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         homeOdds:  transaction.homeOdds,
         awayOdds:  transaction.awayOdds,
         drawOdds: transaction.drawOdds,
-        opString: transaction.opCode,
+        opString: JSON.stringify(transaction),
         opCode: transaction.opCode,
       });
     } catch (e) {

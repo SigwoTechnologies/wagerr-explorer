@@ -35,7 +35,7 @@ const config = {
   },
   coin:{
     testnet: process.env.COIN_TESTNET || true,
-    oracle_payout_address: process.env.ORACLE_PAYOUT_ADDRESS || 'TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP', // testnet address, replace with mainnet
+    oracle_payout_address: process.env.ORACLE_PAYOUT_ADDRESS || 'TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2', // testnet address, replace with mainnet
     dev_payout_address: process.env.DEV_PAYOUT_ADDRESS || 'TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY', // testnet address, replace with mainnet
   }
 };
