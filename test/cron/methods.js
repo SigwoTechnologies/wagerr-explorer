@@ -1,88 +1,71 @@
 import chai from 'chai';
+import opCode from '../../lib/op_code';
 import methods from '../../cron/methods';
 
+const { rpc } = require('../../lib/cron');
 const { expect } = chai;
 
-const buildTx = (prefix, version, txType, namespaceId, mappingId, str) => ({
-  prefix,
-  version,
-  txType,
-  namespaceId,
-  mappingId,
-  string: str,
-});
-
 describe('Methods', () => {
-  describe('dec2Hex', () => {
-    it('should convert a decimal value into a hex value', () => {
-      let response = methods.dec2Hex(1, 2);
-      expect(response).to.equal('01');
+  let vout;
 
-      response = methods.dec2Hex(1, 4);
-      expect(response).to.equal('0001');
+  beforeEach(() => {
+    vout = {
+      scriptPubKey: {
+        type: 'nulldata',
+        asm: 'OP_RETURN 420102000000015BD39C700001000100010000000100000002000057E400004C2C000088B8',
+      },
+    };
 
-      response = methods.dec2Hex(1, 8);
-      expect(response).to.equal('00000001');
+    rpc.call = (req, index) => {
+      const sportsResponse = [{ 'mapping-name': 'Soccer' }];
+      const teamnameResponse = [{ 'mapping-name': 'Russia' }];
+      const tournamentResponse = [{ 'mapping-name': 'World Cup 2018' }];
+
+      if (req === 'getmappingname' && index[0] === 'sports') {
+        return sportsResponse;
+      }
+
+      if (req === 'getmappingname' && index[0] === 'teamnames') {
+        return teamnameResponse;
+      }
+
+      if (req === 'getmappingname' && index[0] === 'tournaments') {
+        return tournamentResponse;
+      }
+
+      return(sportsResponse);
+    };
+  });
+
+  describe('getOPCode', () => {
+    it('should retrieve op code from proided out data', () => {
+      let response = methods.getOPCode(vout);
+      expect(response).to.equal('420102000000015BD39C700001000100010000000100000002000057E400004C2C000088B8');
+    
+      vout.scriptPubKey.asm = 'OP_RETURN 3|1.0|#000|RUS';
+      response = methods.getOPCode(vout);
+      expect(response).to.equal('3|1.0|#000|RUS');
     });
   });
 
-  describe('hexToString', () => {
-    it('should convert a hex into a string value', () => {
-      const response = methods.hexToString('536f63636572', 4);
+  describe('validateVoutData', () => {
+    it('should decode provided hex value', async () => {
+      const transaction = await methods.validateVoutData(vout);
 
-      expect(response).to.equal('Soccer');
-    });
-  });
-
-  describe('Codify', () => {
-    it('should convert a string into a hex value', () => {
-      let response = methods.Codify('B', 'prefix');
-      expect(response.hex).to.equal('42');
-
-      response = methods.Codify(1, 'version');
-      expect(response.hex).to.equal('01');
-      
-      response = methods.Codify(1, 'txType');
-      expect(response.hex).to.equal('01');
-      
-      response = methods.Codify(1, 'namespaceId');
-      expect(response.hex).to.equal('01');
-
-      response = methods.Codify(1, 'mappingId');
-      expect(response.hex).to.equal('0001');
-
-      response = methods.Codify('Soccer', 'string');
-      expect(response.hex).to.equal('536f63636572');
-
-      response = methods.Codify(1, 'mappingId', 'txTeamNames');
-      expect(response.hex).to.equal('00000001');
-
-      response = methods.Codify(1540594800, 'timeStamp');
-      expect(response.hex).to.equal('5BD39C70');
-    });
-  });
-
-  describe('buildOPCode', () => {
-    it('should convert a string into a hex value', () => {
-      let tx = buildTx('B', 1, 1, 1, 1, 'Soccer'); 
-      let response = methods.buildOPCode(tx);
-
-      expect(response.refactoredHex).to.equal('420101010001536f63636572');
-
-      tx = buildTx('B', 1, 1, 2, 1, 'World Cup 2018'); 
-      response = methods.buildOPCode(tx);
-
-      expect(response.refactoredHex).to.equal('420101020001576f726c64204375702032303138');
-
-      tx = buildTx('B', 1, 1, 3, 1, 'Round 1'); 
-      response = methods.buildOPCode(tx);
-
-      expect(response.refactoredHex).to.equal('420101030001526f756e642031');
-
-      tx = buildTx('B', 1, 1, 4, 1, 'Russia'); 
-      response = methods.buildOPCode(tx, 'txTeamNames');
-
-      expect(response.refactoredHex).to.equal('4201010400000001527573736961');
+      expect(transaction.prefix).to.equal('B');
+      expect(transaction.version).to.equal(1);
+      expect(transaction.type).to.equal(2);
+      expect(transaction.txType).to.equal('peerlessEvent');
+      expect(transaction.eventId).to.equal(1);
+      expect(transaction.timestamp).to.equal(1540594800);
+      expect(transaction.sport).to.equal('Soccer');
+      expect(transaction.tournament).to.equal('World Cup 2018');
+      expect(transaction.round).to.equal(1);
+      expect(transaction.homeTeam).to.equal('Russia');
+      expect(transaction.homeOdds).to.equal(22500);
+      expect(transaction.awayOdds).to.equal(19500);
+      expect(transaction.drawOdds).to.equal(35000);
+      expect(transaction.opCode).to.equal('420102000000015BD39C700001000100010000000100000002000057E400004C2C000088B8');
     });
   });
 });

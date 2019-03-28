@@ -19,6 +19,7 @@
     "cron:listevent": "node ./cron/listevent.js >> ./tmp/listevent.log",
     "cron:rich": "node ./cron/rich.js >> ./tmp/rich.log",
     "cron:rpc": "node ./cron/rpc-test.js >> ./tmp/rpc-test.log",
+    "cron:tx-query": "node ./cron/decode.js >> ./tmp/tx-query.log",
     "start:api": "NODE_ENV=production node ./server/index.js",
     "db:clean": "node ./cron/clear-db.js >> ./tmp/clear-db.log",
     "start:maint": "NODE_ENV=production node ./server/maintenance.js",
@@ -28,6 +29,7 @@
     "test:rpc": "mocha --compilers js:babel-core/register --timeout 2000 ./test/server/rpc",
     "test:server": "yarn run test:api && yarn run test:file && yarn run test:rpc",
     "test:web": "mocha --compilers js:babel-core/register ./test/client",
+    "test:lib": "mocha --compilers js:babel-core/register ./test/lib",
     "test:cron": "mocha --compilers js:babel-core/register ./test/cron"
   },
   "dependencies": {

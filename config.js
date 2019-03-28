@@ -3,7 +3,7 @@
  */
 const config = {
   api: {
-    host: process.env.SERVER_API_HOST || '0.0.0.0',
+    host: 'http://localhost:8087',
     port: process.env.SERVER_API_PORT || '8087',
     prefix: '/api',
     timeout: '10s'

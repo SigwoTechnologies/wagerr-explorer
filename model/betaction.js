@@ -16,6 +16,7 @@ const BetAction = mongoose.model('BetAction', new mongoose.Schema({
   betValue: { required: true, type: Number },
   betChoose: { required: true, type: String },
   opString: { required: true, type: String },
+  opCode: { required: false, type: String}
 }, { versionKey: false }), 'betactions');
 
 

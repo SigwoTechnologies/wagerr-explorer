@@ -4,11 +4,14 @@ const {exit, rpc} = require('../lib/cron')
 const {forEachSeries} = require('p-iteration')
 const locker = require('../lib/locker')
 const util = require('./util')
+const methods = require('./methods')
+
 // Models.
 const Block = require('../model/block')
 const BetAction = require('../model/betaction')
 const BetEvent = require('../model/betevent')
 const BetResult = require('../model/betresult')
+const Transaction = require('../model/transaction')
 const TX = require('../model/tx')
 
 function hexToString (hexx) {
@@ -19,66 +22,113 @@ function hexToString (hexx) {
   return str
 }
 
+async function preOPCode(block, rpctx, vout) {
+  let opString = hexToString(vout.scriptPubKey.asm.substring(10))
+  let datas = opString.split('|')
+  if (datas[0] === '1' && datas.length === 11) {
+    BetEvent.create({
+      _id: datas[2]+rpctx.txid,
+      txId: rpctx.txid,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      eventId: datas[2],
+      timeStamp:  datas[3],
+      league:  datas[4],
+      info:  datas[5],
+      homeTeam:  datas[6],
+      awayTeam:  datas[7],
+      homeOdds:  datas[8],
+      awayOdds:  datas[9],
+      drawOdds: datas[10],
+      opString: opString,
+    })
+  } else if (datas[0] === '2' && datas.length === 4) {
+    BetAction.create({
+      _id: datas[2]+datas[3]+rpctx.txid,
+      txId: rpctx.txid,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      eventId: datas[2],
+      betChoose: datas[3],
+      betValue: vout.value,
+      opString: opString,
+    })
+  } else if (datas[0] === '3' && datas.length === 4) {
+    let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
+    BetResult.create({
+      _id: datas[2]+rpctx.txid,
+      txId: rpctx.txid,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      eventId: datas[2],
+      result: datas[3],
+      opString: opString,
+      payoutTx: resultPayoutTxs[0]
+    })
+  } else if (datas[0] === '4' && datas.length === 4){
+    let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
+    BetResult.create({
+      _id: datas[2]+rpctx.txid,
+      txId: rpctx.txid,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      eventId: datas[2],
+      result: 'REFUND '+datas[3],
+      opString: opString,
+      payoutTx: resultPayoutTxs[0]
+    })
+  }
+}
+
+async function saveOPTransaction(block, rpctx, vout, transaction) {
+  if (transaction.txType === 'peerlessEvent') {
+    return BetEvent.create({
+      _id: transaction.eventId+rpctx.txid,
+      txId: rpctx.txid,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      eventId: transaction.eventId,
+      timeStamp:  transaction.timestamp,
+      league:  transaction.tournament,
+      info:  `R${transaction.round}`,
+      homeTeam:  transaction.homeTeam,
+      awayTeam:  transaction.awayTeam,
+      homeOdds:  transaction.homeOdds,
+      awayOdds:  transaction.awayOdds,
+      drawOdds: transaction.drawOdds,
+      opString: opString,
+    })
+  }
+
+  return Transaction.create({
+    _id: transaction.eventId+rpctx.txid,
+    txId: rpctx.txid,
+    blockHeight: block.height,
+    createdAt: block.createdAt,
+    opCode: transaction.opCode,
+    type: transaction.type,
+    txType: transaction.txType,
+    opObject: JSON.stringify(transaction),
+  });
+}
+
 async function addPoS (block, rpctx) {
   // We will ignore the empty PoS txs.
   // Setup the outputs for the transaction.
   if (rpctx.vout) {
     rpctx.vout.forEach(async (vout) => {
       if (vout.scriptPubKey.type === 'nulldata') {
-        let opString = hexToString(vout.scriptPubKey.asm.substring(10))
-        let datas = opString.split('|')
-        if (datas[0] === '1' && datas.length === 11) {
-          BetEvent.create({
-            _id: datas[2]+rpctx.txid,
-            txId: rpctx.txid,
-            blockHeight: block.height,
-            createdAt: block.createdAt,
-            eventId: datas[2],
-            timeStamp:  datas[3],
-            league:  datas[4],
-            info:  datas[5],
-            homeTeam:  datas[6],
-            awayTeam:  datas[7],
-            homeOdds:  datas[8],
-            awayOdds:  datas[9],
-            drawOdds: datas[10],
-            opString: opString,
-          })
-        } else if (datas[0] === '2' && datas.length === 4) {
-          BetAction.create({
-            _id: datas[2]+datas[3]+rpctx.txid,
-            txId: rpctx.txid,
-            blockHeight: block.height,
-            createdAt: block.createdAt,
-            eventId: datas[2],
-            betChoose: datas[3],
-            betValue: vout.value,
-            opString: opString,
-          })
-        } else if (datas[0] === '3' && datas.length === 4) {
-          let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
-          BetResult.create({
-            _id: datas[2]+rpctx.txid,
-            txId: rpctx.txid,
-            blockHeight: block.height,
-            createdAt: block.createdAt,
-            eventId: datas[2],
-            result: datas[3],
-            opString: opString,
-            payoutTx: resultPayoutTxs[0]
-          })
-        } else if (datas[0] === '4' && datas.length === 4){
-          let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
-          BetResult.create({
-            _id: datas[2]+rpctx.txid,
-            txId: rpctx.txid,
-            blockHeight: block.height,
-            createdAt: block.createdAt,
-            eventId: datas[2],
-            result: 'REFUND '+datas[3],
-            opString: opString,
-            payoutTx: resultPayoutTxs[0]
-          })
+        let transaction;
+        try {
+          transaction = await methods.validateVoutData(vout);
+        } catch (e) {
+          transaction = { error: true, fullError: e };
+        }
+        
+        if (transaction.error || !transaction.prefix) {
+          await preOPCode(block, rpctx, vout);
+        } else {
+          await saveOPTransaction(block, rpctx, vout, transaction);
         }
       }
     })
