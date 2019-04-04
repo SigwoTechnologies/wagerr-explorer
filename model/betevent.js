@@ -21,7 +21,8 @@ const BetEvent = mongoose.model('BetEvent', new mongoose.Schema({
   drawOdds: { required: true, type: String },
   awayOdds: { required: true, type: String },
   opString: { required: true, type: String },
-  opCode: { required: false, type: String}
+  opCode: { required: false, type: String},
+  transaction: { required: false, type: Map }
 }, { versionKey: false }), 'betevents');
 
 

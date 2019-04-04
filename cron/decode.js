@@ -7,7 +7,7 @@ const mockVoutValidation = async () => {
   const data = {
     scriptPubKey: {
       type: 'nulldata',
-      asm: 'OP_RETURN 4201020000035a5ca395100003000e0000000001440000013a00003cb5000135760000aa20',
+      asm: 'OP_RETURN 42010400000381010303',
     },
   };
   
@@ -60,6 +60,6 @@ const exec = async () => {
   return res;
 };
 
-// mockVoutValidation();
+mockVoutValidation();
 // exec();
 getTransactionTypeCount()

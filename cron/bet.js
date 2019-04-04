@@ -3,6 +3,7 @@ const blockchain = require('../lib/blockchain')
 const {exit, rpc} = require('../lib/cron')
 const {forEachSeries} = require('p-iteration')
 const locker = require('../lib/locker')
+const opCode = require('../lib/op_code')
 const util = require('./util')
 const methods = require('./methods')
 
@@ -81,8 +82,9 @@ async function preOPCode(block, rpctx, vout) {
 }
 
 async function saveOPTransaction(block, rpctx, vout, transaction) {
-  if (transaction.txType === 'peerlessEvent') {
-    let createResponse;
+  let createResponse;
+
+  if (['peerlessEvent'].includes(transaction.txType)) {
     try {
       createResponse = await BetEvent.create({
         _id: transaction.eventId+rpctx.txid,
@@ -100,7 +102,55 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         drawOdds: transaction.drawOdds,
         opString: JSON.stringify(transaction),
         opCode: transaction.opCode,
+        transaction,
       });
+    } catch (e) {
+      console.log(e);
+      createResponse = e;
+    }
+
+    return createResponse
+  }
+
+  if (['peerlessBet'].includes(transaction.txType)) {
+    try {
+      createResponse = await BetAction.create({
+        _id: transaction.eventId+transaction.outcome+rpctx.txid,
+        txId: rpctx.txid,
+        blockHeight: block.height,
+        createdAt: block.createdAt,
+        eventId: transaction.eventId,
+        betChoose: opCode.outcomeMapping[transaction.outcome],
+        betValue: vout.value,
+        opString: JSON.stringify(transaction),
+        opCode: transaction.opCode,
+        transaction,
+      });
+    } catch (e) {
+      console.log(e);
+      createResponse = e;
+    }
+
+    return createResponse
+  }
+
+  if (
+    ['peerlessResult'].includes(transaction.txType)
+  ) {
+    try {
+      let resultPayoutTxs = await TX.find({blockHeight: block.height+1});
+
+      createResponse = await BetResult.create({
+        _id: transaction.eventId+rpctx.txid,
+        txId: rpctx.txid,
+        blockHeight: block.height,
+        createdAt: block.createdAt,
+        eventId: transaction.eventId,
+        result: opCode.resultMapping[transaction.tResult],
+        opString: JSON.stringify(transaction),
+        payoutTx: resultPayoutTxs[0],
+        transaction,
+      })
     } catch (e) {
       console.log(e);
       createResponse = e;
@@ -117,7 +167,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     opCode: transaction.opCode,
     type: transaction.type,
     txType: transaction.txType,
-    opObject: JSON.stringify(transaction),
+    opObject: transaction,
   });
 }
 
