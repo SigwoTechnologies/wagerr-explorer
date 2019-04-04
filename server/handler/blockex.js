@@ -714,9 +714,18 @@ const getBetEventInfo = async (req, res) => {
       }
     })
 
+    // We add how home teams are represented in bets with new opCodes
+    homeTeamNames.push('Money Line - Home Win');
+    homeTeamNames.push('Spreads - Home');
+    // We add how home teams are represented in bets with new opCodes
+    awayTeamNames.push('Money Line - Away Win');
+    awayTeamNames.push('Spreads - Away');
+    // We create the array that contains draw values
+    const drawResults = ['DRW', 'Money Line - Draw'];
+
     const homeBets = await BetAction.find({eventId: eventId, betChoose: {$in:homeTeamNames}})
     const awayBets = await BetAction.find({eventId: eventId, betChoose: {$in:awayTeamNames}})
-    const drawBets = await BetAction.find({eventId: eventId, betChoose: 'DRW'})
+    const drawBets = await BetAction.find({eventId: eventId, betChoose: {$in: drawResults}})
     res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
   } catch (err) {
     console.log(err)
