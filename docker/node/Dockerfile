@@ -4,6 +4,7 @@ COPY install.sh /root/install.sh
 COPY dev.sh /root/dev.sh
 
 RUN apt-get update -y
+RUN apt-get upgrade -y
 RUN apt-get install -y bash curl
 RUN bash /root/install.sh
 
