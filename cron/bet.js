@@ -12,6 +12,7 @@ const Block = require('../model/block')
 const BetAction = require('../model/betaction')
 const BetEvent = require('../model/betevent')
 const BetResult = require('../model/betresult')
+const Betupdate = require('../model/betupdate')
 const Transaction = require('../model/transaction')
 const TX = require('../model/tx')
 
@@ -81,13 +82,33 @@ async function preOPCode(block, rpctx, vout) {
   }
 }
 
+async function recordExists(rType, _id) {
+  let response;
+  try {
+    response = await rType.findOne({ _id });
+  } catch (e) {
+    console.log(e);
+  }
+
+  return response;
+}
+
 async function saveOPTransaction(block, rpctx, vout, transaction) {
   let createResponse;
+  const timeNow = Date.now();
 
   if (['peerlessEvent'].includes(transaction.txType)) {
+    const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
+    const eventExists = await recordExists(BetEvent, _id);
+
+    if (eventExists) {
+      console.log(`Bet event ${_id} already on record`);
+      return eventExists;
+    }
+
     try {
       createResponse = await BetEvent.create({
-        _id: transaction.eventId+rpctx.txid,
+        _id,
         txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
@@ -105,43 +126,128 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       });
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       createResponse = e;
     }
 
-    return createResponse
+    return createResponse;
   }
+  
+  if (['peerlessUpdateOdds'].includes(transaction.txType)) {
+    const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
+    const updateExists = await recordExists(Betupdate, _id);
 
-  if (['peerlessBet'].includes(transaction.txType)) {
+    if (updateExists) {
+      console.log(`Bet update ${_id} already on record`);
+      return updateExists;
+    }
+
     try {
-      createResponse = await BetAction.create({
-        _id: transaction.eventId+transaction.outcome+rpctx.txid,
+      const event = await BetEvent.findOne({
+        eventId: `${transaction.eventId}`,
+      });
+
+      if (event) {
+        if (transaction.homeOdds) event.homeOdds = `${transaction.homeOdds}`;
+        if (transaction.awayOdds) event.awayOdds = `${transaction.awayOdds}`;
+        if (transaction.drawOdds) event.drawOdds = `${transaction.drawOdds}`;
+
+        if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
+          console.log('Invalid transaction data');
+          console.log(transaction);
+        }
+
+        try {
+          await event.save();
+          console.log(`Odds updated for event#${transaction.eventId} at height ${block.height}`);
+        } catch (e) {
+          console.log('Unable to save event data');
+          console.log(event);
+          console.log(e);
+        }
+      }
+    } catch (e) {
+      console.log('Was not able to process odds updates');
+      console.log.log(e);
+    }
+
+    try {
+      createResponse = Betupdate.create({
+        _id,
         txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
-        eventId: transaction.eventId,
-        betChoose: opCode.outcomeMapping[transaction.outcome],
-        betValue: vout.value,
-        opString: JSON.stringify(transaction),
         opCode: transaction.opCode,
-        transaction,
+        type: transaction.type,
+        txType: transaction.txType,
+        eventId: transaction.eventId,
+        opObject: transaction,
       });
     } catch (e) {
+      console.log('Error creating event update record');
       console.log(e);
-      createResponse = e;
     }
 
-    return createResponse
+    return createResponse;
   }
 
-  if (
-    ['peerlessResult'].includes(transaction.txType)
-  ) {
+  if (['peerlessBet'].includes(transaction.txType)) {
+    const _id = `${transaction.eventId}${transaction.outcome}${rpctx.txid}${block.height}`;
+    const betExists = await recordExists(BetAction, _id);
+    
+    if (betExists) {
+      console.log(`Bet update ${_id} already on record`);
+      return betExists;
+    }
+
+    try {
+      const event = await BetEvent.findOne({
+        eventId: `${transaction.eventId}`,
+      });
+      
+
+      try {
+        createResponse = await BetAction.create({
+          _id,
+          txId: rpctx.txid,
+          blockHeight: block.height,
+          createdAt: block.createdAt,
+          eventId: transaction.eventId,
+          betChoose: opCode.outcomeMapping[transaction.outcome],
+          betValue: vout.value,
+          opString: JSON.stringify(transaction),
+          opCode: transaction.opCode,
+          homeOdds: event.homeOdds,
+          awayOdds: event.awayOdds,
+          drawOdds: event.drawOdds,
+          transaction,
+        });
+      } catch (e) {
+        // console.log(e);
+        createResponse = e;
+      }
+    } catch (e) {
+      console.log('Error retrieving event data');
+      console.log(e);
+    }
+
+    return createResponse;
+  }
+
+  if (['peerlessResult'].includes(transaction.txType)) {
+    const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
+    const resultExists = await recordExists(BetResult, _id);
+
+    if (resultExists) {
+      console.log(`Bet update ${_id} already on record`);
+      return resultExists;
+    }
+
     try {
       let resultPayoutTxs = await TX.find({blockHeight: block.height+1});
 
       createResponse = await BetResult.create({
-        _id: transaction.eventId+rpctx.txid,
+        _id,
         txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
@@ -152,15 +258,23 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       })
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       createResponse = e;
     }
 
-    return createResponse
+    return createResponse;
+  }
+
+  const transactionId = `${transaction.txType}-${rpctx.txid}${block.height}`;
+  const transactionsExists = await recordExists(Transaction, transactionId);
+
+  if (transactionsExists) {
+    console.log(`Bet update ${_id} already on record`);
+    return transactionsExists;
   }
 
   return Transaction.create({
-    _id: rpctx.txid,
+    _id: transactionId,
     txId: rpctx.txid,
     blockHeight: block.height,
     createdAt: block.createdAt,

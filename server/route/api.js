@@ -4,6 +4,7 @@ const blockex = require('../handler/blockex');
 const faucet = require('../handler/faucet');
 const iquidus = require('../handler/iquidus');
 const custom = require('../handler/custom');
+const opCode = require('../handler/opcode');
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ router.get('/bet/action/week', blockex.getBetActioinsWeek());
 router.get('/pps/current', blockex.getCurrentProposals);
 router.get('/statistic/perweek', blockex.getStatisticPerWeek());
 
-//faucet
+// faucet
 router.get('/faucet/donate', faucet.donate);
 
 // Iquidus Explorer routes.
@@ -50,5 +51,8 @@ router.get('/getnetworkhashps', iquidus.getnetworkhashps);
 // Custom
 router.get('/custom/betstatus', custom.getBetStatus);
 router.get('/custom/supply', custom.getCustomSupply);
+
+// OpCode decryption
+router.get('/opcodes/:hex_value', opCode.decodeOP);
 
 module.exports =  router;

@@ -1,6 +1,7 @@
 import chai from 'chai';
 import opCode from '../../lib/op_code';
 
+const Mappingname = require('../../model/mappingname');
 const { rpc } = require('../../lib/cron');
 const { expect } = chai;
 
@@ -353,6 +354,13 @@ describe('OpCode', () => {
     });
 
     it('should decrypt peerless events op codes', async () => {
+      let createdRecord = false;
+      Mappingname.findOne = () => false;
+      Mappingname.create = () => {
+        createdRecord = true;
+        return true;
+      };
+
       rpc.call = (req, index) => {
         const sportsResponse = [{ 'mapping-name': 'Soccer' }];
         const teamnameResponse = [{ 'mapping-name': 'Russia' }];
@@ -374,7 +382,6 @@ describe('OpCode', () => {
       };
 
       const transaction = await opCode.decode('420102000000015BD39C700001000100010000000100000002000057E400004C2C000088B8');
-
       expect(transaction.prefix).to.equal('B');
       expect(transaction.version).to.equal(1);
       expect(transaction.type).to.equal(2);
@@ -389,6 +396,7 @@ describe('OpCode', () => {
       expect(transaction.awayOdds).to.equal(19500);
       expect(transaction.drawOdds).to.equal(35000);
       expect(transaction.opCode).to.equal('420102000000015BD39C700001000100010000000100000002000057E400004C2C000088B8');
+      expect(createdRecord).to.equal(true);
     });
   });
 });

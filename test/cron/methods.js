@@ -2,6 +2,7 @@ import chai from 'chai';
 import opCode from '../../lib/op_code';
 import methods from '../../cron/methods';
 
+const Mappingname = require('../../model/mappingname');
 const { rpc } = require('../../lib/cron');
 const { expect } = chai;
 
@@ -38,7 +39,7 @@ describe('Methods', () => {
   });
 
   describe('getOPCode', () => {
-    it('should retrieve op code from proided out data', () => {
+    it('should retrieve op code from provided out data', () => {
       let response = methods.getOPCode(vout);
       expect(response).to.equal('420102000000015BD39C700001000100010000000100000002000057E400004C2C000088B8');
     
@@ -50,6 +51,8 @@ describe('Methods', () => {
 
   describe('validateVoutData', () => {
     it('should decode provided hex value', async () => {
+      Mappingname.findOne = () => false;
+      Mappingname.create = () => true;
       const transaction = await methods.validateVoutData(vout);
 
       expect(transaction.prefix).to.equal('B');
