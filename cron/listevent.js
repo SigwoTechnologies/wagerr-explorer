@@ -25,12 +25,11 @@ async function syncListEvents () {
   const inserts = []
   await forEach(events, async (event) => {
     let teams = await getTeams(event)
-
     const listEvent = new ListEvent({
       txId: event['tx-id'],
-      id: event.id,
+      id: event.event_id,
       createdAt: date,
-      name: event.name,
+      name: event.tournament,
       round: event.round,
       starting: event.starting,
       teams: teams
@@ -47,13 +46,29 @@ async function syncListEvents () {
 async function getTeams (event) {
   // Setup the outputs for the transaction.
   const teamsResult = []
-  event.teams.forEach((team) => {
-    const teamItem = {
-      name: team.name,
-      odds: team.odds,
+  const { teams } = event;
+  let homeOdds;
+  let awayOdds;
+
+  event.odds.forEach((odd) => {
+    if (odd.mlHome) {
+      homeOdds = odd.mlHome;
     }
-    teamsResult.push(teamItem)
-  })
+    if (odd.mlHome) {
+      awayOdds = odd.mlAway;
+    }
+  });
+
+  teamsResult.push({
+    name: teams.home,
+    odds: homeOdds,
+  });
+
+  teamsResult.push({
+    name: teams.away,
+    odds: awayOdds,
+  });
+
   return teamsResult
 }
 

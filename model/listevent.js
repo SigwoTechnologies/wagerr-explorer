@@ -32,11 +32,11 @@ const Team = new mongoose.Schema({
 
 const ListEvent = mongoose.model('ListEvent', new mongoose.Schema({
   __v: { select: false, type: Number },
-  txId: { index: true, required: true, type: String },
+  txId: { index: true, required: false, type: String },
   id: { index: true, required: true, type: String },
   createdAt: { required: true, type: Date },
   name: { required: true, type: String },
-  round: { required: true, type: String },
+  round: { required: false, type: String },
   starting: { index: true,  required: true, type: String },
   teams:  { required: true, type: [Team] }
 }, { versionKey: false }), 'listevents');

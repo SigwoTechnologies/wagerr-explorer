@@ -67,12 +67,12 @@ class BetEvent extends Component {
         sortBy(res[0].events,['blockHeight']).forEach(event =>{
           res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
             action =>{
-              if (action.betChoose === event.homeTeam) {
-                action.odds = event.homeOdds / 10000
-              }else if (action.betChoose === event.awayTeam) {
-                action.odds = event.awayOdds / 10000
+              if (action.betChoose.includes('Home')) {
+                action.odds = action.homeOdds / 10000
+              }else if (action.betChoose.includes('Away')) {
+                action.odds = action.awayOdds / 10000
               } else{
-                action.odds = event.drawOdds / 10000
+                action.odds = action.drawOdds / 10000
               }
             })
         this.setState({
@@ -146,7 +146,7 @@ class BetEvent extends Component {
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
-                  bet: action.betChoose,
+                  bet: action.betChoose.replace('Money Line - ', ''),
                   odds: action.odds,
                   value: action.betValue
                     ? (<span
