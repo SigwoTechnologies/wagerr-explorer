@@ -6,6 +6,8 @@ const locker = require('../lib/locker');
 const Rich = require('../model/rich');
 const UTXO = require('../model/utxo');
 
+console.log('Running rich cron job');
+
 /**
  * Build the list of rich addresses from
  * unspent transactions.

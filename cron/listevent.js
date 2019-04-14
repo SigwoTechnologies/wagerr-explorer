@@ -9,6 +9,8 @@ const moment = require('moment')
 // Models.
 const ListEvent = require('../model/listevent')
 
+console.log('Running listevent cron job');
+
 /**
  * Get a list of the mns and request IP information
  * from freegeopip.net.

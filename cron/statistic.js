@@ -11,6 +11,9 @@ const TX = require('../model/tx')
 const BetResult = require('../model/betresult')
 const BetAction = require('../model/betaction')
 
+
+console.log('Running statistic cron job');
+
 /**
  * Process the blocks and transactions.
  * @param {Number} start The current starting block height.

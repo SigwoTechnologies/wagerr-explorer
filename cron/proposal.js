@@ -12,6 +12,8 @@ const _ = require('lodash')
 const Proposal = require('../model/proposal')
 const TX = require('../model/tx')
 
+console.log('Running proposal cron job');
+
 async function syncProposal () {
   const date = moment().utc().startOf('minute').toDate()
   await Proposal.deleteMany({})

@@ -10,6 +10,8 @@ const moment = require('moment');
 // Models.
 const Peer = require('../model/peer');
 
+console.log('Runnning peer cron job');
+
 /**
  * Get a list of the peers and request IP information
  * from freegeopip.net.

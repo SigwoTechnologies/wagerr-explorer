@@ -11,6 +11,8 @@ const UTXO = require('../model/utxo');
 const BetResult = require('../model/betresult');
 const BetAction = require('../model/betaction');
 
+console.log('Running coin cron job');
+
 /**
  * Get the coin related information including things
  * like price coinmarketcap.com data.

@@ -16,6 +16,8 @@ const Betupdate = require('../model/betupdate')
 const Transaction = require('../model/transaction')
 const TX = require('../model/tx')
 
+console.log('Running bet cron job');
+
 function hexToString (hexx) {
   var hex = hexx.toString()//force conversion
   var str = ''

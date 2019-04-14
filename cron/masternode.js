@@ -1,6 +1,7 @@
 
 require('babel-polyfill');
 require('../lib/cron');
+
 const config = require('../config');
 const { exit, rpc } = require('../lib/cron');
 const fetch = require('../lib/fetch');
@@ -9,6 +10,8 @@ const locker = require('../lib/locker');
 const moment = require('moment');
 // Models.
 const Masternode = require('../model/masternode');
+
+console.log('Running masternode cron job');
 
 /**
  * Get a list of the mns and request IP information
