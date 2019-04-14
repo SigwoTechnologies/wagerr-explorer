@@ -20,6 +20,7 @@ const UTXO = require('../../model/utxo');
 const STXO = require('../../model/stxo');
 const ListEvent = require('../../model/listevent');
 const BetEvent = require('../../model/betevent');
+const BetUpdate = require('../../model/betupdate');
 const BetAction = require('../../model/betaction');
 const BetResult = require('../../model/betresult');
 const Proposal = require('../../model/proposal');
@@ -726,7 +727,44 @@ const getBetEventInfo = async (req, res) => {
     const homeBets = await BetAction.find({eventId: eventId, betChoose: {$in:homeTeamNames}})
     const awayBets = await BetAction.find({eventId: eventId, betChoose: {$in:awayTeamNames}})
     const drawBets = await BetAction.find({eventId: eventId, betChoose: {$in: drawResults}})
-    res.json({events, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
+
+    // These will return only one event with the latest updated odds (with possibility of duplicates), 
+    // but contains the original odds the event was created with. We update them to these original
+    // values for the frontend
+    const formattedEvents =  [];
+
+    if (events.length  > 0) {
+      await events.forEach((e) => {
+        const event = JSON.parse(JSON.stringify(e));
+
+        event.homeOdds = event.transaction.homeOdds;
+        event.awayOdds = event.transaction.awayOdds;
+        event.drawOdds = event.transaction.drawOdds;
+
+        formattedEvents.push(event);
+      });
+
+      // We also query event updates
+      const updates = await BetUpdate.find({eventId: eventId}).sort({createdAt: 1}) 
+
+      await updates.forEach((u) => {
+        const update = JSON.parse(JSON.stringify(u));
+
+        update.homeOdds = update.opObject.homeOdds;
+        update.awayOdds = update.opObject.awayOdds;
+        update.drawOdds = update.opObject.drawOdds;
+
+        if (
+          update.homeOdds > 0
+          && update.awayOdds > 0
+          && update.drawOdds > 0
+        ) {
+          formattedEvents.push(update);
+        }
+      });
+    }
+
+    res.json({events: formattedEvents, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
   } catch (err) {
     console.log(err)
     res.status(500).send(err.message || err)
