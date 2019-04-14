@@ -12,11 +12,11 @@ const config = {
     tickerId: '1779'
   },
   db: {
-    host: process.env.MONGODB_HOST || 'mongo',
-    port: process.env.MONGODB_PORT || '27017',
-    name:  process.env.MONGODB_DATABASE || 'wagerrx',
-    user:  process.env.MONGODB_USERNAME || 'wagerru',
-    pass: process.env.MONGODB_PASSWORD || 'wagerrpass2019'
+    host: '$MONGODB_HOST' || 'mongo',
+    port: '$MONGODB_PORT' || '27017',
+    name: '$MONGODB_DATABASE' || 'wagerrx',
+    user: '$MONGODB_USERNAME' || 'wagerru',
+    pass: '$MONGODB_PASSWORD' || 'wagerrpass2019'
   },
   freegeoip: {
     api: 'https://extreme-ip-lookup.com/json/'
