@@ -70,7 +70,6 @@ services:
     networks:
       - dbnet
     volumes:
-      - ./docker/node/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
       - ./docker/node/start.sh:/usr/local/bin/start.sh
     ports:
       - "8087:8087"

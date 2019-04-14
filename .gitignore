@@ -58,7 +58,7 @@ typings/
 .env
 
 # setings file for syste
-#config.js
+config.js
 *.cron_lock
 
 .DS_Store
