@@ -89,6 +89,7 @@ async function recordExists(rType, _id) {
   try {
     response = await rType.findOne({ _id });
   } catch (e) {
+    console.log('bet.js:recordExists');
     console.log(e);
   }
 
@@ -128,7 +129,8 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       });
     } catch (e) {
-      // console.log(e);
+      console.log('Error creating bet event data');
+      console.log(e);
       createResponse = e;
     }
 
@@ -225,7 +227,8 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
           transaction,
         });
       } catch (e) {
-        // console.log(e);
+        console.log('Error creating bet action record');
+        console.log(e);
         createResponse = e;
       }
     } catch (e) {
@@ -241,7 +244,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const resultExists = await recordExists(BetResult, _id);
 
     if (resultExists) {
-      console.log(`Bet update ${_id} already on record`);
+      console.log(`Bet result ${_id} already on record`);
       return resultExists;
     }
 
@@ -260,7 +263,8 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       })
     } catch (e) {
-      // console.log(e);
+      console.log('bet.js:peerlessResult line 265');
+      console.log(e);
       createResponse = e;
     }
 
@@ -297,6 +301,8 @@ async function addPoS (block, rpctx) {
         try {
           transaction = await methods.validateVoutData(vout);
         } catch (e) {
+          console.log('addPoS error');
+          console.log(e);
           transaction = { error: true, fullError: e };
         }
         
@@ -397,12 +403,14 @@ async function update () {
     locker.lock(type)
     await syncBlocksForBet(dbHeight, blockDbHeight, clean)
   } catch (err) {
+    console.log('Update() error');
     console.log(err)
     code = 1
   } finally {
     try {
       locker.unlock(type)
     } catch (err) {
+      console.log('Update() error: finally');
       console.log(err)
       code = 1
     }
