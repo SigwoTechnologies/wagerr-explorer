@@ -102,7 +102,7 @@ class BetEventList extends Component {
       {key: 'start', title: t('start')},
       {key: 'event', title: t('eventId')},
       {key: 'name', title: t('name')},
-      {key: 'round', title: t('round')},
+      // {key: 'round', title: t('round')},
       {key: 'homeTeam', title: t('homeTeam')},
       {key: 'awayTeam', title: t('awayTeam')},
       {key: 'homeOdds', title: '1'},
