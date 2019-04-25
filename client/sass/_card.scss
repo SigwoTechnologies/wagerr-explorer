@@ -75,8 +75,13 @@
 
 	&--address {
 		&-hash {
+      color: $gray-dark;
 			font-size: 24px;
-			font-weight: 400;
+      font-weight: 400;
+
+      &:hover {
+        color: $wgreen;
+      }
 		}
 
 		&-wallet {

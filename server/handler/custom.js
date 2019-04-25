@@ -15,7 +15,7 @@ const getBetStatus = async (req, res) => {
       .allowDiskUse(true)
       .exec()
 
-    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD')
+    const staked = txs.filter(tx => tx.vout[0].address === '5NON_STANDARD')
       .reduce((acc, tx) => acc.minus(tx.vin.reduce((a, t) => {
         if (t.address === config.coin.oracle_payout_address) {
           return a.plus(BigNumber(t.value))

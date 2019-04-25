@@ -103,7 +103,7 @@ async function vout(rpctx, blockHeight) {
       }else if (vout.scriptPubKey.type == 'zerocoinmint') {
         address = 'ZERO_COIN_MINT'
       } else if (vout.scriptPubKey.type == 'nonstandard') {
-        address = 'NON_STANDARD'
+        address = '6NON_STANDARD'
       } else {
         address = vout.scriptPubKey.addresses[0]
       }

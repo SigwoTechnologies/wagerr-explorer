@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import config from '../../../config'
 import Table from '../Table';
+import BetModal from '../Modal';
 
 export default class CardTXOut extends Component {
   static defaultProps = {
@@ -34,9 +35,17 @@ export default class CardTXOut extends Component {
         data={ this.props.txs.map(tx => ({
           ...tx,
           address:
-            (tx.address.indexOf('OP_RETURN 1|') !== -1 || tx.address.indexOf('OP_RETURN 2|') !== -1 || tx.address.indexOf('OP_RETURN 3|') !== -1) ?
+          //   (tx.address.indexOf('OP_RETURN 1|') !== -1 || tx.address.indexOf('OP_RETURN 2|') !== -1 || tx.address.indexOf('OP_RETURN 3|') !== -1) ?
+          //     <Link to={`/bet/event/${ encodeURIComponent(tx.address.split('|')[2]) }`}>{tx.address}test1</Link>
+          //     :  (tx.address.indexOf('OP_RETURN') !== -1 ) ?  <span>{tx.address}test2</span> : <Link to={`/address/${ tx.address }`}>{tx.address}test3</Link>
+          // ,
+          // (tx.address.indexOf('OP_RETURN 1|') !== -1 || tx.address.indexOf('OP_RETURN 2|') !== -1 || tx.address.indexOf('OP_RETURN 3|') !== -1) ?
+          //     <Link to={`/bet/event/${ encodeURIComponent(tx.address.split('|')[2]) }`}>{tx.address}</Link>
+          //     :  (tx.address.indexOf('OP_RETURN') !== -1 ) ? <BetModal buttonLabel={tx.address} className="test" /> : <Link to={`/address/${tx.address}`}>{tx.address}</Link>
+          // ,
+          (tx.address.indexOf('OP_RETURN 1|') !== -1 || tx.address.indexOf('OP_RETURN 2|') !== -1 || tx.address.indexOf('OP_RETURN 3|') !== -1) ?
               <Link to={`/bet/event/${ encodeURIComponent(tx.address.split('|')[2]) }`}>{tx.address}</Link>
-              :  (tx.address.indexOf('OP_RETURN') !== -1 ) ?  <span>{tx.address}</span> : <Link to={`/address/${ tx.address }`}>{tx.address}</Link>
+              :  (tx.address.indexOf('OP_RETURN') !== -1 ) ? <BetModal buttonLabel="test" className="test" /> : <Link to={`/address/${tx.address}`}>{tx.address}</Link>
           ,
           value: (
             (tx.address === config.coin.oracle_payout_address) ?

@@ -41,7 +41,7 @@ const getAddress = async (req, res) => {
       .allowDiskUse(true)
       .exec()
 
-    const sent = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
+    const sent = txs.filter(tx => tx.vout[0].address !== '1NON_STANDARD')
       .reduce((acc, tx) => acc.plus(tx.vin.reduce((a, t) => {
       if (t.address === req.params.hash) {
         return a.plus(BigNumber(t.value))
@@ -50,7 +50,7 @@ const getAddress = async (req, res) => {
       }
     }, BigNumber(0.0))), BigNumber(0.0))
 
-    const received = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
+    const received = txs.filter(tx => tx.vout[0].address !== '2NON_STANDARD')
       .reduce((acc, tx) => acc.plus(tx.vout.reduce((a, t) => {
       if (t.address === req.params.hash) {
         return a.plus(BigNumber(t.value))
@@ -59,7 +59,7 @@ const getAddress = async (req, res) => {
       }
     }, BigNumber(0.0))), BigNumber(0.0))
 
-    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD')
+    const staked = txs.filter(tx => tx.vout[0].address === '3NON_STANDARD')
       .reduce((acc, tx) => acc.minus(tx.vin.reduce((a, t) => {
         if (t.address === req.params.hash) {
           return a.plus(BigNumber(t.value))
@@ -470,7 +470,7 @@ const getTX = async (req, res) => {
     // vin section of the tx.
     const vin = [];
     await forEach(tx.vin, async (vi) => {
-      if (tx.vout[0].address === 'NON_STANDARD' && !vi.coinbase){
+      if (tx.vout[0].address === '4NON_STANDARD' && !vi.coinbase){
         vin.push({coinstake:true});
       } else if(vi.isZcSpend){
         vin.push({isZcSpend:true, value: vi.sequence});

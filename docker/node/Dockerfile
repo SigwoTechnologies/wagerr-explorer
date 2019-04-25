@@ -13,7 +13,7 @@ COPY start.sh /usr/local/bin/start.sh
 
 ENTRYPOINT ["bash", "docker-entrypoint.sh"]
 
-EXPOSE 55055
+EXPOSE 55005
 EXPOSE 8332
 EXPOSE 55004
 
