@@ -23,7 +23,7 @@ echo 'Cloning wagerr'
 
 mkdir -p /tmp/wagerr
 cd /tmp/wagerr
-git clone -b WGR-3.0.1-rc3 https://github.com/Wagerr-TestNet/wagerr.git
+git clone -b WGR-3.0.1-rc4 https://github.com/Wagerr-TestNet/wagerr.git 
 cd  wagerr
 echo 'Running autogen'
 ./autogen.sh

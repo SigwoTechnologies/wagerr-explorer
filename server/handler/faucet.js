@@ -5,6 +5,7 @@ const RpcClient = require('wagerrd-rpc')
 const rpc = new RpcClient({
   user: config.rpc.user,
   pass: config.rpc.pass,
+  host: config.rpc.host,
   port: config.rpc.port
 })
 // set constants
@@ -12,7 +13,7 @@ var waitTime = config.faucet.wait_time // time in seconds until app refreshes ip
 var percent = config.faucet.percent
 // config redis
 var redisClient = redis.createClient({
-  host: `${process.env.REDIS_HOST}`
+  host: `${config.redis.host}`
 })
 redisClient.on('error', function (err) {
   console.log('Error: ' + err)

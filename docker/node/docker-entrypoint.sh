@@ -27,6 +27,7 @@ rpcpassword=$RPC_PASS
 rpcclienttimeout=30
 rpcport=$RPC_PORT
 testnet=$COIN_TESTNET
+staking=0
 whitelist=38.122.91.218
 whitelist=95.30.197.214
 whitelist=149.28.58.198
