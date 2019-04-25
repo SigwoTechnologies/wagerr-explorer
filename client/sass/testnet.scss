@@ -1,3 +1,31 @@
 $wgreen: rgba(0, 194, 101, 1);
 $wgreen-dark: #00783C;
 $wgreen-light: #00DD70;
+
+.modal-dialog {
+  max-width: 750px !important;
+}
+
+.modal-content {
+  border: 0;
+}
+
+.modal-header {
+  background-color: $wgreen;
+
+  .close {
+    color: #ffffff;
+  }
+
+  .close:not(:disabled):not(.disabled):hover,
+  .close:not(:disabled):not(.disabled):focus {
+    opacity: .25;
+  }
+}
+
+.modal-title {
+  color: #ffffff;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: bold;
+}

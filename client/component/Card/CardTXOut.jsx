@@ -45,7 +45,7 @@ export default class CardTXOut extends Component {
           // ,
           (tx.address.indexOf('OP_RETURN 1|') !== -1 || tx.address.indexOf('OP_RETURN 2|') !== -1 || tx.address.indexOf('OP_RETURN 3|') !== -1) ?
               <Link to={`/bet/event/${ encodeURIComponent(tx.address.split('|')[2]) }`}>{tx.address}</Link>
-              :  (tx.address.indexOf('OP_RETURN') !== -1 ) ? <BetModal buttonLabel="test" className="test" /> : <Link to={`/address/${tx.address}`}>{tx.address}</Link>
+              :  (tx.address.indexOf('OP_RETURN') !== -1 ) ? <BetModal buttonLabel="test" className="test" tx={tx} /> : <Link to={`/address/${tx.address}`}>{tx.address}</Link>
           ,
           value: (
             (tx.address === config.coin.oracle_payout_address) ?

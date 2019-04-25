@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+// import axios from 'axios';
 
 export default class BetModal extends Component {
   constructor(props) {
@@ -19,6 +20,15 @@ export default class BetModal extends Component {
   };
 
   componentDidMount() {
+    const { address } = this.props.tx;
+    console.log(address);
+    // axios.get(`/api/bet/actions`)
+    //   .then((req, res) => {
+    //     console.log(res);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    // });
   };
 
   componentWillUnmount() {
@@ -31,7 +41,9 @@ export default class BetModal extends Component {
   }
 
   render() {
-    const { buttonLabel, className } = this.props;
+    const { buttonLabel, className, tx } = this.props;
+
+    console.log('tx', tx);
 
     if (!buttonLabel || !className) {
       return false;
@@ -41,13 +53,16 @@ export default class BetModal extends Component {
       <React.Fragment>
           <span className="link-btn" onClick={this.toggle}>{buttonLabel}</span>
           <Modal isOpen={this.state.modal} toggle={this.toggle} className={className}>
-            <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+            <ModalHeader toggle={this.toggle}>Transaction Report</ModalHeader>
             <ModalBody>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              <h5>TX Details</h5>
+              <p><b>id:</b> {tx._id}</p>
+              <p><b>Address:</b> {tx.address}</p>
+              <p><b>N:</b> {tx.address}</p>
+              <p><b>Value:</b> {tx.value}</p>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-              <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+              <Button color="secondary" onClick={this.toggle}>Close</Button>
             </ModalFooter>
           </Modal>
         </React.Fragment>
