@@ -119,7 +119,7 @@ describe('OpCode', () => {
       tx = { prefix: 'B', version: 1, txType: 4, eventId: 1, mlResult: 2, sResult: 3, tResult: 1 }; 
       response = opCode.buildOPCode(tx, 'peerlessResult');
 
-      expect(response.refactoredHex).to.equal('42010400000001020301');
+      expect(response.refactoredHex).to.equal('420104000000010200030001');
     });
 
     it('should convert an object description for Peerless update odds transactions into a hex value', () => {

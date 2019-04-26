@@ -47,16 +47,20 @@ async function preOPCode(block, rpctx, vout) {
       opString: opString,
     })
   } else if (datas[0] === '2' && datas.length === 4) {
-    BetAction.create({
-      _id: datas[2]+datas[3]+rpctx.txid,
-      txId: rpctx.txid,
-      blockHeight: block.height,
-      createdAt: block.createdAt,
-      eventId: datas[2],
-      betChoose: datas[3],
-      betValue: vout.value,
-      opString: opString,
-    })
+    try {
+      await BetAction.create({
+        _id: datas[2]+datas[3]+rpctx.txid,
+        txId: rpctx.txid,
+        blockHeight: block.height,
+        createdAt: block.createdAt,
+        eventId: datas[2],
+        betChoose: datas[3],
+        betValue: vout.value,
+        opString: opString,
+      })
+    } catch (e) {
+      console.log('Error saving bet action with old decryption method');
+    }
   } else if (datas[0] === '3' && datas.length === 4) {
     let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
     BetResult.create({
@@ -152,9 +156,12 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
       });
 
       if (event) {
-        if (transaction.homeOdds) event.homeOdds = `${transaction.homeOdds}`;
-        if (transaction.awayOdds) event.awayOdds = `${transaction.awayOdds}`;
-        if (transaction.drawOdds) event.drawOdds = `${transaction.drawOdds}`;
+        // if (transaction.homeOdds)
+        event.homeOdds = `${transaction.homeOdds}`;
+        //if (transaction.awayOdds)
+        event.awayOdds = `${transaction.awayOdds}`;
+        //if (transaction.drawOdds)
+        event.drawOdds = `${transaction.drawOdds}`;
 
         if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
           console.log('Invalid transaction data');
@@ -228,6 +235,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         });
       } catch (e) {
         console.log('Error creating bet action record');
+        console.log(transaction);
         console.log(e);
         createResponse = e;
       }
@@ -257,7 +265,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         blockHeight: block.height,
         createdAt: block.createdAt,
         eventId: transaction.eventId,
-        result: opCode.resultMapping[transaction.tResult],
+        result: opCode.resultMapping[transaction.resultType],
         opString: JSON.stringify(transaction),
         payoutTx: resultPayoutTxs[0],
         transaction,
@@ -275,7 +283,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   const transactionsExists = await recordExists(Transaction, transactionId);
 
   if (transactionsExists) {
-    console.log(`Bet update ${_id} already on record`);
+    console.log(`Bet update ${transactionId} already on record`);
     return transactionsExists;
   }
 
