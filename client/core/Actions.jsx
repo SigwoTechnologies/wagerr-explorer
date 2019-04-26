@@ -220,6 +220,11 @@ export const getBetPerWeek = () => {
     return getFromWorker('betperweek', resolve, reject);
   });
 };
+export const getOpCode = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('opcode', resolve, reject, query);
+  });
+};
 export default {
   getAddress,
   getBlock,
@@ -244,5 +249,6 @@ export default {
   getCurrentPPs,
   getBetPerWeek,
   setWatch,
-  removeWatch
+  removeWatch,
+  getOpCode,
 };
