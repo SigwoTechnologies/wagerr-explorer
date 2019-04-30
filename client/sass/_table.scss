@@ -1,7 +1,8 @@
 
 .table-wrapper {
 	@include media-breakpoint-down(lg) {
-		overflow-x: auto;
+    overflow-x: auto;
+    position: sticky;
 	}
 
 	&__shadow-margin {

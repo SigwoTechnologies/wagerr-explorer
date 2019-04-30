@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Actions from '../../core/Actions';
 
@@ -27,7 +26,7 @@ export default class BetModal extends Component {
   };
 
   axiosCall = async () => {
-    const decryption = await Actions.getOpCode(this.props.tx.address);
+    const decryption = await Actions.getOpCode(this.props.address);
     this.setState({
       decryption,
     });
@@ -42,44 +41,78 @@ export default class BetModal extends Component {
     }));
   };
 
-  renderDecryption = () => (
+  renderDecryption = (decryption) => (
     <div>
-      <h3>Event</h3>
-      <hr />
-      <div><b>Type: </b><span>{this.state.decryption.sport} - {this.state.decryption.tournament}</span></div>
-      <div><b>Game: </b><span>{this.state.decryption.homeTeam} vs {this.state.decryption.awayTeam}</span></div>
-      {this.state.decryption.eventId ? (
-        <div><b>Event ID: </b><Link to={`/bet/event/${this.state.decryption.eventId}`}>{this.state.decryption.eventId}</Link></div>
-      ) : null}
+      <div className="text-center">
+        <h3>
+          <b>{decryption.homeTeam}</b>
+          <span> vs </span>
+          <b>{decryption.awayTeam}</b>
+        </h3>
+        {decryption.tournament}
+        {' - '}
+        {decryption.sport}
+        {decryption.eventId ? (
+          <span>
+            {' - '}
+            <span>Event </span>
+            <Link to={`/bet/event/${decryption.eventId}`}>#{decryption.eventId}</Link>
+          </span>
+        ) : null}
+      </div>
       <br />
       <br />
-      <h3>Odds</h3>
-      <hr />
-      <div><b>Home: </b><span>{this.state.decryption.homeOdds / 10000}</span></div>
-      <div><b>Away: </b><span>{this.state.decryption.awayOdds / 10000}</span></div>
-      <div><b>Draw: </b><span>{this.state.decryption.drawOdds / 10000}</span></div>
+      <div className="row">
+        <div className="col text-center">
+          <h4><b>{decryption.homeTeam}</b></h4>
+        </div>
+        <div className="col text-center">
+          <h4><b>Draw</b></h4>
+        </div>
+        <div className="col text-center">
+          <h4><b>{decryption.awayTeam}</b></h4>
+        </div>
+      </div>
+      <div className="divider my-3"></div>
+      <div className="row">
+        <div className="col text-center">
+          <div className="badge badge-success">{decryption.homeOdds / 10000}</div>
+        </div>
+        <div className="col text-center">
+          <div className="badge badge-danger">{decryption.drawOdds / 10000}</div>
+        </div>
+        <div className="col text-center">
+          <div className="badge badge-success">{decryption.awayOdds / 10000}</div>
+        </div>
+      </div>
     </div>
   );
 
   render() {
-    const { buttonLabel, className, tx } = this.props;
-    if (!buttonLabel || !className) {
+    const { buttonLabel, className, address } = this.props;
+    const { modal, decryption } = this.state;
+    const { homeTeam, awayTeam } = decryption;
+    if (!address) {
       return false;
     }
 
     return (
       <React.Fragment>
-          <span className="link-btn" onClick={this.toggle}>{buttonLabel}</span>
-          <Modal isOpen={this.state.modal} toggle={this.toggle} className={className}>
-            <ModalHeader toggle={this.toggle}>{this.state.decryption ? this.state.decryption.homeTeam : 'Home Team'} vs {this.state.decryption ? this.state.decryption.awayTeam : 'Away Team'}</ModalHeader>
-            <ModalBody>
-              {this.state.decryption ? this.renderDecryption() : null}
-            </ModalBody>
-            <ModalFooter>
-              <Button color="secondary" onClick={this.toggle}>Close</Button>
-            </ModalFooter>
-          </Modal>
-        </React.Fragment>
+        <span className="link-btn" onClick={this.toggle}>{buttonLabel}</span>
+        <Modal isOpen={modal} toggle={this.toggle} className={className}>
+          <ModalHeader toggle={this.toggle}>
+            <div>
+              {decryption ? homeTeam : 'Home Team'} vs {decryption ? awayTeam : 'Away Team'}
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            {decryption ? this.renderDecryption(decryption) : null}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="secondary" onClick={this.toggle}>Close</Button>
+          </ModalFooter>
+        </Modal>
+      </React.Fragment>
     );
   };
 }
