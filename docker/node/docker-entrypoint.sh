@@ -28,27 +28,18 @@ rpcclienttimeout=30
 rpcport=$RPC_PORT
 testnet=$COIN_TESTNET
 staking=0
-whitelist=38.122.91.218
-whitelist=95.30.197.214
-whitelist=149.28.58.198
-whitelist=158.69.120.138
 whitelist=144.202.87.185
 whitelist=95.179.178.244
 whitelist=198.13.42.84
-addnode=38.122.91.218
-addnode=95.30.197.214
-addnode=149.28.58.198
-addnode=158.69.120.138
+whitelist=95.30.197.214
 addnode=144.202.87.185
 addnode=95.179.178.244
 addnode=198.13.42.84
-connect=38.122.91.218
-connect=95.30.197.214
-connect=149.28.58.198
-connect=158.69.120.138
+addnode=95.30.197.214
 connect=144.202.87.185
 connect=95.179.178.244
 connect=198.13.42.84
+connect=95.30.197.214
 EOL
 
 echo 'RPC configuration has been applied'

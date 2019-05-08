@@ -164,8 +164,8 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         event.drawOdds = `${transaction.drawOdds}`;
 
         if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
-          console.log('Invalid transaction data');
-          console.log(transaction);
+          // console.log('Invalid transaction data');
+          // console.log(transaction);
         }
 
         try {
@@ -173,8 +173,8 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
           console.log(`Odds updated for event#${transaction.eventId} at height ${block.height}`);
         } catch (e) {
           console.log('Unable to save event data');
-          console.log(event);
-          console.log(e);
+          // console.log(e);
+          console.log(transaction);
         }
       }
     } catch (e) {
@@ -271,7 +271,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       })
     } catch (e) {
-      console.log('bet.js:peerlessResult line 265');
+      console.log('Error creating peerlessResult data');
       console.log(e);
       createResponse = e;
     }

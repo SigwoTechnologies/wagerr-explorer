@@ -64,13 +64,13 @@ export default class BetModal extends Component {
       <br />
       <div className="row">
         <div className="col text-center">
-          <h4><b>{decryption.homeTeam}</b></h4>
+          <h4><b>{decryption.homeTeam || 'Home'}</b></h4>
         </div>
         <div className="col text-center">
           <h4><b>Draw</b></h4>
         </div>
         <div className="col text-center">
-          <h4><b>{decryption.awayTeam}</b></h4>
+          <h4><b>{decryption.awayTeam || 'Away'}</b></h4>
         </div>
       </div>
       <div className="divider my-3"></div>
@@ -79,7 +79,7 @@ export default class BetModal extends Component {
           <div className="badge badge-success">{decryption.homeOdds / 10000}</div>
         </div>
         <div className="col text-center">
-          <div className="badge badge-danger">{decryption.drawOdds / 10000}</div>
+          <div className="badge badge-danger">{(decryption.drawOdds / 10000) || 0}</div>
         </div>
         <div className="col text-center">
           <div className="badge badge-success">{decryption.awayOdds / 10000}</div>
