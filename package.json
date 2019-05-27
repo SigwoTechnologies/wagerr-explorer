@@ -42,6 +42,7 @@
     "chart.js": "^2.7.1",
     "connect-timeout": "^1.9.0",
     "cors": "^2.8.4",
+    "endianness": "^8.0.2",
     "express": "^4.16.2",
     "express-rate-limit": "^2.11.0",
     "i18next": "^11.9.0",

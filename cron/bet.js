@@ -88,10 +88,10 @@ async function preOPCode(block, rpctx, vout) {
   }
 }
 
-async function recordExists(rType, _id) {
+async function recordExists(rType, val, recordType = '_id') {
   let response;
   try {
-    response = await rType.findOne({ _id });
+    response = await rType.findOne({ [recordType]: val });
   } catch (e) {
     console.log('bet.js:recordExists');
     console.log(e);
@@ -106,6 +106,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
 
   if (['peerlessEvent'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
+    // const _id = `${transaction.eventId}`;
     const eventExists = await recordExists(BetEvent, _id);
 
     if (eventExists) {
@@ -144,42 +145,54 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   if (['peerlessUpdateOdds'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
     const updateExists = await recordExists(Betupdate, _id);
+    const resultExists = await recordExists(BetResult, `${transaction.eventId}`, 'eventId');
 
     if (updateExists) {
       console.log(`Bet update ${_id} already on record`);
       return updateExists;
     }
 
-    try {
-      const event = await BetEvent.findOne({
-        eventId: `${transaction.eventId}`,
-      });
-
-      if (event) {
-        // if (transaction.homeOdds)
-        event.homeOdds = `${transaction.homeOdds}`;
-        //if (transaction.awayOdds)
-        event.awayOdds = `${transaction.awayOdds}`;
-        //if (transaction.drawOdds)
-        event.drawOdds = `${transaction.drawOdds}`;
-
-        if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
-          // console.log('Invalid transaction data');
-          // console.log(transaction);
-        }
-
-        try {
-          await event.save();
-          console.log(`Odds updated for event#${transaction.eventId} at height ${block.height}`);
-        } catch (e) {
-          console.log('Unable to save event data');
-          // console.log(e);
-          console.log(transaction);
-        }
+    if (resultExists) {
+      if (transaction.eventId == 198) {
+        console.log('This is for event 198');
+        console.log(transaction);
       }
-    } catch (e) {
-      console.log('Was not able to process odds updates');
-      console.log.log(e);
+      console.log(`Bet result for event ${transaction.eventId} on record`);
+    } else {
+      if (transaction.eventId == 198) {
+        console.log('Creating bet update for 198');
+      }
+      try {
+        const event = await BetEvent.findOne({
+          eventId: `${transaction.eventId}`,
+        });
+  
+        if (event) {
+          // if (transaction.homeOdds)
+          event.homeOdds = `${transaction.homeOdds}`;
+          //if (transaction.awayOdds)
+          event.awayOdds = `${transaction.awayOdds}`;
+          //if (transaction.drawOdds)
+          event.drawOdds = `${transaction.drawOdds}`;
+  
+          if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
+            // console.log('Invalid transaction data');
+            // console.log(transaction);
+          }
+  
+          try {
+            await event.save();
+            console.log(`Odds updated for event#${transaction.eventId} at height ${block.height}`);
+          } catch (e) {
+            console.log('Unable to save event data');
+            // console.log(e);
+            console.log(transaction);
+          }
+        }
+      } catch (e) {
+        console.log('Was not able to process odds updates');
+        console.log.log(e);
+      }
     }
 
     try {
@@ -253,12 +266,19 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
 
     if (resultExists) {
       console.log(`Bet result ${_id} already on record`);
+      if (transaction.eventId == 198) {
+        console.log('Event 198 already on record');
+        console.log(transaction);
+      }
       return resultExists;
     }
+    
 
     try {
       let resultPayoutTxs = await TX.find({blockHeight: block.height+1});
-
+      if (transaction.eventId == 198) {
+        console.log('Creating bet result for 198');
+      }
       createResponse = await BetResult.create({
         _id,
         txId: rpctx.txid,

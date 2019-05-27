@@ -92,7 +92,7 @@ class BetEvent extends Component {
       return this.renderLoading()
     }
     const { t } = this.props;
-
+    console.log(this.state.eventInfo);
     const cols = [
       {key: 'createdAt', title: t('time')},
       {key: 'bet', title: t('bet')},
