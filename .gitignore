@@ -69,7 +69,7 @@ config.js
 /public/*.js
 /public/*.gz
 /public/*.html
-/public/*.js.map
+/public/bundle.js.map
 
 data
 volumes

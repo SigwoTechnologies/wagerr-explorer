@@ -24,6 +24,10 @@ import CardBetEvent from '../component/Card/CardBetEvent'
 import CardBetResult from '../component/Card/CardBetResult'
 import { compose } from 'redux'
 import { translate } from 'react-i18next'
+import CardMoneyLineEvent from '../component/Card/CardMoneyLineEvent';
+import CardSpreadEvent from '../component/Card/CardSpreadEvent';
+import CardOverUnderEvent from '../component/Card/CardOverUnderEvent'
+
 
 class BetEvent extends Component {
   static propTypes = {
@@ -155,32 +159,51 @@ class BetEvent extends Component {
             <TabPane tabId="1">
               <Row>
                 <Col sm="12">
-                  <h4>Money Line Contents</h4>
-                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta blanditiis minus quidem quis ad numquam ea pariatur doloribus modi ducimus velit voluptatibus, mollitia optio molestias quibusdam excepturi ut vel iste.</p>
+                  <div className="row">
+                    <div className="col-sm-12 col-md-6">
+                      <CardMoneyLineEvent eventInfo={this.state.eventInfo}/>
+                    </div>
+                    <div className="col-sm-12 col-md-6">
+                      <CardBetResult eventInfo={this.state.eventInfo}/>
+                    </div>
+                  </div>
                 </Col>
               </Row>
             </TabPane>
             <TabPane tabId="2">
               <Row>
                 <Col sm="12">
-                  <h4>Spread Contents</h4>
-                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta blanditiis minus quidem quis ad numquam ea pariatur doloribus modi ducimus velit voluptatibus, mollitia optio molestias quibusdam excepturi ut vel iste.</p>
+                  <div className="row">
+                    <div className="col-sm-12 col-md-6">
+                      <CardSpreadEvent eventInfo={this.state.eventInfo}/>
+                    </div>
+                    <div className="col-sm-12 col-md-6">
+                      <CardBetResult eventInfo={this.state.eventInfo}/>
+                    </div>
+                  </div>
                 </Col>
               </Row>
             </TabPane>
             <TabPane tabId="3">
-              <p>Over/Under markets are dynamic and the point value can change. Bets are assigned to the active market during the time of the bet confirmation.</p>
+              <div className="row">
+                <div className="col-sm-12 col-md-6">
+                  <CardOverUnderEvent eventInfo={this.state.eventInfo}/>
+                </div>
+                <div className="col-sm-12 col-md-6">
+                  <CardBetResult eventInfo={this.state.eventInfo}/>
+                </div>
+              </div>
             </TabPane>
           </TabContent>
         </div>
-        <div className="row">
+        {/* <div className="row">
           <div className="col-sm-12 col-md-6">
             <CardBetEvent eventInfo={this.state.eventInfo}/>
           </div>
           <div className="col-sm-12 col-md-6">
             <CardBetResult eventInfo={this.state.eventInfo}/>
           </div>
-        </div>
+        </div> */}
         <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
