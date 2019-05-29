@@ -118,6 +118,16 @@ const APIdata = [
         name: 'getBetResults',
         info: 'Returns all the bet results or bet result with specific id with query string eventId',
         path: '/api/bet/results?eventId=%23061'
+      },
+      {
+        name: 'getBetspreads',
+        info: 'Returns bet spreads',
+        path: '/api/bet/spreads?eventId=%23061'
+      },
+      {
+        name: 'getBettotals',
+        info: 'Returns bet totals',
+        path: '/api/bet/totals?eventId=%23061'
       }
     ]
   },

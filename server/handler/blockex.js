@@ -25,6 +25,8 @@ const BetAction = require('../../model/betaction');
 const BetResult = require('../../model/betresult');
 const Proposal = require('../../model/proposal');
 const Statistic = require('../../model/statistic');
+const Betspread = require('../../model/betspread');
+const Bettotal = require('../../model/bettotal');
 
 /**
  * Get transactions and unspent transactions by address.
@@ -645,6 +647,48 @@ const getBetResults = async (req, res) => {
   }
 }
 
+const getBetspreads = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    if (req.query.eventId) {
+      const eventId = req.query.eventId
+      const total = await Betspread.find({eventId: `${eventId}`}).sort({createdAt: 1}).count()
+      const results = await Betspread.find({eventId: `${eventId}`}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    } else {
+      const total = await Betspread.find().sort({createdAt: 1}).count()
+      const results = await Betspread.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    }
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
+const getBettotals = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    if (req.query.eventId) {
+      const eventId = req.query.eventId
+      const total = await Bettotal.find({eventId: `${eventId}`}).sort({createdAt: 1}).count()
+      const results = await Bettotal.find({eventId: `${eventId}`}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    } else {
+      const total = await Bettotal.find().sort({createdAt: 1}).count()
+      const results = await Bettotal.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    }
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
 const getBetActioinsWeek = () => {
   // When does the cache expire.
   // For now this is hard coded.
@@ -956,5 +1000,7 @@ module.exports =  {
   getBetEventInfo,
   getBetEventsInfo,
   getCurrentProposals,
-  getStatisticPerWeek
+  getStatisticPerWeek,
+  getBetspreads,
+  getBettotals,
 };
