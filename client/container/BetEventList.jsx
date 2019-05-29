@@ -140,8 +140,11 @@ class BetEventList extends Component {
                   return acc+ action.betValue
               },0.0
             )
+            console.log('Event');
+            console.log(event);
             let betStatus = t('open')
             const eventTime = parseInt(event.events[0].timeStamp);
+            const eventData = event.events[0];
             if ((eventTime - (20 * 60 * 1000)) < Date.now()) {
               betStatus = t('waitForStart')
               if (eventTime < Date.now()) {
@@ -154,11 +157,13 @@ class BetEventList extends Component {
                     const awayVsHome = result.transaction.awayScore - result.transaction.homeScore;
                     let outcome;
                     if (awayVsHome > 0) {
-                      outcome = 'Away Win';
+                      // outcome = 'Away Win';
+                      outcome = eventData.awayTeam;
                     }
 
                     if (awayVsHome < 0) {
-                      outcome = 'Home Win';
+                      // outcome = 'Home Win';
+                      outcome = eventData.homeTeam;
                     }
 
                     if (awayVsHome === 0) {
