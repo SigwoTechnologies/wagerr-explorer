@@ -379,7 +379,7 @@ async function syncBlocksForBet (start, stop, clean = false) {
     await forEachSeries(txs, async (txhash) => {
       const rpctx = await util.getTX(txhash)
 
-      if (blockchain.isPoS(block)) {
+      if (blockchain.isPoS(block) && height >= 45000) {
         await addPoS(block, rpctx)
       }
     })

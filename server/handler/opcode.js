@@ -13,7 +13,7 @@ const decodeOP = async (req, res) => {
   let response;
 
   try {
-    response = await opCode.decode(hexValue);  
+    response = await opCode.decode(hexValue, 'hex', true);  
   } catch (e) {
     console.log(e);
   }

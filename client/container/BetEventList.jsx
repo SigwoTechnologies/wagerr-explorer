@@ -141,9 +141,9 @@ class BetEventList extends Component {
               },0.0
             )
             let betStatus = t('open')
-            if (event.events[0].timeStamp*1000 + 20 * 60 * 1000< Date.now()) {
+            if (event.events[0].timeStamp + 20 * 60 * 1000< Date.now()) {
               betStatus = t('waitForStart')
-              if (event.events[0].timeStamp*1000< Date.now()) {
+              if (event.events[0].timeStamp < Date.now()) {
                 betStatus = t('started')
                 if (event.results.length === 0) {
                   betStatus = <span className={ `badge badge-warning` }>{t('waitingForOracle')}</span>
