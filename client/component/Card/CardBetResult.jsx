@@ -33,13 +33,46 @@ const CardBetResult = ({eventInfo, t}) => {
       })
     }
     const supplyChange = totalMint - totalBet
+    const resultDisplay = (resultData) => {
+      const { transaction } = resultData;
+      // return `${resultData.result}  | \n\n Home ${transaction.homeScore / 10} Away ${transaction.awayScore / 10}`;
+      let resultSection;
+      if (transaction.homeScore > transaction.awayScore) {
+        resultSection = (
+          <span>
+            {`${resultData.result}`} <br />
+            <strong>{`Home ${transaction.homeScore / 10} `}</strong>
+            {`Away ${transaction.awayScore / 10}`}
+          </span>
+        );
+      } else if (transaction.homeScore < transaction.awayScore) {
+        resultSection = (
+          <span>
+            {resultData.result} <br />
+            {`Home ${transaction.homeScore / 10} `}
+            <strong>{`Away ${transaction.awayScore / 10}`}</strong>
+          </span>
+        );
+      } else {
+        resultSection = (
+          <span>
+            {resultData.result} <br />
+            {`Home ${transaction.homeScore / 10} `}
+            {`Away ${transaction.awayScore / 10}`}
+          </span>
+        );
+      }
+
+      return resultSection;
+    };
+
     return <Card title={t('betResult')} className="card--status">
       {results.map((resultItem) => <div key={resultItem.txId}>
         <div className="card__row">
           <span className="card__label">{t('result')}:</span>
           <span className="card__result">
-               {resultItem.result}
-            </span>
+            {resultDisplay(resultItem)}
+          </span>
         </div>
         <div className="card__row">
           <span className="card__label">{t('txId')}:</span>

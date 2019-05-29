@@ -13,6 +13,8 @@ const BetAction = require('../model/betaction')
 const BetEvent = require('../model/betevent')
 const BetResult = require('../model/betresult')
 const Betupdate = require('../model/betupdate')
+const Betspread = require('../model/betspread')
+const Bettotal = require('../model/bettotal')
 const Transaction = require('../model/transaction')
 const TX = require('../model/tx')
 
@@ -153,15 +155,8 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     }
 
     if (resultExists) {
-      if (transaction.eventId == 198) {
-        console.log('This is for event 198');
-        console.log(transaction);
-      }
       console.log(`Bet result for event ${transaction.eventId} on record`);
     } else {
-      if (transaction.eventId == 198) {
-        console.log('Creating bet update for 198');
-      }
       try {
         const event = await BetEvent.findOne({
           eventId: `${transaction.eventId}`,
@@ -260,16 +255,84 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     return createResponse;
   }
 
+  if (['peerlessSpreadsMarket'].includes(transaction.txType)) {
+    const _id = `SM${transaction.eventId}${rpctx.txid}${block.height}`;
+    const spreadExists = await recordExists(Betspread, _id);
+
+    if (spreadExists) {
+      console.log(`Bet spread ${_id} already on record`);
+      return spreadExists;
+    }
+
+    const { spreadPoints } = transaction; 
+
+    const homePoints = (transaction.homeOdds < transaction.awayOdds) ? -(spreadPoints) : spreadPoints;
+    const awayPoints = (transaction.homeOdds > transaction.awayOdds) ? -(spreadPoints) : spreadPoints;
+
+    try {
+      createResponse = Betspread.create({
+        _id,
+        txId: rpctx.txid,
+        blockHeight: block.height,
+        createdAt: block.createdAt,
+        opCode: transaction.opCode,
+        type: transaction.type,
+        txType: transaction.txType,
+        eventId: transaction.eventId,
+        opObject: transaction,
+        homeOdds: transaction.homeOdds,
+        awayOdds: transaction.awayOdds,
+        homePoints,
+        awayPoints,
+      });
+    } catch (e) {
+      console.log('Error creating event update record');
+      console.log(transaction);
+      console.log(e);
+    }
+
+    return createResponse;
+  }
+
+  if (['peerlessTotalsMarket'].includes(transaction.txType)) {
+    const _id = `TM${transaction.eventId}${rpctx.txid}${block.height}`;
+    const spreadExists = await recordExists(Bettotal, _id);
+
+    if (spreadExists) {
+      console.log(`Bet spread ${_id} already on record`);
+      return spreadExists;
+    }
+
+    try {
+      createResponse = Bettotal.create({
+        _id,
+        txId: rpctx.txid,
+        blockHeight: block.height,
+        createdAt: block.createdAt,
+        opCode: transaction.opCode,
+        type: transaction.type,
+        txType: transaction.txType,
+        eventId: transaction.eventId,
+        opObject: transaction,
+        points: transaction.spreadPoints,
+        overOdds: transaction.homeOdds,
+        underOdds: transaction.awayOdds,
+      });
+    } catch (e) {
+      console.log('Error creating event update record');
+      console.log(transaction);
+      console.log(e);
+    }
+
+    return createResponse;
+  }
+
   if (['peerlessResult'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
     const resultExists = await recordExists(BetResult, _id);
 
     if (resultExists) {
       console.log(`Bet result ${_id} already on record`);
-      if (transaction.eventId == 198) {
-        console.log('Event 198 already on record');
-        console.log(transaction);
-      }
       return resultExists;
     }
     

@@ -140,8 +140,8 @@ class BetEventList extends Component {
                   return acc+ action.betValue
               },0.0
             )
-            console.log('Event');
-            console.log(event);
+
+            
             let betStatus = t('open')
             const eventTime = parseInt(event.events[0].timeStamp);
             const eventData = event.events[0];
