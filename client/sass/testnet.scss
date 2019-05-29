@@ -2,6 +2,17 @@ $wgreen: rgba(0, 194, 101, 1);
 $wgreen-dark: #00783C;
 $wgreen-light: #00DD70;
 
+.nav-tabs {
+  font-weight: bold;
+  padding: '0 7px 0 7px';
+
+ .nav-link.active {
+    background: $wgreen !important;
+    background-color: $wgreen !important;
+    border-color: $wgreen-dark !important;
+  }
+}
+
 .modal-dialog {
   max-width: 750px !important;
 }

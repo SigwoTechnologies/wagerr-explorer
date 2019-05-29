@@ -3,6 +3,9 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import React from 'react'
 
+import { TabContent, TabPane, Nav, NavItem, NavLink, Button, Row, Col } from 'reactstrap';
+import classnames from 'classnames';
+
 import CardEarnings from '../component/Card/CardEarnings'
 import CardExchanges from '../component/Card/CardExchanges'
 import CardLinks from '../component/Card/CardLinks'
@@ -37,8 +40,10 @@ class BetEvent extends Component {
       eventInfo: [],
       betActions: [],
       loading: true,
-      error: null
+      error: null,
+      activeTab: '1'
     }
+    this.toggle = this.toggle.bind(this);
   };
 
   componentDidMount () {
@@ -85,6 +90,14 @@ class BetEvent extends Component {
     })
   })}
 
+  toggle(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab
+      });
+    }
+  }
+
   render () {
     if (!!this.state.error) {
       return this.renderError(this.state.error)
@@ -92,7 +105,7 @@ class BetEvent extends Component {
       return this.renderLoading()
     }
     const { t } = this.props;
-    console.log(this.state.eventInfo);
+    // console.log(this.state.eventInfo);
     const cols = [
       {key: 'createdAt', title: t('time')},
       {key: 'bet', title: t('bet')},
@@ -111,6 +124,55 @@ class BetEvent extends Component {
     return (
       <div>
         <HorizontalRule title="Bet Event Info"/>
+        <div className="betevents-tab">
+          <Nav tabs>
+            <NavItem>
+              <NavLink
+                className={classnames({ active: this.state.activeTab === '1' })}
+                onClick={() => { this.toggle('1'); }}
+              >
+                Money Line
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={classnames({ active: this.state.activeTab === '2' })}
+                onClick={() => { this.toggle('2'); }}
+              >
+                Spread
+              </NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink
+                className={classnames({ active: this.state.activeTab === '3' })}
+                onClick={() => { this.toggle('3'); }}
+              >
+                Over/Under
+              </NavLink>
+            </NavItem>
+          </Nav>
+          <TabContent activeTab={this.state.activeTab}>
+            <TabPane tabId="1">
+              <Row>
+                <Col sm="12">
+                  <h4>Money Line Contents</h4>
+                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta blanditiis minus quidem quis ad numquam ea pariatur doloribus modi ducimus velit voluptatibus, mollitia optio molestias quibusdam excepturi ut vel iste.</p>
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane tabId="2">
+              <Row>
+                <Col sm="12">
+                  <h4>Spread Contents</h4>
+                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta blanditiis minus quidem quis ad numquam ea pariatur doloribus modi ducimus velit voluptatibus, mollitia optio molestias quibusdam excepturi ut vel iste.</p>
+                </Col>
+              </Row>
+            </TabPane>
+            <TabPane tabId="3">
+              <p>Over/Under markets are dynamic and the point value can change. Bets are assigned to the active market during the time of the bet confirmation.</p>
+            </TabPane>
+          </TabContent>
+        </div>
         <div className="row">
           <div className="col-sm-12 col-md-6">
             <CardBetEvent eventInfo={this.state.eventInfo}/>
