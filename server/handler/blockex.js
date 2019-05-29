@@ -745,8 +745,8 @@ const getBetEventInfo = async (req, res) => {
       });
 
       // We also query event updates
-      const updates = await BetUpdate.find({eventId: eventId}).sort({createdAt: 1}) 
-
+      const updates = await BetUpdate.find({eventId: `${eventId}`}).sort({createdAt: 1}) 
+ 
       await updates.forEach((u) => {
         const update = JSON.parse(JSON.stringify(u));
 
@@ -754,13 +754,15 @@ const getBetEventInfo = async (req, res) => {
         update.awayOdds = update.opObject.awayOdds;
         update.drawOdds = update.opObject.drawOdds;
 
-        if (
+        formattedEvents.push(update);
+
+        /* if (
           update.homeOdds > 0
           && update.awayOdds > 0
           && update.drawOdds > 0
         ) {
           formattedEvents.push(update);
-        }
+        } */
       });
     }
 

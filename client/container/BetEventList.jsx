@@ -141,17 +141,32 @@ class BetEventList extends Component {
               },0.0
             )
             let betStatus = t('open')
-            if (event.events[0].timeStamp + 20 * 60 * 1000< Date.now()) {
+            const eventTime = parseInt(event.events[0].timeStamp);
+            if ((eventTime - (20 * 60 * 1000)) < Date.now()) {
               betStatus = t('waitForStart')
-              if (event.events[0].timeStamp < Date.now()) {
+              if (eventTime < Date.now()) {
                 betStatus = t('started')
                 if (event.results.length === 0) {
                   betStatus = <span className={ `badge badge-warning` }>{t('waitingForOracle')}</span>
                 }
                 if (event.results.length > 0) {
                   for (const result of event.results) {
-                    if (result.result === event.events[0].homeTeam || result.result === event.events[0].awayTeam || result.result === 'DRW') {
-                      betStatus = <span className={`badge badge-info`}>{result.result}</span>
+                    const awayVsHome = result.transaction.awayScore - result.transaction.homeScore;
+                    let outcome;
+                    if (awayVsHome > 0) {
+                      outcome = 'Away Win';
+                    }
+
+                    if (awayVsHome < 0) {
+                      outcome = 'Home Win';
+                    }
+
+                    if (awayVsHome === 0) {
+                      outcome = 'Draw';
+                    }
+
+                    if (outcome) {
+                      betStatus = <span className={`badge badge-info`}>{outcome}</span>
                     }
                   }
                 }

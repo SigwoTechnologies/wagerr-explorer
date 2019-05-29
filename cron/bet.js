@@ -276,9 +276,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
 
     try {
       let resultPayoutTxs = await TX.find({blockHeight: block.height+1});
-      if (transaction.eventId == 198) {
-        console.log('Creating bet result for 198');
-      }
+
       createResponse = await BetResult.create({
         _id,
         txId: rpctx.txid,
