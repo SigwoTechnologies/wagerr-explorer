@@ -220,7 +220,7 @@ class BetEventList extends Component {
               name: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
                 {event.events[0].league}</Link>,
               round: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
-                {event.events[0].info}</Link>,
+                </Link>,
               homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].homeTeam}</Link>,
               awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].awayTeam}</Link>,
               homeOdds: homeOdds,
