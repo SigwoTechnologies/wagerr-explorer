@@ -22,31 +22,26 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
       </div>
       <div className="card__row">
         <span className="card__label">{t('league')}:</span>
-        {eventInfo.events[0].league} {eventInfo.events[0].info}
+        {eventInfo.events[0].league}
       </div>
       <div className="card__row">
-        <span className="card__label">{t('homeTeam')}:</span>
+        <span className="card__label">{t('Match')}:</span>
         <span className="card__result">
-               {eventInfo.events[0].homeTeam}
-            </span>
-      </div>
-      <div className="card__row">
-        <span className="card__label">{t('awayTeam')}:</span>
-        <span className="card__result">
-                {eventInfo.events[0].awayTeam}
+          {console.log('HERE', eventInfo.events[0])}
+          {`${eventInfo.events[0].homeTeam} vs ${eventInfo.events[0].awayTeam}`}
           </span>
       </div>
       <div className="card__row">
-        <span className="card__label">{t('homeBetNum')}:</span>
+        <span className="card__label">Over {t('Bet Num')}:</span>
         <span
           className="card__result">{eventInfo.homeBets.length}</span>
       </div>
       <div className="card__row">
-        <span className="card__label">{t('homeBetAmount')}:</span>
+        <span className="card__label">Over {t('Bet Amount')}:</span>
         <span className="card__result"> <span className={`badge badge-danger`}>
                 {numeral(homeBetAmount).format('0,0.0000')}</span></span>
       </div>
-      <div className="card__row">
+      {/* <div className="card__row">
         <span className="card__label">{t('drawBetNum')}:</span>
         <span
           className="card__result">{eventInfo.drawBets.length}</span>
@@ -56,14 +51,14 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
         <span className="card__result">
            <span className={`badge badge-danger`}>
                 {numeral(drawBetAmount).format('0,0.0000')}</span></span>
-      </div>
+      </div> */}
       <div className="card__row">
-        <span className="card__label">{t('awayBetNum')}:</span>
+        <span className="card__label">Under {t('Bet Num')}:</span>
         <span
           className="card__result">{eventInfo.awayBets.length}</span>
       </div>
       <div className="card__row">
-        <span className="card__label">{t('awayBetAmount')}:</span>
+        <span className="card__label">Under {t('Bet Amount')}:</span>
         <span className="card__result"><span className={`badge badge-danger`}>
                {numeral(awayBetAmount).format('0,0.0000')}</span>
           </span>

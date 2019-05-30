@@ -21,7 +21,7 @@ const CardBetEvent = ({eventInfo, t}) => {
       </div>
       <div className="card__row">
         <span className="card__label">{t('league')}:</span>
-        {eventInfo.events[0].league} {eventInfo.events[0].info}
+        {eventInfo.events[0].league}
       </div>
       <div className="card__row">
         <span className="card__label">{t('homeTeam')}:</span>
