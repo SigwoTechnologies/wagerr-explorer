@@ -13,9 +13,8 @@ const CardSpreadEvent = ({eventInfo, t}) => {
   if (eventInfo) {
     const homeBetAmount = eventInfo.homeBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
     const awayBetAmount = eventInfo.awayBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    const drawBetAmount = eventInfo.drawBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    return <Card className="card--status">
-      <h1>Spread Event</h1>
+    return <Card title={t('betEvent')} className="card--status">
+      {/* <h1>Spread Event</h1> */}
       <div className="card__row">
         <span className="card__label">{t('time')}:</span>
         {timeStamp24Format(eventInfo.events[0].timeStamp)}
