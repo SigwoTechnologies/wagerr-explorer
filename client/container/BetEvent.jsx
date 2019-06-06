@@ -26,7 +26,8 @@ import { compose } from 'redux'
 import { translate } from 'react-i18next'
 import CardMoneyLineEvent from '../component/Card/CardMoneyLineEvent';
 import CardSpreadEvent from '../component/Card/CardSpreadEvent';
-import CardOverUnderEvent from '../component/Card/CardOverUnderEvent'
+import CardOverUnderEvent from '../component/Card/CardOverUnderEvent';
+import BetEventTable from '../container/BetEventTable';
 
 
 class BetEvent extends Component {
@@ -45,7 +46,7 @@ class BetEvent extends Component {
       betActions: [],
       loading: true,
       error: null,
-      activeTab: '1'
+      activeTab: '1',
     }
     this.toggle = this.toggle.bind(this);
   };
@@ -92,6 +93,7 @@ class BetEvent extends Component {
       })
 
     })
+    .catch((err) => console.log(err))
   })}
 
   toggle(tab) {
@@ -109,21 +111,27 @@ class BetEvent extends Component {
       return this.renderLoading()
     }
     const { t } = this.props;
-    // console.log(this.state.eventInfo);
-    const cols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
-      {key: 'txId', title: t('txId')},
-    ]
-    const oddsCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'homeOdds', title: t('homeOdds')},
-      {key: 'drawOdds', title: t('drawOdds')},
-      {key: 'awayOdds', title: t('awayOdds')},
-      {key: 'txId', title: t('txId')},
-    ]
+    // const cols = [
+    //   {key: 'createdAt', title: t('time')},
+    //   {key: 'bet', title: t('bet')},
+    //   {key: 'odds', title: t('odds')},
+    //   {key: 'value', title: t('value')},
+    //   {key: 'txId', title: t('txId')},
+    // ]
+    // const oddsCols = [
+    //   {key: 'createdAt', title: t('time')},
+    //   {key: 'homeOdds', title: t('homeOdds')},
+    //   {key: 'drawOdds', title: t('drawOdds')},
+    //   {key: 'awayOdds', title: t('awayOdds')},
+    //   {key: 'txId', title: t('txId')},
+    // ]
+    const tableData = {
+      t: t,
+      eventInfo: this.state.eventInfo,
+      activeTab: this.state.activeTab,
+      betActions: this.state.betActions,
+      match: this.props.match,
+    };
 
     return (
       <div>
@@ -169,6 +177,9 @@ class BetEvent extends Component {
                   </div>
                 </Col>
               </Row>
+              <Row>
+                <BetEventTable data={tableData} />
+              </Row>
             </TabPane>
             <TabPane tabId="2">
               <Row>
@@ -183,16 +194,22 @@ class BetEvent extends Component {
                   </div>
                 </Col>
               </Row>
+              <Row>
+                <BetEventTable data={tableData} />
+              </Row>
             </TabPane>
             <TabPane tabId="3">
-              <div className="row">
+              <Row>
                 <div className="col-sm-12 col-md-6">
                   <CardOverUnderEvent eventInfo={this.state.eventInfo}/>
                 </div>
                 <div className="col-sm-12 col-md-6">
                   <CardBetResult eventInfo={this.state.eventInfo}/>
                 </div>
-              </div>
+              </Row>
+              <Row>
+                <BetEventTable data={tableData} />
+              </Row>
             </TabPane>
           </TabContent>
         </div>
@@ -204,7 +221,7 @@ class BetEvent extends Component {
             <CardBetResult eventInfo={this.state.eventInfo}/>
           </div>
         </div> */}
-        <div className="row">
+        {/* <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
               cols={oddsCols}
@@ -222,8 +239,8 @@ class BetEvent extends Component {
               }), ['createdAt'])}
             />
           </div>
-        </div>
-        <div className="row">
+        </div> */}
+        {/* <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
               cols={cols}
@@ -243,7 +260,7 @@ class BetEvent extends Component {
               }), ['createdAt'])}
             />
           </div>
-        </div>
+        </div> */}
       </div>
     )
   };
