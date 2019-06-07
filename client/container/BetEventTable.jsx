@@ -5,10 +5,99 @@ import { date24Format } from '../../lib/date';
 import Table from '../component/Table';
 import { Link } from 'react-router-dom';
 
+// actions
+import PropTypes from 'prop-types';
+import Actions, { getBetEventInfo, getBetTotals } from '../core/Actions';
+import { compose } from 'redux';
+import { translate } from 'react-i18next';
+import { connect } from 'react-redux';
+
 class BetEventTable extends Component {
+  static propTypes = {
+    match: PropTypes.object.isRequired,
+    getBetEventInfo: PropTypes.func.isRequired,
+    getBetActions: PropTypes.func.isRequired,
+    getBetTotals: PropTypes.func.isRequired,
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      eventId: '',
+      eventInfo: [],
+      betActions: [],
+      loading: true,
+      error: null,
+    }
+  };
+
   componentDidMount() {
-    this.getBetEventTotals();
+    this.setState({
+      eventId: this.props.match.params.eventId,
+    });
+    this.getBetData();
+    this.getTheTotals();
+  };
+
+  componentDidUpdate(prevProps) {
+    const { params: { eventId } } = this.props.match
+    if (prevProps.match.params.eventId !== eventId) {
+      this.setState({
+        eventId: this.props.match.params.eventId,
+      });
+      this.getBetData();
+      this.getTheTotals();
+    }
+  };
+
+  getTheTotals = () => {
+    this.setState({ loading: true }, () => {
+      Promise.all([
+        this.props.getBetTotals(this.state.eventId),
+      ]).then((res) => {
+        console.log('###############');
+        console.log(res[0].results[0]);
+        console.log('###############');
+        this.setState({
+          points: res[0].results[0].points,
+          overOdds: res[0].results[0].overOdds,
+          underOdds: res[0].results[0].underOdds,
+          loading: false,
+        });
+      }).catch((err) => {
+        console.log(err);
+      })
+    })
   }
+
+  getBetData = () => {
+    this.setState({loading: true}, () => {
+      Promise.all([
+        this.props.getBetEventInfo(this.state.eventId),
+        this.props.getBetActions(this.state.eventId),
+      ]).then((res) => {
+        sortBy(res[0].events,['blockHeight']).forEach(event =>{
+          res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
+            action =>{
+              if (action.betChoose.includes('Home')) {
+                action.odds = action.homeOdds / 10000
+              }else if (action.betChoose.includes('Away')) {
+                action.odds = action.awayOdds / 10000
+              } else{
+                action.odds = action.drawOdds / 10000
+              }
+            })
+        this.setState({
+          eventInfo: res[0], // 7 days at 5 min = 2016 coins
+          betActions: res[1].actions,
+          loading: false,
+        })
+      })
+
+    })
+    .catch((err) => console.log(err))
+  })}
 
   getBetEventTotals = () => {
     console.log('--------------');
@@ -17,6 +106,11 @@ class BetEventTable extends Component {
   }
 
   render() {
+    // if (!!this.state.error) {
+    //   return this.renderError(this.state.error)
+    // } else if (this.state.loading) {
+    //   return this.renderLoading()
+    // }
     const { t } = this.props.data;
 
     const topOneCols = [
@@ -66,6 +160,8 @@ class BetEventTable extends Component {
       {key: 'value', title: t('value')},
       {key: 'txId', title: t('txId')},
     ]
+
+    console.log(this.state);
 
     return (
       <div className="col-sm-12 col-md-12">
@@ -185,4 +281,15 @@ class BetEventTable extends Component {
   }
 }
 
-export default BetEventTable;
+const mapDispatch = dispatch => ({
+  getBetEventInfo: query => Actions.getBetEventInfo(query),
+  getBetActions: query => Actions.getBetActions(query),
+  getBetTotals: query => Actions.getBetTotals(query),
+});
+
+// export default BetEventTable;
+
+export default compose(
+  translate('betEvent'),
+  connect(null, mapDispatch),
+)(BetEventTable)

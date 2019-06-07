@@ -668,7 +668,7 @@ const getBetspreads = async (req, res) => {
   }
 }
 
-const getBettotals = async (req, res) => {
+const getBetTotals = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
@@ -1002,5 +1002,5 @@ module.exports =  {
   getCurrentProposals,
   getStatisticPerWeek,
   getBetspreads,
-  getBettotals,
+  getBetTotals,
 };

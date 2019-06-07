@@ -11,7 +11,7 @@ import CardExchanges from '../component/Card/CardExchanges'
 import CardLinks from '../component/Card/CardLinks'
 import CardROI from '../component/Card/CardROI'
 import HorizontalRule from '../component/HorizontalRule'
-import Actions, { getBetEventInfo } from '../core/Actions'
+import Actions, { getBetEventInfo, getBetTotals } from '../core/Actions'
 import numeral from 'numeral'
 import { date24Format } from '../../lib/date'
 import Table from '../component/Table'
@@ -34,7 +34,8 @@ class BetEvent extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     getBetEventInfo: PropTypes.func.isRequired,
-    getBetActions: PropTypes.func.isRequired
+    getBetActions: PropTypes.func.isRequired,
+    getBetTotals: PropTypes.func.isRequired,
   }
 
   constructor (props) {
@@ -64,7 +65,7 @@ class BetEvent extends Component {
       this.setState({
         eventId: this.props.match.params.eventId,
       })
-      this.getBetData()
+      this.getBetData();
     }
   };
 
@@ -130,7 +131,6 @@ class BetEvent extends Component {
       eventInfo: this.state.eventInfo,
       activeTab: this.state.activeTab,
       betActions: this.state.betActions,
-      match: this.props.match,
     };
 
     return (
@@ -178,7 +178,7 @@ class BetEvent extends Component {
                 </Col>
               </Row>
               <Row>
-                <BetEventTable data={tableData} />
+                <BetEventTable match={this.props.match} data={tableData} />
               </Row>
             </TabPane>
             <TabPane tabId="2">
@@ -195,7 +195,7 @@ class BetEvent extends Component {
                 </Col>
               </Row>
               <Row>
-                <BetEventTable data={tableData} />
+                <BetEventTable match={this.props.match} data={tableData} />
               </Row>
             </TabPane>
             <TabPane tabId="3">
@@ -208,7 +208,7 @@ class BetEvent extends Component {
                 </div>
               </Row>
               <Row>
-                <BetEventTable data={tableData} />
+                <BetEventTable match={this.props.match} data={tableData} />
               </Row>
             </TabPane>
           </TabContent>
@@ -268,7 +268,8 @@ class BetEvent extends Component {
 
 const mapDispatch = dispatch => ({
   getBetEventInfo: query => Actions.getBetEventInfo(query),
-  getBetActions: query => Actions.getBetActions(query)
+  getBetActions: query => Actions.getBetActions(query),
+  getBetTotals: query => Actions.getBetTotals(query),
 })
 
 export default compose(

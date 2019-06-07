@@ -204,7 +204,7 @@ export const getBetspreads = (query) => {
   return new promise((resolve, reject) => {
     return getFromWorker('betspreads', resolve, reject, query);
   });
-};export const getBettotals = (query) => {
+};export const getBetTotals = (query) => {
   return new promise((resolve, reject) => {
     return getFromWorker('bettotals', resolve, reject, query);
   });
@@ -261,5 +261,5 @@ export default {
   removeWatch,
   getOpCode,
   getBetspreads,
-  getBettotals,
+  getBetTotals,
 };
