@@ -37,7 +37,7 @@ class BetEventTable extends Component {
       eventId: this.props.match.params.eventId,
     });
     this.getBetData();
-    this.getTheTotals();
+    // this.getTheTotals();
   };
 
   componentDidUpdate(prevProps) {
@@ -47,29 +47,29 @@ class BetEventTable extends Component {
         eventId: this.props.match.params.eventId,
       });
       this.getBetData();
-      this.getTheTotals();
+      // this.getTheTotals();
     }
   };
 
-  getTheTotals = () => {
-    this.setState({ loading: true }, () => {
-      Promise.all([
-        this.props.getBetTotals(this.state.eventId),
-      ]).then((res) => {
-        console.log('###############');
-        console.log(res[0].results[0]);
-        console.log('###############');
-        this.setState({
-          points: res[0].results[0].points,
-          overOdds: res[0].results[0].overOdds,
-          underOdds: res[0].results[0].underOdds,
-          loading: false,
-        });
-      }).catch((err) => {
-        console.log(err);
-      })
-    })
-  }
+  // getTheTotals = () => {
+  //   this.setState({ loading: true }, () => {
+  //     Promise.all([
+  //       this.props.getBetTotals(this.state.eventId),
+  //     ]).then((res) => {
+  //       console.log('###############');
+  //       console.log(res[0].results[0]);
+  //       console.log('###############');
+  //       this.setState({
+  //         points: res[0].results[0].points,
+  //         overOdds: res[0].results[0].overOdds,
+  //         underOdds: res[0].results[0].underOdds,
+  //         loading: false,
+  //       });
+  //     }).catch((err) => {
+  //       console.log(err);
+  //     })
+  //   })
+  // }
 
   getBetData = () => {
     this.setState({loading: true}, () => {
@@ -99,12 +99,6 @@ class BetEventTable extends Component {
     .catch((err) => console.log(err))
   })}
 
-  getBetEventTotals = () => {
-    console.log('--------------');
-    console.log('getBetEventTotals has been fired!');
-    console.log('--------------');
-  }
-
   render() {
     // if (!!this.state.error) {
     //   return this.renderError(this.state.error)
@@ -120,18 +114,20 @@ class BetEventTable extends Component {
       {key: 'awayOdds', title: t('awayOdds')},
       {key: 'txId', title: t('txId')},
     ]
-    const topTwoCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'homeOdds', title: t('homeOdds')},
-      {key: 'drawOdds', title: t('spread')},
-      {key: 'awayOdds', title: t('awayOdds')},
-      {key: 'txId', title: t('txId')},
-    ]
+
+    // const topTwoCols = [
+    //   {key: 'createdAt', title: t('time')},
+    //   {key: 'homeOdds', title: t('homeOdds')},
+    //   {key: 'drawOdds', title: t('spread')},
+    //   {key: 'awayOdds', title: t('awayOdds')},
+    //   {key: 'txId', title: t('txId')},
+    // ]
+
     const topThreeCols = [
       {key: 'createdAt', title: t('time')},
-      {key: 'homeOdds', title: t('over odds')},
-      {key: 'drawOdds', title: t('o/u')},
-      {key: 'awayOdds', title: t('under odds')},
+      {key: 'points', title: t('points')},
+      {key: 'overOdds', title: t('home odds')},
+      {key: 'underOdds', title: t('away odds')},
       {key: 'txId', title: t('txId')},
     ]
 
@@ -145,23 +141,20 @@ class BetEventTable extends Component {
 
     const bottomTwoCols = [
       {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'sread', title: t('spread')},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
+      {key: 'homeOdds', title: t('homeOdds')},
+      {key: 'awayOdds', title: t('awayOdds')},
+      {key: 'spread', title: t('spread')},
       {key: 'txId', title: t('txId')},
     ]
 
-    const bottomThreeCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'o/u', title: t('o/u')},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
-      {key: 'txId', title: t('txId')},
-    ]
-
-    console.log(this.state);
+    // const bottomThreeCols = [
+    //   {key: 'createdAt', title: t('time')},
+    //   {key: 'bet', title: t('bet')},
+    //   {key: 'o/u', title: t('o/u')},
+    //   {key: 'odds', title: t('odds')},
+    //   {key: 'value', title: t('value')},
+    //   {key: 'txId', title: t('txId')},
+    // ]
 
     return (
       <div className="col-sm-12 col-md-12">
@@ -205,7 +198,7 @@ class BetEventTable extends Component {
       {
         this.props.data.activeTab == 2 &&
         <div>
-            <Table
+            {/* <Table
               cols={topTwoCols}
               data={sortBy(this.props.data.eventInfo.events.map((event) => {
                 return {
@@ -219,18 +212,20 @@ class BetEventTable extends Component {
                   )
                 }
               }), ['createdAt'])}
-            />
+            /> */}
             <Table
               cols={bottomTwoCols}
-              data={sortBy(this.props.data.betActions.map((action) => {
+              data={sortBy(this.props.data.betSpreads.map((action) => {
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
-                  bet: action.betChoose.replace('Money Line - ', ''),
-                  odds: action.odds,
-                  value: action.betValue
-                    ? (<span
-                      className="badge badge-danger">-{numeral(action.betValue).format('0,0.0000')} WGR</span>) : '',
+                  homeOdds: action.homeOdds / 10000,
+                  awayOdds: action.awayOdds / 10000,
+                  spread: action.homePoints,
+                  // odds: action.odds,
+                  // value: action.betValue
+                  //   ? (<span
+                  //     className="badge badge-danger">-{numeral(action.betValue).format('0,0.0000')} WGR</span>) : '',
                   txId: (
                     <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
                   )
@@ -244,26 +239,26 @@ class BetEventTable extends Component {
         <div>
           <Table
             cols={topThreeCols}
-            data={sortBy(this.props.data.eventInfo.events.map((event) => {
+            data={sortBy(this.props.data.betTotals.map((action) => {
               return {
-                ...event,
-                createdAt: date24Format(event.createdAt),
-                homeOdds: event.homeOdds / 10000,
-                drawOdds: event.drawOdds / 10000,
-                awayOdds: event.awayOdds / 10000,
+                ...action,
+                createdAt: date24Format(action.createdAt),
+                points: action.points,
+                overOdds: action.overOdds / 10000,
+                underOdds: action.underOdds / 10000,
                 txId: (
-                  <Link to={`/tx/${ event.txId }`}>{event.txId}</Link>
+                  <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
                 )
               }
             }), ['createdAt'])}
           />
-          <Table
+          {/* <Table
             cols={bottomThreeCols}
             data={sortBy(this.props.data.betActions.map((action) => {
               return {
                 ...action,
                 createdAt: date24Format(action.createdAt),
-                bet: action.betChoose.replace('Money Line - ', ''),
+                bet: '',
                 odds: action.odds,
                 value: action.betValue
                   ? (<span
@@ -273,7 +268,7 @@ class BetEventTable extends Component {
                 )
               }
             }), ['createdAt'])}
-          />
+          /> */}
       </div>
       }
       </div>

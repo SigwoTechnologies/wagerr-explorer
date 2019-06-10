@@ -11,7 +11,7 @@ import CardExchanges from '../component/Card/CardExchanges'
 import CardLinks from '../component/Card/CardLinks'
 import CardROI from '../component/Card/CardROI'
 import HorizontalRule from '../component/HorizontalRule'
-import Actions, { getBetEventInfo, getBetTotals } from '../core/Actions'
+import Actions from '../core/Actions'
 import numeral from 'numeral'
 import { date24Format } from '../../lib/date'
 import Table from '../component/Table'
@@ -35,6 +35,7 @@ class BetEvent extends Component {
     match: PropTypes.object.isRequired,
     getBetEventInfo: PropTypes.func.isRequired,
     getBetActions: PropTypes.func.isRequired,
+    getBetspreads: PropTypes.func.isRequired,
     getBetTotals: PropTypes.func.isRequired,
   }
 
@@ -45,6 +46,8 @@ class BetEvent extends Component {
       eventId: '',
       eventInfo: [],
       betActions: [],
+      betSpreads: [],
+      betTotals: [],
       loading: true,
       error: null,
       activeTab: '1',
@@ -73,7 +76,9 @@ class BetEvent extends Component {
     this.setState({loading: true}, () => {
       Promise.all([
         this.props.getBetEventInfo(this.state.eventId),
-        this.props.getBetActions(this.state.eventId)
+        this.props.getBetActions(this.state.eventId),
+        this.props.getBetspreads(this.state.eventId),
+        this.props.getBetTotals(this.state.eventId),
       ]).then((res) => {
         sortBy(res[0].events,['blockHeight']).forEach(event =>{
           res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
@@ -89,6 +94,8 @@ class BetEvent extends Component {
         this.setState({
           eventInfo: res[0], // 7 days at 5 min = 2016 coins
           betActions: res[1].actions,
+          betSpreads: res[2].results,
+          betTotals: res[3].results,
           loading: false,
         })
       })
@@ -131,6 +138,8 @@ class BetEvent extends Component {
       eventInfo: this.state.eventInfo,
       activeTab: this.state.activeTab,
       betActions: this.state.betActions,
+      betSpreads: this.state.betSpreads,
+      betTotals: this.state.betTotals,
     };
 
     return (
@@ -269,6 +278,7 @@ class BetEvent extends Component {
 const mapDispatch = dispatch => ({
   getBetEventInfo: query => Actions.getBetEventInfo(query),
   getBetActions: query => Actions.getBetActions(query),
+  getBetspreads: query => Actions.getBetspreads(query),
   getBetTotals: query => Actions.getBetTotals(query),
 })
 
