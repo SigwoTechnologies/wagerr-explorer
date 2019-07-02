@@ -26,7 +26,6 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">{t('Match')}:</span>
         <span className="card__result">
-          {console.log('HERE', eventInfo.events[0])}
           {`${eventInfo.events[0].homeTeam} vs ${eventInfo.events[0].awayTeam}`}
           </span>
       </div>

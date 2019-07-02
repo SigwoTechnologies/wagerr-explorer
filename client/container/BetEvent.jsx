@@ -11,7 +11,7 @@ import CardExchanges from '../component/Card/CardExchanges'
 import CardLinks from '../component/Card/CardLinks'
 import CardROI from '../component/Card/CardROI'
 import HorizontalRule from '../component/HorizontalRule'
-import Actions, { getBetEventInfo } from '../core/Actions'
+import Actions from '../core/Actions'
 import numeral from 'numeral'
 import { date24Format } from '../../lib/date'
 import Table from '../component/Table'
@@ -26,14 +26,17 @@ import { compose } from 'redux'
 import { translate } from 'react-i18next'
 import CardMoneyLineEvent from '../component/Card/CardMoneyLineEvent';
 import CardSpreadEvent from '../component/Card/CardSpreadEvent';
-import CardOverUnderEvent from '../component/Card/CardOverUnderEvent'
+import CardOverUnderEvent from '../component/Card/CardOverUnderEvent';
+import BetEventTable from '../container/BetEventTable';
 
 
 class BetEvent extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     getBetEventInfo: PropTypes.func.isRequired,
-    getBetActions: PropTypes.func.isRequired
+    getBetActions: PropTypes.func.isRequired,
+    getBetspreads: PropTypes.func.isRequired,
+    getBetTotals: PropTypes.func.isRequired,
   }
 
   constructor (props) {
@@ -43,9 +46,11 @@ class BetEvent extends Component {
       eventId: '',
       eventInfo: [],
       betActions: [],
+      betSpreads: [],
+      betTotals: [],
       loading: true,
       error: null,
-      activeTab: '1'
+      activeTab: '1',
     }
     this.toggle = this.toggle.bind(this);
   };
@@ -63,7 +68,7 @@ class BetEvent extends Component {
       this.setState({
         eventId: this.props.match.params.eventId,
       })
-      this.getBetData()
+      this.getBetData();
     }
   };
 
@@ -71,7 +76,9 @@ class BetEvent extends Component {
     this.setState({loading: true}, () => {
       Promise.all([
         this.props.getBetEventInfo(this.state.eventId),
-        this.props.getBetActions(this.state.eventId)
+        this.props.getBetActions(this.state.eventId),
+        this.props.getBetspreads(this.state.eventId),
+        this.props.getBetTotals(this.state.eventId),
       ]).then((res) => {
         sortBy(res[0].events,['blockHeight']).forEach(event =>{
           res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
@@ -87,11 +94,14 @@ class BetEvent extends Component {
         this.setState({
           eventInfo: res[0], // 7 days at 5 min = 2016 coins
           betActions: res[1].actions,
+          betSpreads: res[2].results,
+          betTotals: res[3].results,
           loading: false,
         })
       })
 
     })
+    .catch((err) => console.log(err))
   })}
 
   toggle(tab) {
@@ -109,21 +119,28 @@ class BetEvent extends Component {
       return this.renderLoading()
     }
     const { t } = this.props;
-    // console.log(this.state.eventInfo);
-    const cols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
-      {key: 'txId', title: t('txId')},
-    ]
-    const oddsCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'homeOdds', title: t('homeOdds')},
-      {key: 'drawOdds', title: t('drawOdds')},
-      {key: 'awayOdds', title: t('awayOdds')},
-      {key: 'txId', title: t('txId')},
-    ]
+    // const cols = [
+    //   {key: 'createdAt', title: t('time')},
+    //   {key: 'bet', title: t('bet')},
+    //   {key: 'odds', title: t('odds')},
+    //   {key: 'value', title: t('value')},
+    //   {key: 'txId', title: t('txId')},
+    // ]
+    // const oddsCols = [
+    //   {key: 'createdAt', title: t('time')},
+    //   {key: 'homeOdds', title: t('homeOdds')},
+    //   {key: 'drawOdds', title: t('drawOdds')},
+    //   {key: 'awayOdds', title: t('awayOdds')},
+    //   {key: 'txId', title: t('txId')},
+    // ]
+    const tableData = {
+      t: t,
+      eventInfo: this.state.eventInfo,
+      activeTab: this.state.activeTab,
+      betActions: this.state.betActions,
+      betSpreads: this.state.betSpreads,
+      betTotals: this.state.betTotals,
+    };
 
     return (
       <div>
@@ -169,6 +186,9 @@ class BetEvent extends Component {
                   </div>
                 </Col>
               </Row>
+              <Row>
+                <BetEventTable match={this.props.match} data={tableData} />
+              </Row>
             </TabPane>
             <TabPane tabId="2">
               <Row>
@@ -183,16 +203,22 @@ class BetEvent extends Component {
                   </div>
                 </Col>
               </Row>
+              <Row>
+                <BetEventTable match={this.props.match} data={tableData} />
+              </Row>
             </TabPane>
             <TabPane tabId="3">
-              <div className="row">
+              <Row>
                 <div className="col-sm-12 col-md-6">
                   <CardOverUnderEvent eventInfo={this.state.eventInfo}/>
                 </div>
                 <div className="col-sm-12 col-md-6">
                   <CardBetResult eventInfo={this.state.eventInfo}/>
                 </div>
-              </div>
+              </Row>
+              <Row>
+                <BetEventTable match={this.props.match} data={tableData} />
+              </Row>
             </TabPane>
           </TabContent>
         </div>
@@ -204,7 +230,7 @@ class BetEvent extends Component {
             <CardBetResult eventInfo={this.state.eventInfo}/>
           </div>
         </div> */}
-        <div className="row">
+        {/* <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
               cols={oddsCols}
@@ -222,8 +248,8 @@ class BetEvent extends Component {
               }), ['createdAt'])}
             />
           </div>
-        </div>
-        <div className="row">
+        </div> */}
+        {/* <div className="row">
           <div className="col-sm-12 col-md-12">
             <Table
               cols={cols}
@@ -243,7 +269,7 @@ class BetEvent extends Component {
               }), ['createdAt'])}
             />
           </div>
-        </div>
+        </div> */}
       </div>
     )
   };
@@ -251,7 +277,9 @@ class BetEvent extends Component {
 
 const mapDispatch = dispatch => ({
   getBetEventInfo: query => Actions.getBetEventInfo(query),
-  getBetActions: query => Actions.getBetActions(query)
+  getBetActions: query => Actions.getBetActions(query),
+  getBetspreads: query => Actions.getBetspreads(query),
+  getBetTotals: query => Actions.getBetTotals(query),
 })
 
 export default compose(

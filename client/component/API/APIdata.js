@@ -125,7 +125,7 @@ const APIdata = [
         path: '/api/bet/spreads?eventId=%23061'
       },
       {
-        name: 'getBettotals',
+        name: 'getBetTotals',
         info: 'Returns bet totals',
         path: '/api/bet/totals?eventId=%23061'
       }
