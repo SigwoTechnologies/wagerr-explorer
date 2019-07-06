@@ -14,7 +14,9 @@ const Betspread = mongoose.model('Betspread', new mongoose.Schema({
     awayPoints: { required: true, type: Number },
     homeOdds: { required: true, type: Number },
     awayOdds: {  required: true, type: Number },
-    txType: { required: false, type: String }
+    txType: { required: false, type: String },
+    betValue: { required: false, type: Number },
+    value: { required: false, type: Number },
   }, { versionKey: false }), 'betspreads');
   
   module.exports =  Betspread;

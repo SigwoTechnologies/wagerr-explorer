@@ -282,6 +282,9 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         opObject: transaction,
         homeOdds: transaction.homeOdds,
         awayOdds: transaction.awayOdds,
+        betValue: vout.value,
+        value: transaction.betValue,
+        transaction,
         homePoints,
         awayPoints,
       });

@@ -80,6 +80,7 @@ class BetEvent extends Component {
         this.props.getBetspreads(this.state.eventId),
         this.props.getBetTotals(this.state.eventId),
       ]).then((res) => {
+        console.log('res0', res[0], 'res1', res[1], 'res2', res[2], 'res3', res[3])
         sortBy(res[0].events,['blockHeight']).forEach(event =>{
           res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
             action =>{
