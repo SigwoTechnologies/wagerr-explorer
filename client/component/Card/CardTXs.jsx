@@ -55,7 +55,7 @@ export default class CardTXs extends Component {
             ),
             vout: (
               <span className={ `badge badge-${ blockValue < 0 ? 'danger' : 'success' }` }>
-                { numeral(blockValue).format('0,0.0000') }
+                { numeral(blockValue).format('0,0.00000000') }
               </span>
             )
           });

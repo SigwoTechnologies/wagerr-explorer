@@ -95,21 +95,21 @@ const CardBetResult = ({eventInfo, t}) => {
         <span className="card__label">{t('betAmount')}:</span>
         <span className="card__result">
           <span className={`badge badge-danger`}>
-            {numeral(totalBet).format('0,0.0000')}</span>
+            {numeral(totalBet).format('0,0.00000000')}</span>
         </span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('payoutAmount')}:</span>
         <span className="card__result">
           <span className={`badge badge-success`}>
-            {numeral(totalMint).format('0,0.0000')}</span>
+            {numeral(totalMint).format('0,0.00000000')}</span>
         </span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('supplyChange')}:</span>
         <span className="card__result">
         <span className={`badge badge-${ supplyChange < 0 ? 'danger' : 'success' }`}>
-                {numeral(supplyChange).format('0,0.0000')}
+                {numeral(supplyChange).format('0,0.00000000')}
               </span>
           </span>
       </div>

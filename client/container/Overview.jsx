@@ -53,7 +53,7 @@ class Overview extends Component {
         createdAt: date24Format(tx.createdAt),
         recipients: tx.vout.length,
         txId: (<Link to={ `/tx/${ tx.txId }` }>{ tx.txId }</Link>),
-        vout: numeral(blockValue).format('0,0.0000')
+        vout: numeral(blockValue).format('0,0.00000000')
       });
     });
 
