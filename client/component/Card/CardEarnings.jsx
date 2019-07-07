@@ -13,7 +13,7 @@ const CardEarnings = ({ coin }) => {
   const month = blockchain.getMNBlocksPerMonth(coin.mnsOn) * subsidy;
   const year = blockchain.getMNBlocksPerYear(coin.mnsOn) * subsidy;
 
-  const nbtc = v => numeral(v).format('0,0.0000');
+  const nbtc = v => numeral(v).format('0,0.00000000');
   const nusd = v => numeral(v).format('$0,0.00');
   
   return (

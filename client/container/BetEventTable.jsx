@@ -259,7 +259,7 @@ class BetEventTable extends Component {
                 odds: action.odds,
                 value: action.betValue
                   ? (<span
-                    className="badge badge-danger">-{numeral(action.betValue).format('0,0.0000')} WGR</span>) : 'd',
+                    className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : 'd',
                 txId: (
                   <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
                 )
@@ -298,7 +298,7 @@ class BetEventTable extends Component {
                   odds: action.homeOdds / 10000,
                   value: action.betValue
                     ? (<span
-                      className="badge badge-danger">-{numeral(action.betValue).format('0,0.0000')} WGR</span>) : '',
+                      className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
                   txId: (
                     <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
                   )
@@ -336,7 +336,7 @@ class BetEventTable extends Component {
                 overUnder: 'NA',
                 odds: action.odds,
                 value: action.betValue
-                  ? (<span className="badge badge-danger">-{numeral(action.betValue).format('0,0.0000')} WGR</span>) : '',
+                  ? (<span className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
                 txId: (
                   <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
                 )

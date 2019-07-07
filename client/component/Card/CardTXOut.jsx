@@ -43,16 +43,16 @@ export default class CardTXOut extends Component {
             (tx.address === config.coin.oracle_payout_address) ?
               <span>  <span className="badge badge-success">Oracle</span>
               <span className="badge badge-success">
-              {numeral(tx.value).format('0,0.0000')} WGR
+              {numeral(tx.value).format('0,0.00000000')} WGR
             </span></span>
               : (tx.address === config.coin.dev_payout_address) ?
               <span>  <span className="badge badge-success">Dev</span>
               <span className="badge badge-success">
-              {numeral(tx.value).format('0,0.0000')} WGR
+              {numeral(tx.value).format('0,0.00000000')} WGR
             </span></span>
               :
               <span className="badge badge-success">
-              {numeral(tx.value).format('0,0.0000')} WGR
+              {numeral(tx.value).format('0,0.00000000')} WGR
             </span>
           )
         }))}/>

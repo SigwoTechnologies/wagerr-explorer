@@ -43,7 +43,7 @@ const CardBetEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">{t('homeBetAmount')}:</span>
         <span className="card__result"> <span className={`badge badge-danger`}>
-                {numeral(homeBetAmount).format('0,0.0000')}</span></span>
+                {numeral(homeBetAmount).format('0,0.00000000')}</span></span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('drawBetNum')}:</span>
@@ -54,7 +54,7 @@ const CardBetEvent = ({eventInfo, t}) => {
         <span className="card__label">{t('drawBetAmount')}:</span>
         <span className="card__result">
            <span className={`badge badge-danger`}>
-                {numeral(drawBetAmount).format('0,0.0000')}</span></span>
+                {numeral(drawBetAmount).format('0,0.00000000')}</span></span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('awayBetNum')}:</span>
@@ -64,7 +64,7 @@ const CardBetEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">{t('awayBetAmount')}:</span>
         <span className="card__result"><span className={`badge badge-danger`}>
-               {numeral(awayBetAmount).format('0,0.0000')}</span>
+               {numeral(awayBetAmount).format('0,0.00000000')}</span>
           </span>
       </div>
     </Card>

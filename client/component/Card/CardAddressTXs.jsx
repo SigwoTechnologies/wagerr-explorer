@@ -55,7 +55,7 @@ export default class CardAddressTXs extends Component {
             amount: (
               <span
                 className={ `badge badge-${ isSpent ? 'danger' : 'success' }` }>
-                { numeral(amount).format('0,0.0000') } WGR
+                { numeral(amount).format('0,0.00000000') } WGR
               </span>
             ),
             createdAt: date24Format(tx.createdAt),

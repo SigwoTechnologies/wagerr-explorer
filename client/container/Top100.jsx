@@ -50,7 +50,7 @@ class Top100 extends Component {
             ),
             index: idx + 1,
             percent: numeral((wallet.value / this.props.coin.supply) * 100.0).format('0,0.00'),
-            value: numeral(wallet.value).format('0,0.0000')
+            value: numeral(wallet.value).format('0,0.00000000')
           })) } />
       </div>
     );

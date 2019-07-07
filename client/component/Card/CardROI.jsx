@@ -24,7 +24,7 @@ const CardROI = ({ coin }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(roi).format('0,0.0000') }%
+          { numeral(roi).format('0,0.00000000') }%
         </div>
         <div className="h5">
           Estimated ROI
@@ -32,7 +32,7 @@ const CardROI = ({ coin }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(coin.supply ? coin.supply : 0.0).format('0,0.0000') } WGR
+          { numeral(coin.supply ? coin.supply : 0.0).format('0,0.00000000') } WGR
         </div>
         <div className="h5">
           Coin Supply (Total)
@@ -40,7 +40,7 @@ const CardROI = ({ coin }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(coin.supply ? coin.supply - (mns * mncoins) : 0.0).format('0,0.0000') } WGR
+          { numeral(coin.supply ? coin.supply - (mns * mncoins) : 0.0).format('0,0.00000000') } WGR
         </div>
         <div className="h5">
           Coin Supply (Circulating)
@@ -48,7 +48,7 @@ const CardROI = ({ coin }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(coin.cap * coin.btc).format('0,0.0000') } BTC
+          { numeral(coin.cap * coin.btc).format('0,0.00000000') } BTC
         </div>
         <div className="h5">
           Market Cap BTC
@@ -64,7 +64,7 @@ const CardROI = ({ coin }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(mns * mncoins).format('0,0.0000') } WGR
+          { numeral(mns * mncoins).format('0,0.00000000') } WGR
         </div>
         <div className="h5">
           Coins Locked
@@ -72,7 +72,7 @@ const CardROI = ({ coin }) => {
       </div>
       <div className="mb-3">
         <div className="h3">
-          { numeral(mncoins * coin.btc).format('0,0.0000') } BTC / { numeral(mncoins * coin.usd).format('$0,0.00') }
+          { numeral(mncoins * coin.btc).format('0,0.00000000') } BTC / { numeral(mncoins * coin.usd).format('$0,0.00') }
         </div>
         <div className="h5">
           Masternode Worth

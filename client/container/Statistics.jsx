@@ -173,8 +173,8 @@ class Statistics extends Component {
             </div>
             <div className="col-md-12 col-lg-6">
               <h3>Network Hash Rate Last 7 Days</h3>
-              <h4>{ numeral(netHash.hash).format('0,0.0000') } { netHash.label }/s { day }</h4>
-              <h5>Difficulty: { numeral(this.props.coin.diff).format('0,0.0000') }</h5>
+              <h4>{ numeral(netHash.hash).format('0,0.00000000') } { netHash.label }/s { day }</h4>
+              <h5>Difficulty: { numeral(this.props.coin.diff).format('0,0.00000000') }</h5>
               <div>
                 <GraphLineFull
                   color="#1991eb"
@@ -200,7 +200,7 @@ class Statistics extends Component {
             <div className="col-md-12 col-lg-6">
               <h3>Wagerr Price USD</h3>
               <h4>{ numeral(this.props.coin.usd).format('$0,0.00') } { day }</h4>
-              <h5>{ numeral(this.props.coin.btc).format('0.00000000') } BTC</h5>
+              <h5>{ numeral(this.props.coin.btc).format('0.000000000000') } BTC</h5>
               <div>
                 <GraphLineFull
                   color="#1991eb"
@@ -235,7 +235,7 @@ class Statistics extends Component {
             </div>
             <div className="col-md-12 col-lg-6">
               <h3>Supply Change Last 7 Days</h3>
-              <h4>{ numeral(this.props.coin.supply).format('0,0.0000') } { day }</h4>
+              <h4>{ numeral(this.props.coin.supply).format('0,0.00000000') } { day }</h4>
               <div>
                 <GraphLineFull
                   color="#1991eb"

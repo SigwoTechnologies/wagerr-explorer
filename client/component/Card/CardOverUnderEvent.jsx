@@ -37,7 +37,7 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">Over {t('Bet Amount')}:</span>
         <span className="card__result"> <span className={`badge badge-danger`}>
-                {numeral(homeBetAmount).format('0,0.0000')}</span></span>
+                {numeral(homeBetAmount).format('0,0.00000000')}</span></span>
       </div>
       {/* <div className="card__row">
         <span className="card__label">{t('drawBetNum')}:</span>
@@ -48,7 +48,7 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
         <span className="card__label">{t('drawBetAmount')}:</span>
         <span className="card__result">
            <span className={`badge badge-danger`}>
-                {numeral(drawBetAmount).format('0,0.0000')}</span></span>
+                {numeral(drawBetAmount).format('0,0.00000000')}</span></span>
       </div> */}
       <div className="card__row">
         <span className="card__label">Under {t('Bet Num')}:</span>
@@ -58,7 +58,7 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">Under {t('Bet Amount')}:</span>
         <span className="card__result"><span className={`badge badge-danger`}>
-               {numeral(awayBetAmount).format('0,0.0000')}</span>
+               {numeral(awayBetAmount).format('0,0.00000000')}</span>
           </span>
       </div>
     </Card>
