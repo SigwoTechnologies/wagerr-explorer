@@ -41,10 +41,11 @@ export default class BetModal extends Component {
     }));
   };
 
-  renderDecryption = (decryption) => (
+  renderDecryptionOne = (decryption) => (
     <div>
       <div className="text-center">
         <h3>
+          ONE
           <b>{decryption.homeTeam}</b>
           <span> vs </span>
           <b>{decryption.awayTeam}</b>
@@ -88,6 +89,31 @@ export default class BetModal extends Component {
     </div>
   );
 
+  renderDecryptionTwo = (decryption) => (
+    <div>
+      <div className="text-center">
+        {decryption.eventId ? (
+          <span>
+            <span>Event </span>
+            <Link to={`/bet/event/${decryption.eventId}`}>#{decryption.eventId}</Link>
+          </span>
+        ) : null}
+      </div>
+      <br />
+      <br />
+      <div className="row">
+        <div className="col text-center">
+          <h4>Home</h4>
+          <h4><b>{decryption.homeScore}</b></h4>
+        </div>
+        <div className="col text-center">
+          <h4>Away</h4>
+          <h4><b>{decryption.awayScore}</b></h4>
+        </div>
+      </div>
+    </div>
+  );
+
   render() {
     const { buttonLabel, className, address } = this.props;
     const { modal, decryption } = this.state;
@@ -102,11 +128,15 @@ export default class BetModal extends Component {
         <Modal isOpen={modal} toggle={this.toggle} className={className}>
           <ModalHeader toggle={this.toggle}>
             <div>
-              {decryption ? homeTeam : 'Home Team'} vs {decryption ? awayTeam : 'Away Team'}
+              {decryption.homeTeam
+                ? (<div>{homeTeam} vs {awayTeam}</div>)
+                : (<div>Bet Results</div>)}
             </div>
           </ModalHeader>
           <ModalBody>
-            {decryption ? this.renderDecryption(decryption) : null}
+            {decryption.homeTeam
+              ? this.renderDecryptionOne(decryption)
+              : this.renderDecryptionTwo(decryption)}
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.toggle}>Close</Button>
