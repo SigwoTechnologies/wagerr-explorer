@@ -30,9 +30,9 @@ class BetEventTable extends Component {
       betActions: [],
       loading: true,
       error: null,
-      moneyLineData: [],
-      spreadData: [],
-      ouData: [],
+      MoneyLine: [],
+      Totals: [],
+      Spreads: [],
     }
   };
 
@@ -41,6 +41,7 @@ class BetEventTable extends Component {
       eventId: this.props.match.params.eventId,
     });
     this.getBetData();
+    this.sortBetData();
   };
 
   componentDidUpdate(prevProps) {
@@ -50,34 +51,31 @@ class BetEventTable extends Component {
         eventId: this.props.match.params.eventId,
       });
       this.getBetData();
+      this.sortBetData();
     }
   };
 
-  /* Map the this.props.data to the state and sort the data by what type of bet it is (money line, spread, over/under) */
-  // mapDataToState = () => {
-  //   const propData = this.props.data;
-  //   console.log('propData', propData);
-  // }
-
-  // getTheTotals = () => {
-  //   this.setState({ loading: true }, () => {
-  //     Promise.all([
-  //       this.props.getBetTotals(this.state.eventId),
-  //     ]).then((res) => {
-  //       console.log('###############');
-  //       console.log(res[0].results[0]);
-  //       console.log('###############');
-  //       this.setState({
-  //         points: res[0].results[0].points,
-  //         overOdds: res[0].results[0].overOdds,
-  //         underOdds: res[0].results[0].underOdds,
-  //         loading: false,
-  //       });
-  //     }).catch((err) => {
-  //       console.log(err);
-  //     })
-  //   })
-  // }
+  sortBetData = () => {
+    // Money Line Data
+    const MoneyLineBetData = this.props.data.betActions;
+    let MoneyLine = [];
+    let Totals = [];
+    let Spreads = [];
+    MoneyLineBetData.forEach((action) => {
+      if (action.betChoose == 'Money Line - Away Win' || action.betChoose == 'Money Line - Home Win') {
+        MoneyLine.push(action);
+      } else if (action.betChoose == 'Totals - Over' || action.betChoose == 'Totals - Under') {
+        Totals.push(action);
+      } else if (action.betChoose == 'Spreads - Home' || action.betChoose == 'Spreads - Away') {
+        Spreads.push(action);
+      };
+      this.setState({
+        MoneyLine,
+        Totals,
+        Spreads,
+      });
+    });
+  };
 
   getBetData = () => {
     this.setState({loading: true}, () => {
@@ -97,10 +95,7 @@ class BetEventTable extends Component {
               } else {
                 action.odds = action.drawOdds / 10000
               }
-            })
-          const betActions = res[1].actions;
-          const betSpreads = res[3].results;
-          console.log('66666666666666', betActions, betSpreads);
+            });
           this.setState({
             eventInfo: res[0], // 7 days at 5 min = 2016 coins
             betActions: res[1].actions,
@@ -113,48 +108,7 @@ class BetEventTable extends Component {
     .catch((err) => console.log(err))
   })};
 
-  // getBetSpreadsValue = (txId) => {
-  //   console.log('TXID ========');
-  //   console.log(txId);
-  // }
-
-  // getEventValue = (txId) => {
-  //   console.log('#### getEventValue(txId) ####');
-  //   // console.log(txId);
-  // };
-
-  // getFilteredBetData = (betData) => {
-  //   console.log('#### getFilteredBetData ####');
-  //   // const betData = this.props.data.betActions;
-  //   let moneyLineData;
-  //   let totalsData;
-  //   let spreadsData;
-
-  //   const filterBet = action => {
-  //     if (action.betChoose == 'Money Line - Away Win' || action.betChoose == 'Money Line - Home Win') {
-  //       moneyLineData = action;
-  //       return moneyLineData;
-  //     } else if (action.betChoose == 'Totals - Over' || action.betChoose == 'Totals - Under') {
-  //       totalsData = action;
-  //       return totalsData;
-  //     } else if (action.betChoose == 'Spreads - Home' || action.betChoose == 'Spreads - Away') {
-  //       spreadsData = action;
-  //       return spreadsData;
-  //     }
-  //   }
-
-  //   const filtedList = betData.filter(filterBet);
-
-  //   console.log('$#$#$#$#$#$#$#', this.props.data);
-  //   console.log(filtedList);
-  // }
-
   render() {
-    // if (!!this.state.error) {
-    //   return this.renderError(this.state.error)
-    // } else if (this.state.loading) {
-    //   return this.renderLoading()
-    // }
     const { t } = this.props.data;
 
     const topOneCols = [
@@ -207,28 +161,6 @@ class BetEventTable extends Component {
       {key: 'txId', title: t('txId')},
     ]
 
-    // this.getFilteredBetData();
-
-    // console.log('%%%%%%%%%%%%%%%');
-    // console.log('%%%%%%%%%%%%%%%');
-    // console.log('%%%%%%%%%%%%%%%');
-    // console.log(this.props.data);
-
-    const filterMoneyLine = x => {
-      if (x.betChoose == 'Money Line - Away Win' || x.betChoose == 'Money Line - Home Win') {
-        moneyLineData = x;
-        return x;
-      } else if (x.betChoose == 'Totals - Over' || x.betChoose == 'Totals - Under') {
-        totalsData = x;
-        return x;
-      } else if (x.betChoose == 'Spreads - Home' || x.betChoose == 'Spreads - Away') {
-        spreadsData = x;
-        return x;
-      }
-    }
-
-    console.log(filterMoneyLine(1000));
-
     return (
       <div className="col-sm-12 col-md-12">
       {
@@ -251,7 +183,7 @@ class BetEventTable extends Component {
           />
           <Table
             cols={bottomOneCols}
-            data={sortBy(this.props.data.betActions.map((action) => {
+            data={sortBy(this.state.MoneyLine.map((action) => {
               return {
                 ...action,
                 createdAt: date24Format(action.createdAt),
@@ -288,13 +220,14 @@ class BetEventTable extends Component {
             />
             <Table
               cols={bottomTwoCols}
-              data={sortBy(this.props.data.betSpreads.map((action) => {
-                console.log('$$$$$$$$$$', this.props.data.betSpreads)
+              data={sortBy(this.state.Totals.map((action) => {
+                console.log(action);
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
                   bet: action.homeOdds / 10000,
-                  spread: action.homePoints > 0 ? `+${action.homePoints / 10}` : `+${(action.awayPoints / 10)}`,
+                  spread: action.homeOdds > 0 ? `+${action.homeOdds / 10000}` : `+${(action.awayPoints / 10000)}`,
+                  spread: action.homeOdds,
                   odds: action.homeOdds / 10000,
                   value: action.betValue
                     ? (<span
@@ -327,13 +260,13 @@ class BetEventTable extends Component {
           />
           <Table
             cols={bottomThreeCols}
-            data={sortBy(this.props.data.betActions.map((action) => {
+            data={sortBy(this.state.Spreads.map((action) => {
+              console.log('overUnder', action);
               return {
                 ...action,
                 createdAt: date24Format(action.createdAt),
                 bet: action.betChoose.replace('Money Line - ', ''),
-                // overUnder: getUnderOver(action.),
-                overUnder: 'NA',
+                overUnder: ((action.homeOdds / action.awayOdds + action.homeOdds) * 100).toFixed(1),
                 odds: action.odds,
                 value: action.betValue
                   ? (<span className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
