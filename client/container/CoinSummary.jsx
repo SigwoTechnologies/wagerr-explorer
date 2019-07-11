@@ -10,7 +10,6 @@ import Icon from '../component/Icon';
 import CardMarket from '../component/Card/CardMarket';
 import CardMasternodeSummary from '../component/Card/CardMasternodeSummary';
 import CardNetworkSummary from '../component/Card/CardNetworkSummary';
-import CardPoS from '../component/Card/CardPoS';
 import CardStatus from '../component/Card/CardStatus';
 import WatchList from '../component/WatchList';
 import CardOracleProfit from '../component/Card/CardOracleProfit'
@@ -76,10 +75,6 @@ class CoinSummary extends Component {
             </div>
           </div>
           <div className="col-md-12 col-lg-3">
-            <CardPoS
-              average={ coin.avgBlockTime?coin.avgBlockTime:0 }
-              height={ height }
-              posHeight={ 182700 } />
             <WatchList
               items={ watchlist }
               onSearch={ this.props.onSearch }

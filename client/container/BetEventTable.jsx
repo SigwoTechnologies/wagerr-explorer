@@ -220,7 +220,7 @@ class BetEventTable extends Component {
             />
             <Table
               cols={bottomTwoCols}
-              data={sortBy(this.state.Totals.map((action) => {
+              data={sortBy(this.state.Spreads.map((action) => {
                 console.log(action);
                 return {
                   ...action,
@@ -260,7 +260,7 @@ class BetEventTable extends Component {
           />
           <Table
             cols={bottomThreeCols}
-            data={sortBy(this.state.Spreads.map((action) => {
+            data={sortBy(this.state.Totals.map((action) => {
               console.log('overUnder', action);
               return {
                 ...action,
