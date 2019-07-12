@@ -101,12 +101,14 @@ class BetEventTable extends Component {
             betActions: res[1].actions,
             betTotals: res[2].results,
             betSpreads: res[3].results,
+            opObject: res[2].results.opObject,
             loading: false,
           })
         })
     })
     .catch((err) => console.log(err))
   })};
+
 
   render() {
     const { t } = this.props.data;
@@ -221,7 +223,6 @@ class BetEventTable extends Component {
             <Table
               cols={bottomTwoCols}
               data={sortBy(this.state.Spreads.map((action) => {
-                console.log(action);
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
@@ -261,7 +262,6 @@ class BetEventTable extends Component {
           <Table
             cols={bottomThreeCols}
             data={sortBy(this.state.Totals.map((action) => {
-              console.log('overUnder', action);
               return {
                 ...action,
                 createdAt: date24Format(action.createdAt),

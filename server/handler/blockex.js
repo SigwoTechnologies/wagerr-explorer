@@ -743,7 +743,7 @@ const getBetEventInfo = async (req, res) => {
   let results
   try {
     results = await BetResult.find({eventId: eventId}).sort({createdAt: 1})
-  }catch (e) {
+  } catch (e) {
     console.log("Bet Event Not Publish")
   }
   try {
@@ -757,7 +757,7 @@ const getBetEventInfo = async (req, res) => {
       if (awayTeamNames.indexOf(event.awayTeam) === -1) {
         awayTeamNames.push(event.awayTeam)
       }
-    })
+    });
 
     // We add how home teams are represented in bets with new opCodes
     homeTeamNames.push('Money Line - Home Win');
