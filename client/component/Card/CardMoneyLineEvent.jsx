@@ -9,11 +9,29 @@ import { translate } from 'react-i18next'
 import connect from 'react-redux/es/connect/connect'
 
 const CardMoneyLineEvent = ({eventInfo, t}) => {
-
   if (eventInfo) {
-    const homeBetAmount = eventInfo.homeBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    const awayBetAmount = eventInfo.awayBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    const drawBetAmount = eventInfo.drawBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
+    let MoneyLineBets = { home: [], away: [], draw: [] };
+
+    const sortHomeBets = eventInfo.homeBets.map((event) => {
+      if (event.betChoose == 'Money Line - Home Win') {
+        MoneyLineBets.home.push(event);
+      }
+    });
+    const sortAwayBets = eventInfo.awayBets.map((event) => {
+      if (event.betChoose == 'Money Line - Away Win') {
+        MoneyLineBets.away.push(event);
+      }
+    });
+    const sortDrawBets = eventInfo.drawBets.map((event) => {
+      if (event.betChoose == 'Money Line - Draw') {
+        TotalsBets.draw.push(event);
+      }
+    });
+
+    const MLHomeBetAmount = MoneyLineBets.home.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const MLAwayBetAmount = MoneyLineBets.away.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const MLDrawBetAmount = MoneyLineBets.draw.reduce((acc, bet) => acc + bet.betValue, 0.0);
+
     return <Card className="card--status">
       <h2>Money Line</h2>
       <div className="card__row">
@@ -39,33 +57,33 @@ const CardMoneyLineEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">{t('homeBetNum')}:</span>
         <span
-          className="card__result">{eventInfo.homeBets.length}</span>
+          className="card__result">{MoneyLineBets.home.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('homeBetAmount')}:</span>
         <span className="card__result"> <span className={`badge badge-danger`}>
-                {numeral(homeBetAmount).format('0,0.00000000')}</span></span>
+                {numeral(MLHomeBetAmount).format('0,0.00000000')}</span></span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('drawBetNum')}:</span>
         <span
-          className="card__result">{eventInfo.drawBets.length}</span>
+          className="card__result">{MoneyLineBets.draw.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('drawBetAmount')}:</span>
         <span className="card__result">
            <span className={`badge badge-danger`}>
-                {numeral(drawBetAmount).format('0,0.00000000')}</span></span>
+                {numeral(MLDrawBetAmount).format('0,0.00000000')}</span></span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('awayBetNum')}:</span>
         <span
-          className="card__result">{eventInfo.awayBets.length}</span>
+          className="card__result">{MoneyLineBets.away.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('awayBetAmount')}:</span>
         <span className="card__result"><span className={`badge badge-danger`}>
-               {numeral(awayBetAmount).format('0,0.00000000')}</span>
+               {numeral(MLAwayBetAmount).format('0,0.00000000')}</span>
           </span>
       </div>
     </Card>

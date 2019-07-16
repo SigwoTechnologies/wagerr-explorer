@@ -16,7 +16,7 @@ i18n
   resources: { en, kr, zh },
 
   fallbackLng: "en",
-  debug: process.env.NODE_ENV !== 'production',
+  // debug: process.env.NODE_ENV !== 'production',
 
   // have a common namespace used around the full app
   ns: ["common"],

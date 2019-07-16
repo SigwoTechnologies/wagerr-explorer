@@ -9,10 +9,29 @@ import { translate } from 'react-i18next'
 import connect from 'react-redux/es/connect/connect'
 
 const CardSpreadEvent = ({eventInfo, t}) => {
-
   if (eventInfo) {
-    const homeBetAmount = eventInfo.homeBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
-    const awayBetAmount = eventInfo.awayBets.reduce((acc, bet) => acc + bet.betValue, 0.0)
+    let SpreadsBets = { home: [], away: [], draw: [] };
+
+    const sortHomeBets = eventInfo.homeBets.map((event) => {
+      if (event.betChoose.includes('Spreads - Home')) {
+        SpreadsBets.home.push(event);
+      }
+    });
+    const sortAwayBets = eventInfo.awayBets.map((event) => {
+      if (event.betChoose.includes('Spreads - Away')) {
+        SpreadsBets.away.push(event);
+      }
+    });
+    const sortDrawBets = eventInfo.drawBets.map((event) => {
+      if (event.betChoose.includes('Spreads - Draw')) {
+        TotalsBets.draw.push(event);
+      }
+    });
+
+    const SHomeBetAmount = SpreadsBets.home.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const SAwayBetAmount = SpreadsBets.away.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const SDrawBetAmount = SpreadsBets.draw.reduce((acc, bet) => acc + bet.betValue, 0.0);
+
     return <Card className="card--status">
       {/* <Card title={t('betEvent')} className="card--status"> */}
       <h2>Spread Event</h2>
@@ -39,22 +58,22 @@ const CardSpreadEvent = ({eventInfo, t}) => {
       <div className="card__row">
         <span className="card__label">{t('homeBetNum')}:</span>
         <span
-          className="card__result">{eventInfo.homeBets.length}</span>
+          className="card__result">{SpreadsBets.home.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('homeBetAmount')}:</span>
         <span className="card__result"> <span className={`badge badge-danger`}>
-                {numeral(homeBetAmount).format('0,0.00000000')}</span></span>
+                {numeral(SHomeBetAmount).format('0,0.00000000')}</span></span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('awayBetNum')}:</span>
         <span
-          className="card__result">{eventInfo.awayBets.length}</span>
+          className="card__result">{SpreadsBets.away.length}</span>
       </div>
       <div className="card__row">
         <span className="card__label">{t('awayBetAmount')}:</span>
         <span className="card__result"><span className={`badge badge-danger`}>
-               {numeral(awayBetAmount).format('0,0.00000000')}</span>
+               {numeral(SAwayBetAmount).format('0,0.00000000')}</span>
           </span>
       </div>
     </Card>
