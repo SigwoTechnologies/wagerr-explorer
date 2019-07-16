@@ -13,17 +13,17 @@ const CardSpreadEvent = ({eventInfo, t}) => {
     let SpreadsBets = { home: [], away: [], draw: [] };
 
     const sortHomeBets = eventInfo.homeBets.map((event) => {
-      if (event.betChoose == 'Spreads - Home') {
+      if (event.betChoose.includes('Spreads - Home')) {
         SpreadsBets.home.push(event);
       }
     });
     const sortAwayBets = eventInfo.awayBets.map((event) => {
-      if (event.betChoose == 'Spreads - Away') {
+      if (event.betChoose.includes('Spreads - Away')) {
         SpreadsBets.away.push(event);
       }
     });
     const sortDrawBets = eventInfo.drawBets.map((event) => {
-      if (event.betChoose == 'Spreads - Draw') {
+      if (event.betChoose.includes('Spreads - Draw')) {
         TotalsBets.draw.push(event);
       }
     });

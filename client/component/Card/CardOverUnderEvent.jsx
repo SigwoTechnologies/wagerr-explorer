@@ -10,26 +10,36 @@ import connect from 'react-redux/es/connect/connect'
 
 const CardOverUnderEvent = ({eventInfo, t}) => {
   if (eventInfo) {
-    let TotalsBets = { home: [], away: [], draw: [] };
+    // let TotalsBets = { home: [], away: [], draw: [] };
+    let over = [];
+    let under = [];
 
-    const sortHomeBets = eventInfo.homeBets.map((event) => {
-      if (event.betChoose == 'Totals - Over') {
-        TotalsBets.home.push(event);
+    eventInfo.homeBets.map((event) => {
+      if (event.betChoose.includes('Totals - Over')) {
+        over.push(event);
+      } else if (event.betChoose.includes('Totals - Under')) {
+        under.push(event);
       }
     });
-    const sortAwayBets = eventInfo.awayBets.map((event) => {
-      if (event.betChoose == 'Totals - Under') {
-        TotalsBets.away.push(event);
-      }
-    });
+
+    // const sortHomeBets = eventInfo.homeBets.map((event) => {
+    //   if (event.betChoose == 'Totals - Over') {
+    //     under.push(event);
+    //   }
+    // });
+    // const sortAwayBets = eventInfo.awayBets.map((event) => {
+    //   if (event.betChoose == 'Totals - Under') {
+    //     TotalsBets.away.push(event);
+    //   }
+    // });
     // const sortDrawBets = eventInfo.drawBets.map((event) => {
     //   if (event.betChoose == 'Totals - Draw') {
     //     TotalsBets.draw.push(event);
     //   }
     // });
 
-    const THomeBetAmount = TotalsBets.home.reduce((acc, bet) => acc + bet.betValue, 0.0);
-    const TAwayBetAmount = TotalsBets.away.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const THomeBetAmount = over.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const TAwayBetAmount = under.reduce((acc, bet) => acc + bet.betValue, 0.0);
     
     // const TDrawBetAmount = TotalsBets.draw.reduce((acc, bet) => acc + bet.betValue, 0.0);
     return <Card className="card--status">
@@ -43,20 +53,23 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
         {eventInfo.events[0].league}
       </div>
       <div className="card__row">
-        <span className="card__label">{t('Match')}:</span>
+        <span className="card__label">match:</span>
         <span className="card__result">
           {`${eventInfo.events[0].homeTeam} vs ${eventInfo.events[0].awayTeam}`}
           </span>
       </div>
       <div className="card__row">
-        <span className="card__label">Over {t('Bet Num')}:</span>
+        <span className="card__label">Over Bet Num:</span>
         <span
-          className="card__result">{TotalsBets.home.length}</span>
+          className="card__result">{over.length}</span>
       </div>
       <div className="card__row">
-        <span className="card__label">Over {t('Bet Amount')}:</span>
-        <span className="card__result"> <span className={`badge badge-danger`}>
-                {numeral(THomeBetAmount).format('0,0.00000000')}</span></span>
+        <span className="card__label">Over Bet Amount:</span>
+        <span className="card__result">
+          <span className={`badge badge-danger`}>
+            {numeral(THomeBetAmount).format('0,0.00000000')}
+          </span>
+        </span>
       </div>
       {/* <div className="card__row">
         <span className="card__label">{t('drawBetNum')}:</span>
@@ -70,15 +83,17 @@ const CardOverUnderEvent = ({eventInfo, t}) => {
                 {numeral(drawBetAmount).format('0,0.00000000')}</span></span>
       </div> */}
       <div className="card__row">
-        <span className="card__label">Under {t('Bet Num')}:</span>
+        <span className="card__label">Under Bet Num:</span>
         <span
-          className="card__result">{TotalsBets.away.length}</span>
+          className="card__result">{under.length}</span>
       </div>
       <div className="card__row">
-        <span className="card__label">Under {t('Bet Amount')}:</span>
-        <span className="card__result"><span className={`badge badge-danger`}>
-               {numeral(TAwayBetAmount).format('0,0.00000000')}</span>
+        <span className="card__label">Under Bet Amount:</span>
+        <span className="card__result">
+          <span className="badge badge-danger">
+            {numeral(TAwayBetAmount).format('0,0.00000000')}
           </span>
+        </span>
       </div>
     </Card>
   } else {

@@ -1,29 +1,29 @@
-import Component from '../core/Component'
-import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
-import React from 'react'
+import Component from '../core/Component';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 import { TabContent, TabPane, Nav, NavItem, NavLink, Button, Row, Col } from 'reactstrap';
 import classnames from 'classnames';
 
-import CardEarnings from '../component/Card/CardEarnings'
-import CardExchanges from '../component/Card/CardExchanges'
-import CardLinks from '../component/Card/CardLinks'
-import CardROI from '../component/Card/CardROI'
-import HorizontalRule from '../component/HorizontalRule'
-import Actions from '../core/Actions'
-import numeral from 'numeral'
-import { date24Format } from '../../lib/date'
-import Table from '../component/Table'
-import { Link } from 'react-router-dom'
-import sortBy from 'lodash/sortBy'
-import moment from 'moment/moment'
-import config from '../../config'
-import Card from '../component/Card'
-import CardBetEvent from '../component/Card/CardBetEvent'
-import CardBetResult from '../component/Card/CardBetResult'
-import { compose } from 'redux'
-import { translate } from 'react-i18next'
+import CardEarnings from '../component/Card/CardEarnings';
+import CardExchanges from '../component/Card/CardExchanges';
+import CardLinks from '../component/Card/CardLinks';
+import CardROI from '../component/Card/CardROI';
+import HorizontalRule from '../component/HorizontalRule';
+import Actions from '../core/Actions';
+import numeral from 'numeral';
+import { date24Format } from '../../lib/date';
+import Table from '../component/Table';
+import { Link } from 'react-router-dom';
+import sortBy from 'lodash/sortBy';
+import moment from 'moment/moment';
+import config from '../../config';
+import Card from '../component/Card';
+import CardBetEvent from '../component/Card/CardBetEvent';
+import CardBetResult from '../component/Card/CardBetResult';
+import { compose } from 'redux';
+import { translate } from 'react-i18next';
 import CardMoneyLineEvent from '../component/Card/CardMoneyLineEvent';
 import CardSpreadEvent from '../component/Card/CardSpreadEvent';
 import CardOverUnderEvent from '../component/Card/CardOverUnderEvent';
@@ -37,7 +37,7 @@ class BetEvent extends Component {
     getBetActions: PropTypes.func.isRequired,
     getBetspreads: PropTypes.func.isRequired,
     getBetTotals: PropTypes.func.isRequired,
-  }
+  };
 
   constructor (props) {
     super(props)
@@ -51,15 +51,15 @@ class BetEvent extends Component {
       loading: true,
       error: null,
       activeTab: '1',
-    }
+    };
     this.toggle = this.toggle.bind(this);
   };
 
   componentDidMount () {
     this.setState({
       eventId: this.props.match.params.eventId,
-    })
-    this.getBetData()
+    });
+    this.getBetData();
   };
 
   componentDidUpdate (prevProps) {
@@ -67,9 +67,9 @@ class BetEvent extends Component {
     if (prevProps.match.params.eventId !== eventId) {
       this.setState({
         eventId: this.props.match.params.eventId,
-      })
+      });
       this.getBetData();
-    }
+    };
   };
 
   getBetData = () => {
@@ -80,14 +80,17 @@ class BetEvent extends Component {
         this.props.getBetspreads(this.state.eventId),
         this.props.getBetTotals(this.state.eventId),
       ]).then((res) => {
-        sortBy(res[0].events,['blockHeight']).forEach(event =>{
-          res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
+        sortBy(res[0].events,['blockHeight']).forEach(event => {
+          res[1]
+            .actions
+              .filter(action => {
+                return event.blockHeight < action.blockHeight}).forEach(
             action =>{
               if (action.betChoose.includes('Home')) {
                 action.odds = action.homeOdds / 10000
-              }else if (action.betChoose.includes('Away')) {
+              } else if (action.betChoose.includes('Away')) {
                 action.odds = action.awayOdds / 10000
-              } else{
+              } else {
                 action.odds = action.drawOdds / 10000
               }
             })
