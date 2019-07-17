@@ -24,7 +24,7 @@ const CardMoneyLineEvent = ({eventInfo, t}) => {
     });
     const sortDrawBets = eventInfo.drawBets.map((event) => {
       if (event.betChoose == 'Money Line - Draw') {
-        TotalsBets.draw.push(event);
+        MoneyLineBets.draw.push(event);
       }
     });
 

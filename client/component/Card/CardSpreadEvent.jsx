@@ -24,7 +24,7 @@ const CardSpreadEvent = ({eventInfo, t}) => {
     });
     const sortDrawBets = eventInfo.drawBets.map((event) => {
       if (event.betChoose.includes('Spreads - Draw')) {
-        TotalsBets.draw.push(event);
+        MoneyLineBets.draw.push(event);
       }
     });
 
