@@ -220,10 +220,27 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     }
 
     try {
-      const event = await BetEvent.findOne({
+      let event = {};
+  
+      const originalRecord = await BetEvent.findOne({
         eventId: `${transaction.eventId}`,
       });
       
+      const updates = await Betupdate.find({
+        eventId: `${transaction.eventId}`,
+        createdAt: { $lt: block.createdAt },
+      });
+
+      if(updates && updates.length > 0) {
+        const lastRecord = updates[updates.length - 1];
+        event = {
+          homeOdds: lastRecord.opObject.homeOdds,
+          awayOdds: lastRecord.opObject.awayOdds,
+          drawOdds: lastRecord.opObject.drawOdds,
+        };
+      } else {
+        event = originalRecord;
+      }
 
       try {
         createResponse = await BetAction.create({
