@@ -20,7 +20,8 @@ const Block = mongoose.model('Block', new mongoose.Schema({
   prev: { required: true, type: String },
   size: { type: Number },
   txs: { default: [], required: true, type: [String] },
-  ver: { required: true, type: Number }
+  ver: { required: true, type: Number },
+  rpctxs: { default: [], required: false, type: [Map]},
 }, { versionKey: false }), 'blocks');
 
 module.exports =  Block;

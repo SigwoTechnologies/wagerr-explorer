@@ -13,8 +13,6 @@ const mockVoutValidation = async () => {
   
   const res = await methods.validateVoutData(data);
 
-  console.log(res);
-
   return res;
 };
 
@@ -45,9 +43,9 @@ const getTransactionTypeCount = async () => {
 
     transactionCount[txType] = res;
   }
-  transactionCount.totalCoun = lists.count;
+  transactionCount.totalCount = lists.count;
 
-  console.log(transactionCount);
+  // console.log(transactionCount);
 
   return transactionCount;
 };

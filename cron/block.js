@@ -43,10 +43,11 @@ async function syncBlocks(start, stop, clean = false) {
       ver: rpcblock.version
     });
 
-    await block.save();
+    const rpctxs = [];
 
     await forEachSeries(block.txs, async (txhash) => {
       const rpctx = await util.getTX(txhash);
+      rpctxs.push(rpctx);
 
       if (blockchain.isPoS(block)) {
         await util.addPoS(block, rpctx);
@@ -54,6 +55,10 @@ async function syncBlocks(start, stop, clean = false) {
         await util.addPoW(block, rpctx);
       }
     });
+
+    block.rpctxs = rpctxs;
+
+    await block.save();
 
     console.log(`Height: ${ block.height } Hash: ${ block.hash }`);
   }

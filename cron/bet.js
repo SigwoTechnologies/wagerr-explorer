@@ -18,8 +18,6 @@ const Bettotal = require('../model/bettotal')
 const Transaction = require('../model/transaction')
 const TX = require('../model/tx')
 
-console.log('Running bet cron job');
-
 function hexToString (hexx) {
   var hex = hexx.toString()//force conversion
   var str = ''
@@ -61,7 +59,7 @@ async function preOPCode(block, rpctx, vout) {
         opString: opString,
       })
     } catch (e) {
-      console.log('Error saving bet action with old decryption method');
+      //console.log('Error saving bet action with old decryption method');
     }
   } else if (datas[0] === '3' && datas.length === 4) {
     let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
@@ -112,7 +110,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const eventExists = await recordExists(BetEvent, _id);
 
     if (eventExists) {
-      console.log(`Bet event ${_id} already on record`);
+      //console.log(`Bet event ${_id} already on record`);
       return eventExists;
     }
 
@@ -136,7 +134,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       });
     } catch (e) {
-      console.log('Error creating bet event data');
+      //console.log('Error creating bet event data');
       console.log(e);
       createResponse = e;
     }
@@ -150,12 +148,12 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const resultExists = await recordExists(BetResult, `${transaction.eventId}`, 'eventId');
 
     if (updateExists) {
-      console.log(`Bet update ${_id} already on record`);
+      // //console.log(`Bet update ${_id} already on record`);
       return updateExists;
     }
 
     if (resultExists) {
-      console.log(`Bet result for event ${transaction.eventId} on record`);
+      // //console.log(`Bet result for event ${transaction.eventId} on record`);
     } else {
       try {
         const event = await BetEvent.findOne({
@@ -171,21 +169,21 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
           event.drawOdds = `${transaction.drawOdds}`;
   
           if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
-            // console.log('Invalid transaction data');
-            // console.log(transaction);
+            // //console.log('Invalid transaction data');
+            // //console.log(transaction);
           }
   
           try {
             await event.save();
-            console.log(`Odds updated for event#${transaction.eventId} at height ${block.height}`);
+            //console.log(`Odds updated for event#${transaction.eventId} at height ${block.height}`);
           } catch (e) {
-            console.log('Unable to save event data');
-            // console.log(e);
-            console.log(transaction);
+            //console.log('Unable to save event data');
+            console.log(e);
+            //console.log(transaction);
           }
         }
       } catch (e) {
-        console.log('Was not able to process odds updates');
+        //console.log('Was not able to process odds updates');
         console.log.log(e);
       }
     }
@@ -203,7 +201,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         opObject: transaction,
       });
     } catch (e) {
-      console.log('Error creating event update record');
+      //console.log('Error creating event update record');
       console.log(e);
     }
 
@@ -215,7 +213,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const betExists = await recordExists(BetAction, _id);
     
     if (betExists) {
-      console.log(`Bet update ${_id} already on record`);
+      // console.log(`Bet update ${_id} already on record`);
       return betExists;
     }
 
@@ -232,11 +230,12 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
       });
 
       if(updates && updates.length > 0) {
-        const lastRecord = updates[updates.length - 1];
+        const lastRecord = updates[updates.length - 1].opObject;
+
         event = {
-          homeOdds: lastRecord.opObject.homeOdds,
-          awayOdds: lastRecord.opObject.awayOdds,
-          drawOdds: lastRecord.opObject.drawOdds,
+          homeOdds: lastRecord.get('homeOdds'),
+          awayOdds: lastRecord.get('awayOdds'),
+          drawOdds: lastRecord.get('drawOdds'),
         };
       } else {
         event = originalRecord;
@@ -258,11 +257,18 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
           drawOdds: event.drawOdds,
           transaction,
         });
+
+        //console.log('BetAction posteed');
+
       } catch (e) {
-        console.log('Error creating bet action record');
-        console.log(transaction);
+        if(transaction.eventId == '1612') {
+
+          console.log('Error creating bet action record');
+          console.log(transaction);
+          console.log(e);
+        }
         console.log(e);
-        createResponse = e;
+        // createResponse = e;
       }
     } catch (e) {
       console.log('Error retrieving event data');
@@ -307,7 +313,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
       });
     } catch (e) {
       console.log('Error creating event update record');
-      console.log(transaction);
+      // //console.log(transaction);
       console.log(e);
     }
 
@@ -319,7 +325,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const spreadExists = await recordExists(Bettotal, _id);
 
     if (spreadExists) {
-      console.log(`Bet spread ${_id} already on record`);
+      // //console.log(`Bet spread ${_id} already on record`);
       return spreadExists;
     }
 
@@ -340,7 +346,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
       });
     } catch (e) {
       console.log('Error creating event update record');
-      console.log(transaction);
+      // //console.log(transaction);
       console.log(e);
     }
 
@@ -352,7 +358,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const resultExists = await recordExists(BetResult, _id);
 
     if (resultExists) {
-      console.log(`Bet result ${_id} already on record`);
+      // //console.log(`Bet result ${_id} already on record`);
       return resultExists;
     }
     
@@ -372,7 +378,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         transaction,
       })
     } catch (e) {
-      console.log('Error creating peerlessResult data');
+      // console.log('Error creating peerlessResult data');
       console.log(e);
       createResponse = e;
     }
@@ -384,7 +390,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   const transactionsExists = await recordExists(Transaction, transactionId);
 
   if (transactionsExists) {
-    console.log(`Bet update ${transactionId} already on record`);
+    // console.log(`Bet update ${transactionId} already on record`);
     return transactionsExists;
   }
 
@@ -410,7 +416,7 @@ async function addPoS (block, rpctx) {
         try {
           transaction = await methods.validateVoutData(vout);
         } catch (e) {
-          console.log('addPoS error');
+          // console.log('addPoS error');
           console.log(e);
           transaction = { error: true, fullError: e };
         }
@@ -441,6 +447,34 @@ async function syncBlocksForBet (start, stop, clean = false) {
   for (let height = start; height <= stop; height++) {
     const hash = await rpc.call('getblockhash', [height])
     const rpcblock = await rpc.call('getblock', [hash])
+    /*const block = new Block({
+      hash,
+      height,
+      bits: rpcblock.bits,
+      confirmations: rpcblock.confirmations,
+      createdAt: new Date(rpcblock.time * 1000),
+      diff: rpcblock.difficulty,
+      merkle: rpcblock.merkleroot,
+      nonce: rpcblock.nonce,
+      prev: rpcblock.prevblockhash ? rpcblock.prevblockhash : 'GENESIS',
+      size: rpcblock.size,
+      txs: rpcblock.tx ? rpcblock.tx : [],
+      ver: rpcblock.version
+    })
+
+    const block = await Block.findOne({ height });
+    if (height < 10) {
+      //console.log(block);
+    }
+    let txs = block.txs || [];
+
+    await forEachSeries(txs, async (txhash) => {
+      if (blockchain.isPoS(block) && (height >= 121000) && (height <=126000)) {
+        const rpctx = await util.getTX(txhash)
+        await addPoS(block, rpctx)
+      }
+    }); */
+
     const block = new Block({
       hash,
       height,
@@ -458,14 +492,13 @@ async function syncBlocksForBet (start, stop, clean = false) {
     let txs = rpcblock.tx ? rpcblock.tx : []
 
     await forEachSeries(txs, async (txhash) => {
-      const rpctx = await util.getTX(txhash)
-
       if (blockchain.isPoS(block) && height >= 45000) {
+        const rpctx = await util.getTX(txhash)
         await addPoS(block, rpctx)
       }
     })
 
-    console.log(`Height: ${ block.height } Hash: ${ block.hash }`)
+    // //console.log(`Height: ${ block.height } Hash: ${ block.hash }`)
   }
 }
 
@@ -477,7 +510,7 @@ async function update () {
   let code = 0
 
   try {
-    const info = await rpc.call('getinfo')
+    // const info = await rpc.call('getinfo')
     const betEvent = await BetEvent.findOne().sort({blockHeight: -1})
     const betAction = await BetAction.findOne().sort({blockHeight: -1})
     const betResult = await BetResult.findOne().sort({blockHeight: -1})
@@ -488,6 +521,8 @@ async function update () {
     let dbResultHeight = betResult && betResult.blockHeight ? betResult.blockHeight : 1
     let dbHeight = [dbEventHeight, dbActionHeight, dbResultHeight].sort().reverse()[0]
     const block = await Block.findOne().sort({ height: -1});
+    // const blocks = await Block.find().sort({ height: -1});
+
     let blockDbHeight = block && block.height ? block.height - 1: 1;
 
     // If heights provided then use them instead.
@@ -499,7 +534,7 @@ async function update () {
       clean = true
       blockDbHeight = parseInt(process.argv[3], 10)
     }
-    console.log(dbHeight, blockDbHeight, clean)
+    //console.log(dbHeight, blockDbHeight, clean)
     // If nothing to do then exit.
     if (dbHeight >= blockDbHeight) {
       return
