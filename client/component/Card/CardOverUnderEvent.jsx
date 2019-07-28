@@ -8,13 +8,13 @@ import { compose } from 'redux'
 import { translate } from 'react-i18next'
 import connect from 'react-redux/es/connect/connect'
 
-const CardOverUnderEvent = ({eventInfo, t}) => {
+const CardOverUnderEvent = ({eventInfo, data, t}) => {
   if (eventInfo) {
     // let TotalsBets = { home: [], away: [], draw: [] };
     let over = [];
     let under = [];
 
-    eventInfo.homeBets.map((event) => {
+    data.betActions.map((event) => {
       if (event.betChoose.includes('Totals - Over')) {
         over.push(event);
       } else if (event.betChoose.includes('Totals - Under')) {

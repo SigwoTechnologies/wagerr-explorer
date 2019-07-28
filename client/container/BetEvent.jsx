@@ -158,14 +158,14 @@ class BetEvent extends Component {
                 Money Line
               </NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink
-                className={classnames({ active: this.state.activeTab === '2' })}
-                onClick={() => { this.toggle('2'); }}
-              >
-                Spread
-              </NavLink>
-            </NavItem>
+            { false && (<NavItem>
+                <NavLink
+                  className={classnames({ active: this.state.activeTab === '2' })}
+                  onClick={() => { this.toggle('2'); }}
+                >
+                  Spread
+                </NavLink>
+              </NavItem>)}
             <NavItem>
               <NavLink
                 className={classnames({ active: this.state.activeTab === '3' })}
@@ -213,7 +213,7 @@ class BetEvent extends Component {
             <TabPane tabId="3">
               <Row>
                 <div className="col-sm-12 col-md-6">
-                  <CardOverUnderEvent eventInfo={this.state.eventInfo}/>
+                  <CardOverUnderEvent eventInfo={this.state.eventInfo} data={tableData}/>
                 </div>
                 <div className="col-sm-12 col-md-6">
                   <CardBetResult eventInfo={this.state.eventInfo}/>
