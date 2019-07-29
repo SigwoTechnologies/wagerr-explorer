@@ -20,6 +20,9 @@ const BetAction = mongoose.model('BetAction', new mongoose.Schema({
   homeOdds: { required: true, type: String },
   drawOdds: { required: true, type: String },
   awayOdds: { required: true, type: String },
+  points: { required: false, type: Number },
+  overOdds: { required: false, type: Number },
+  underOdds: { required: false, type: Number },
   transaction: { required: false, type: Map }
 }, { versionKey: false }), 'betactions');
 

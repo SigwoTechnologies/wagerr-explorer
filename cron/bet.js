@@ -229,6 +229,11 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         createdAt: { $lt: block.createdAt },
       });
 
+      const betTotals = await Bettotal.find({
+        eventId: `${transaction.eventId}`,
+        createdAt: { $lt: block.createdAt },
+      });
+
       if(updates && updates.length > 0) {
         const lastRecord = updates[updates.length - 1].opObject;
 
@@ -239,6 +244,14 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
         };
       } else {
         event = originalRecord;
+      }
+
+      if (betTotals && betTotals.length > 0) {
+        const lastTotal = betTotals[betTotals.length - 1];
+
+        event.points = lastTotal.points;
+        event.overOdds = lastTotal.overOdds;
+        event.underOdds = lastTotal.underOdds;
       }
 
       try {
@@ -255,18 +268,16 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
           homeOdds: event.homeOdds,
           awayOdds: event.awayOdds,
           drawOdds: event.drawOdds,
+          points: event.points,
+          overOdds: event.overOdds,
+          underOdds: event.underOdds,
           transaction,
         });
 
         //console.log('BetAction posteed');
 
       } catch (e) {
-        if(transaction.eventId == '1612') {
-
-          console.log('Error creating bet action record');
-          console.log(transaction);
-          console.log(e);
-        }
+        console.log('Error creating bet action record');
         console.log(e);
         // createResponse = e;
       }

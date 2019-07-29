@@ -272,8 +272,9 @@ class BetEventTable extends Component {
                 ...action,
                 createdAt: date24Format(action.createdAt),
                 bet: action.betChoose.replace('Money Line - ', ''),
-                overUnder: ((action.homeOdds / action.awayOdds + action.homeOdds) * 100).toFixed(1),
-                odds: action.odds,
+                // overUnder: ((action.homeOdds / action.awayOdds + action.homeOdds) * 100).toFixed(1),
+                overUnder: (action.points / 10).toFixed(1),
+                odds: action.betChoose.includes('Over') ? action.overOdds / 10000 : action.underOdds / 10000,
                 value: action.betValue
                   ? (<span className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
                 txId: (
