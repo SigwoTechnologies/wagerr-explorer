@@ -105,7 +105,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   const timeNow = Date.now();
 
   if (['peerlessEvent'].includes(transaction.txType)) {
-    const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
+    const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
     // const _id = `${transaction.eventId}`;
     const eventExists = await recordExists(BetEvent, _id);
 
@@ -117,7 +117,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     try {
       createResponse = await BetEvent.create({
         _id,
-        txId: rpctx.get('txid'),
+        txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
         eventId: transaction.eventId,
@@ -143,7 +143,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   }
 
   if (['peerlessUpdateOdds'].includes(transaction.txType)) {
-    const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
+    const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
     const updateExists = await recordExists(Betupdate, _id);
     const resultExists = await recordExists(BetResult, `${transaction.eventId}`, 'eventId');
 
@@ -191,7 +191,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     try {
       createResponse = Betupdate.create({
         _id,
-        txId: rpctx.get('txid'),
+        txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
         opCode: transaction.opCode,
@@ -209,7 +209,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   }
 
   if (['peerlessBet'].includes(transaction.txType)) {
-    const _id = `${transaction.eventId}${transaction.outcome}${rpctx.get('txid')}${block.height}`;
+    const _id = `${transaction.eventId}${transaction.outcome}${rpctx.txid}${block.height}`;
     const betExists = await recordExists(BetAction, _id);
     
     if (betExists) {
@@ -257,7 +257,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
       try {
         createResponse = await BetAction.create({
           _id,
-          txId: rpctx.get('txid'),
+          txId: rpctx.txid,
           blockHeight: block.height,
           createdAt: block.createdAt,
           eventId: transaction.eventId,
@@ -290,7 +290,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   }
 
   if (['peerlessSpreadsMarket'].includes(transaction.txType)) {
-    const _id = `SM${transaction.eventId}${rpctx.get('txid')}${block.height}`;
+    const _id = `SM${transaction.eventId}${rpctx.txid}${block.height}`;
     const spreadExists = await recordExists(Betspread, _id);
 
     if (spreadExists) {
@@ -306,7 +306,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     try {
       createResponse = Betspread.create({
         _id,
-        txId: rpctx.get('txid'),
+        txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
         opCode: transaction.opCode,
@@ -332,7 +332,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   }
 
   if (['peerlessTotalsMarket'].includes(transaction.txType)) {
-    const _id = `TM${transaction.eventId}${rpctx.get('txid')}${block.height}`;
+    const _id = `TM${transaction.eventId}${rpctx.txid}${block.height}`;
     const spreadExists = await recordExists(Bettotal, _id);
 
     if (spreadExists) {
@@ -343,7 +343,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     try {
       createResponse = Bettotal.create({
         _id,
-        txId: rpctx.get('txid'),
+        txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
         opCode: transaction.opCode,
@@ -365,7 +365,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
   }
 
   if (['peerlessResult'].includes(transaction.txType)) {
-    const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
+    const _id = `${transaction.eventId}${rpctx.txid}${block.height}`;
     const resultExists = await recordExists(BetResult, _id);
 
     if (resultExists) {
@@ -379,7 +379,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
 
       createResponse = await BetResult.create({
         _id,
-        txId: rpctx.get('txid'),
+        txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
         eventId: transaction.eventId,
@@ -397,7 +397,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     return createResponse;
   }
 
-  const transactionId = `${transaction.txType}-${rpctx.get('txid')}${block.height}`;
+  const transactionId = `${transaction.txType}-${rpctx.txid}${block.height}`;
   const transactionsExists = await recordExists(Transaction, transactionId);
 
   if (transactionsExists) {
@@ -407,7 +407,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
 
   return Transaction.create({
     _id: transactionId,
-    txId: rpctx.get('txid'),
+    txId: rpctx.txid,
     blockHeight: block.height,
     createdAt: block.createdAt,
     opCode: transaction.opCode,
@@ -423,15 +423,25 @@ async function addPoS (block, rpctx) {
 
   const rpctxVout = rpctx.get('vout');
 
-  if (rpctxVout) {
-    rpctxVout.forEach(async (vout) => {
+  if (block.height == 771987) {
+    console.log('Height 771987 reached');
+    console.log(block);
+    console.log(JSON.parse(rpctx));
+    console.log(rpctxVout);
+  }
+
+
+  if (rpctx.vout) {
+    rpctx.vout.forEach(async (vout) => {
       if (vout.scriptPubKey.type === 'nulldata') {
+        console.log('Null data contained');
         let transaction;
         try {
           transaction = await methods.validateVoutData(vout);
+          console.log('Below is the transaction');
+          console.log(transaction);
         } catch (e) {
-          console.log('addPoS error');
-          console.log(block.height);
+          // console.log('addPoS error');
           console.log(e);
           transaction = { error: true, fullError: e };
         }
@@ -479,7 +489,7 @@ async function syncBlocksForBet (start, stop, clean = false) {
         }
       })
       
-      // console.log(`Height: ${ block.height } Hash: ${ block.hash }`);
+      console.log(`Height: ${ block.height } Hash: ${ block.hash }`);
 
       /*const block = new Block({
         hash,

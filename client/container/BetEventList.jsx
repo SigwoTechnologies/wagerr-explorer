@@ -154,7 +154,7 @@ class BetEventList extends Component {
                 }
                 if (event.results.length > 0) {
                   for (const result of event.results) {
-                    const awayVsHome = result.transaction.awayScore - result.transaction.homeScore;
+                    const awayVsHome = result.transaction ? (result.transaction.awayScore - result.transaction.homeScore) : 0;
                     let outcome;
                     if (awayVsHome > 0) {
                       // outcome = 'Away Win';
