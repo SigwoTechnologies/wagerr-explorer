@@ -25,9 +25,8 @@ services:
       - ./docker/node/start.sh:/usr/local/bin/start.sh
       - ./docker/node/dev.sh:/usr/local/bin/dev.sh
     ports:
-      - "55005:55005"
-      - "8332:8332"
-      - "55004:55004"
+      - "55003:55003"
+      - "55002:55002"
     restart: always
     command: dev.sh
 
