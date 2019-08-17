@@ -41,24 +41,24 @@ const CardBetResult = ({eventInfo, t}) => {
         resultSection = (
           <span>
             {`${resultData.result}`} <br />
-            <strong>{`Home ${transaction.homeScore} `}</strong>
-            {`Away ${transaction.awayScore}`}
+            <strong>{`Home ${transaction.homeScore / 10} `}</strong>
+            {`Away ${transaction.awayScore / 10}`}
           </span>
         );
       } else if (transaction.homeScore < transaction.awayScore) {
         resultSection = (
           <span>
             {resultData.result} <br />
-            {`Home ${transaction.homeScore} `}
-            <strong>{`Away ${transaction.awayScore}`}</strong>
+            {`Home ${transaction.homeScore / 10} `}
+            <strong>{`Away ${transaction.awayScore / 10}`}</strong>
           </span>
         );
       } else {
         resultSection = (
           <span>
             {resultData.result} <br />
-            {`Home ${transaction.homeScore} `}
-            {`Away ${transaction.awayScore}`}
+            {`Home ${transaction.homeScore / 10} `}
+            {`Away ${transaction.awayScore / 10}`}
           </span>
         );
       }
