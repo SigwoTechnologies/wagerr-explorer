@@ -62,7 +62,7 @@ export default class CardStatus extends Component {
           </span>
         </div>
         <div className="card__row">
-          <span className="card__label">Total Supply:</span>
+          {/*  <span className="card__label">Total Supply:</span>
           <span className="card__result">
               <b>
                 <CountUp
@@ -71,8 +71,8 @@ export default class CardStatus extends Component {
                   end={ this.props.supply }
                   start={ 0 } />
               </b>
-          </span>
-        </div>
+          </span> */}
+        </div> 
         <div className="card__row">
           <span className="card__label">Peers:</span>
           <span className="card__result">
