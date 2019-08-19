@@ -135,8 +135,8 @@ async function syncCoin() {
     supply: utxo[0].total + info.zWGRsupply.total,
     usd: eurMarket.quotes.USD.price,
     eur: eurMarket.quotes.EUR.price,
-    totalBet: totalBet,
-    totalMint: totalMint,
+    totalBet: totalBet + 99071397.1752,
+    totalMint: totalMint + 102107516.1294,
     oracleProfitPerSecond: payoutPerSecond,
     nextSuperBlock:nextSuperBlock
   });
