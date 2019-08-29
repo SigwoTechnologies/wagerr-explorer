@@ -35,7 +35,7 @@ class BetEventList extends Component {
       events: [],
       pages: 0,
       page: 1,
-      size: 25
+      size: 50
     }
   };
 
