@@ -8,7 +8,11 @@ const decodeOP = async (req, res) => {
 
   const opData = opCode.isOPCode(hexValue);
 
-  if (!opData.valid) return res.status(500).send('Invalid OP code');
+  if (!opData.valid) {
+    console.log('Error in OP code');
+    console.log(opData);
+    return res.status(500).send('Invalid OP code');
+  }
 
   let response;
 

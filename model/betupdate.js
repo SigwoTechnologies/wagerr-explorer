@@ -10,7 +10,8 @@ const Betupdate = mongoose.model('Betupdate', new mongoose.Schema({
     opObject: { required: false, type: Map },
     type: { required: false, type: Number },
     eventId: { index: true,  required: true, type: String },
-    txType: { required: false, type: String }
+    txType: { required: false, type: String },
+    matched: { required: false, type: Boolean, default: false }
   }, { versionKey: false }), 'betupdates');
   
   module.exports =  Betupdate;

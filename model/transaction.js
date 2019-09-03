@@ -9,7 +9,8 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
     opCode: { required: false, type: String },
     opObject: { required: false, type: Map },
     type: { required: false, type: Number },
-    txType: { required: false, type: String }
+    txType: { required: false, type: String },
+    matched: { required: false, type: Boolean, default: false }
   }, { versionKey: false }), 'transactions');
   
   

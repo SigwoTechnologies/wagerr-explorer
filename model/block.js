@@ -21,7 +21,7 @@ const Block = mongoose.model('Block', new mongoose.Schema({
   size: { type: Number },
   txs: { default: [], required: true, type: [String] },
   ver: { required: true, type: Number },
-  rpctxs: { default: [], required: false, type: [Map]},
+  rpctxs: { default: [], required: true, type: Array},
 }, { versionKey: false }), 'blocks');
 
 module.exports =  Block;
