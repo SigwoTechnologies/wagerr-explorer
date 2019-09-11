@@ -40,7 +40,10 @@ const config = {
   },
   redis:{
     host: '$REDIS_HOST' || 'localhost',
-  }
+  },
+  crons: {
+    start: '$START_HEIGHT',
+  },
 };
 
 module.exports = config;

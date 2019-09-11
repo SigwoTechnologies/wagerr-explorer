@@ -411,7 +411,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
     type: transaction.type,
     txType: transaction.txType,
     opObject: transaction,
-    matched: true,
+    matched: false,
   });
 }
 
