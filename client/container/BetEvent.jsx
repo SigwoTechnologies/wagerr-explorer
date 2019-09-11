@@ -158,14 +158,14 @@ class BetEvent extends Component {
                 Money Line
               </NavLink>
             </NavItem>
-            { false && (<NavItem>
+            <NavItem>
                 <NavLink
                   className={classnames({ active: this.state.activeTab === '2' })}
                   onClick={() => { this.toggle('2'); }}
                 >
                   Spread
                 </NavLink>
-              </NavItem>)}
+              </NavItem>
             <NavItem>
               <NavLink
                 className={classnames({ active: this.state.activeTab === '3' })}
