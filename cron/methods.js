@@ -2,6 +2,7 @@ const { forEachSeries } = require('p-iteration');
 
 const blockchain = require('../lib/blockchain');
 const { rpc } = require('../lib/cron');
+const config = require('../config')
 
 const {
   isOPCode,
@@ -177,6 +178,15 @@ async function addPoS (block, rpcTx) {
  * @param {Number} stop The current block height at the tip of the chain.
  */
 async function syncBlocksForBet (start, stop, clean = false) {
+  const { crons } = config;
+  log(process.env);
+
+  const dataStartBlock = crons.start || 756000;
+
+  if (start == 0 || start == 1) {
+    log(`First time data sync. Only data found in block ${dataStartBlock} and above will be synced`)
+  }
+
   if (clean) {
     await deleteBetData(start, stop);
   }
@@ -185,7 +195,7 @@ async function syncBlocksForBet (start, stop, clean = false) {
   log(start, stop);
 
   for (let height = start; height <= stop; height++) {
-    if (height >= 756000) {
+    if (height >= dataStartBlock) {
 
       const block = (await Block.find({ height }))[0] || {};
 
