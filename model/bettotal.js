@@ -13,7 +13,8 @@ const Bettotal = mongoose.model('Bettotal', new mongoose.Schema({
   points: { required: true, type: Number },
   overOdds: { required: true, type: Number },
   underOdds: {  required: true, type: Number },
-  txType: { required: false, type: String }
+  txType: { required: false, type: String },
+  matched: { required: false, type: Boolean, default: false }
 }, { versionKey: false }), 'bettotals');
   
 module.exports =  Bettotal;

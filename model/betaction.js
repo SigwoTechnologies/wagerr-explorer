@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 
 
 const BetAction = mongoose.model('BetAction', new mongoose.Schema({
-  _id: { required: true, select: false, type: String },
+  _id: { required: true, type: String },
   txId: { index: true, required: true, type: String },
   blockHeight: { index: true, required: true, type: Number },
   createdAt: { required: true, type: Date },
@@ -23,7 +23,8 @@ const BetAction = mongoose.model('BetAction', new mongoose.Schema({
   points: { required: false, type: Number },
   overOdds: { required: false, type: Number },
   underOdds: { required: false, type: Number },
-  transaction: { required: false, type: Map }
+  transaction: { required: false, type: Map },
+  matched: { required: false, type: Boolean, default: false }
 }, { versionKey: false }), 'betactions');
 
 

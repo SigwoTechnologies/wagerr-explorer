@@ -66,7 +66,8 @@ const BetResult = mongoose.model('BetResult', new mongoose.Schema({
   opString: { required: true, type: String },
   payoutTx: { required: true, type: txSchema },
   opCode: { required: false, type: String},
-  transaction: { required: false, type: Map }
+  transaction: { required: false, type: Map },
+  matched: { required: false, type: Boolean, default: false }
 }, { versionKey: false }), 'betresults');
 
 

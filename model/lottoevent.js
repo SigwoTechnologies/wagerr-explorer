@@ -1,30 +1,23 @@
-
 const mongoose = require('mongoose');
 
 /**
- * BetEvent
+ * LottoEvent
  *
  */
 
-const BetEvent = mongoose.model('BetEvent', new mongoose.Schema({
+const LottoEvent = mongoose.model('LottoEvent', new mongoose.Schema({
   _id: { required: true, type: String },
   txId: { index: true, required: true, type: String },
   blockHeight: { index: true, required: true, type: Number },
   createdAt: { required: true, type: Date },
+  txType: { required: true, type: String },
   eventId: { index: true,  required: true, type: String },
-  timeStamp: { index: true,  required: true, type: String },
-  league: { required: true, type: String },
-  info: { type: String },
-  homeTeam: {  required: true, type: String },
-  awayTeam: {  required: true, type: String },
-  homeOdds: { required: true, type: String },
-  drawOdds: { required: true, type: String },
-  awayOdds: { required: true, type: String },
+  entryPrice: { required: true, type: String },
   opString: { required: true, type: String },
   opCode: { required: false, type: String},
   transaction: { required: false, type: Map },
   matched: { required: false, type: Boolean, default: false }
-}, { versionKey: false }), 'betevents');
+}, { versionKey: false }), 'lottoevents');
 
 
-module.exports =  BetEvent;
+module.exports =  LottoEvent;

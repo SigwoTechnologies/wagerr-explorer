@@ -234,6 +234,25 @@ export const getOpCode = (query) => {
     return getFromWorker('opcode', resolve, reject, query);
   });
 };
+
+export const getLottoEvents = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('lottoevents', resolve, reject, query);
+  });
+};
+
+export const getLottoBets = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('lottobets', resolve, reject, query);
+  });
+};
+
+export const getLottoResults = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('lottoresults', resolve, reject, query);
+  });
+};
+
 export default {
   getAddress,
   getBlock,
@@ -262,4 +281,7 @@ export default {
   getOpCode,
   getBetspreads,
   getBetTotals,
+  getLottoBets,
+  getLottoEvents,
+  getLottoResults,
 };
