@@ -219,7 +219,7 @@ class BetEventTable extends Component {
                   ...action,
                   createdAt: date24Format(action.createdAt),
                   homeOdds: action.homeOdds / 10000,
-                  spread: `${action.homePoints}/${action.awayPoints}`,
+                  spread: `${action.homePoints / 10}/${action.awayPoints / 10}`,
                   awayOdds: action.awayOdds / 10000,
                   txId: (
                     <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
