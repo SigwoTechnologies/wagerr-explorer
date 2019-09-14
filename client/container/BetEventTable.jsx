@@ -62,11 +62,11 @@ class BetEventTable extends Component {
     let Totals = [];
     let Spreads = [];
     MoneyLineBetData.forEach((action) => {
-      if (action.betChoose == 'Money Line - Away Win' || action.betChoose == 'Money Line - Home Win') {
+      if (action.betChoose.includes('Money Line')) {
         MoneyLine.push(action);
-      } else if (action.betChoose == 'Totals - Over' || action.betChoose == 'Totals - Under') {
+      } else if (action.betChoose.includes('Totals')) {
         Totals.push(action);
-      } else if (action.betChoose == 'Spreads - Home' || action.betChoose == 'Spreads - Away') {
+      } else if (action.betChoose.includes('Spreads')) {
         Spreads.push(action);
       };
       this.setState({
@@ -101,12 +101,14 @@ class BetEventTable extends Component {
             betActions: res[1].actions,
             betTotals: res[2].results,
             betSpreads: res[3].results,
+            opObject: res[2].results.opObject,
             loading: false,
-          })
-        })
+          });
+        });
     })
-    .catch((err) => console.log(err))
+    .catch((err) => console.log('BetEventTable.jsx', err))
   })};
+
 
   render() {
     const { t } = this.props.data;
@@ -122,16 +124,16 @@ class BetEventTable extends Component {
     const topTwoCols = [
       {key: 'createdAt', title: t('time')},
       {key: 'homeOdds', title: t('homeOdds')},
-      {key: 'spread', title: t('spread')},
+      {key: 'spread', title: 'spread'},
       {key: 'awayOdds', title: t('awayOdds')},
       {key: 'txId', title: t('txId')},
     ]
 
     const topThreeCols = [
       {key: 'createdAt', title: t('time')},
-      {key: 'overOdds', title: t('over odds')},
-      {key: 'overUnder', title: t('o/u')},
-      {key: 'underOdds', title: t('under odds')},
+      {key: 'overOdds', title: 'over odds'},
+      {key: 'overUnder', title: 'o/u'},
+      {key: 'underOdds', title: 'under odds'},
       {key: 'txId', title: t('txId')},
     ]
 
@@ -146,7 +148,7 @@ class BetEventTable extends Component {
     const bottomTwoCols = [
       {key: 'createdAt', title: t('time')},
       {key: 'bet', title: t('bet')},
-      {key: 'spread', title: t('spread')},
+      {key: 'spread', title: 'spread'},
       {key: 'odds', title: t('odds')},
       {key: 'value', title: t('value')},
       {key: 'txId', title: t('txId')},
@@ -155,11 +157,18 @@ class BetEventTable extends Component {
     const bottomThreeCols = [
       {key: 'createdAt', title: t('time')},
       {key: 'bet', title: t('bet')},
-      {key: 'overUnder', title: t('o/u')},
+      {key: 'overUnder', title: 'o/u'},
       {key: 'odds', title: t('odds')},
       {key: 'value', title: t('value')},
       {key: 'txId', title: t('txId')},
     ]
+
+    // console.log('AAAAAAAA', this.props.data.eventInfo.events)
+    // console.log('BBBBBBB', this.state.MoneyLine)
+    // console.log('CCCCCCCC', this.props.data.betSpreads)
+    // console.log('DDDDDDDDDD', this.state.Spreads)
+    // console.log('EEEEEEEE', this.props.data.betTotals)
+    // console.log('FFFFFFFF', this.state.Totals)
 
     return (
       <div className="col-sm-12 col-md-12">
@@ -210,7 +219,7 @@ class BetEventTable extends Component {
                   ...action,
                   createdAt: date24Format(action.createdAt),
                   homeOdds: action.homeOdds / 10000,
-                  spread: `${action.homePoints}/${action.awayPoints}`,
+                  spread: `${action.homePoints / 10}/${action.awayPoints / 10}`,
                   awayOdds: action.awayOdds / 10000,
                   txId: (
                     <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
@@ -221,13 +230,11 @@ class BetEventTable extends Component {
             <Table
               cols={bottomTwoCols}
               data={sortBy(this.state.Spreads.map((action) => {
-                console.log(action);
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
                   bet: action.homeOdds / 10000,
                   spread: action.homeOdds > 0 ? `+${action.homeOdds / 10000}` : `+${(action.awayPoints / 10000)}`,
-                  spread: action.homeOdds,
                   odds: action.homeOdds / 10000,
                   value: action.betValue
                     ? (<span
@@ -261,13 +268,13 @@ class BetEventTable extends Component {
           <Table
             cols={bottomThreeCols}
             data={sortBy(this.state.Totals.map((action) => {
-              console.log('overUnder', action);
               return {
                 ...action,
                 createdAt: date24Format(action.createdAt),
                 bet: action.betChoose.replace('Money Line - ', ''),
-                overUnder: ((action.homeOdds / action.awayOdds + action.homeOdds) * 100).toFixed(1),
-                odds: action.odds,
+                // overUnder: ((action.homeOdds / action.awayOdds + action.homeOdds) * 100).toFixed(1),
+                overUnder: (action.points / 10).toFixed(1),
+                odds: action.betChoose.includes('Over') ? action.overOdds / 10000 : action.underOdds / 10000,
                 value: action.betValue
                   ? (<span className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
                 txId: (

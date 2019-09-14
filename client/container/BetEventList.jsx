@@ -35,7 +35,7 @@ class BetEventList extends Component {
       events: [],
       pages: 0,
       page: 1,
-      size: 25
+      size: 50
     }
   };
 
@@ -73,7 +73,11 @@ class BetEventList extends Component {
                 if (item.results) {
                   item.results.forEach(result =>{
                     let startIndex = 2
-                    if (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address) {
+                    if (
+                      result.payoutTx.vout[1] &&
+                      result.payoutTx.vout[2] &&
+                      result.payoutTx.vout[1].address === result.payoutTx.vout[2].address
+                    ) {
                       startIndex = 3
                     }
                     for (let i = startIndex; i < result.payoutTx.vout.length - 1; i++) {
@@ -99,7 +103,7 @@ class BetEventList extends Component {
   render () {
     const { t } = this.props;
     const cols = [
-      {key: 'start', title: t('start')},
+      {key: 'start', title: t('startingnow')},
       {key: 'event', title: t('eventId')},
       {key: 'name', title: t('name')},
       // {key: 'round', title: t('round')},
@@ -154,7 +158,7 @@ class BetEventList extends Component {
                 }
                 if (event.results.length > 0) {
                   for (const result of event.results) {
-                    const awayVsHome = result.transaction.awayScore - result.transaction.homeScore;
+                    const awayVsHome = result.transaction ? (result.transaction.awayScore - result.transaction.homeScore) : 0;
                     let outcome;
                     if (awayVsHome > 0) {
                       // outcome = 'Away Win';

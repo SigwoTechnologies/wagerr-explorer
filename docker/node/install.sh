@@ -10,7 +10,7 @@ apt-get install libgmp-dev -y
 add-apt-repository ppa:bitcoin/bitcoin
 apt-get update
 apt-get install -y libdb4.8-dev libdb4.8++-dev
-apt-get install -y libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev 
+apt-get install -y libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev
 apt-get install -y libqrencode-dev
 apt-get install git -y
 apt-get install autoconf -y
@@ -23,7 +23,7 @@ echo 'Cloning wagerr'
 
 mkdir -p /tmp/wagerr
 cd /tmp/wagerr
-git clone -b rc6-lotto-update1 https://github.com/Kokary/wagerr
+git clone -b master https://github.com/wagerr/wagerr
 cd  wagerr
 echo 'Running autogen'
 ./autogen.sh

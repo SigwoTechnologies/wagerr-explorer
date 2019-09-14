@@ -1,4 +1,3 @@
-
 #!/bin/bash
 set -e
 
@@ -7,7 +6,7 @@ echo "Pass: $RPC_PASS"
 sleep 1s
 if [ -z "$RPC_USER" ] || [ -z "$RPC_PASS" ]
 then
-  echo "node: RPC_USER or RPC_PASS not provied!"
+  echo "node: RPC_USER or RPC_PASS not provided!"
   printenv
   exit 1
 fi
@@ -28,18 +27,8 @@ rpcclienttimeout=30
 rpcport=$RPC_PORT
 testnet=$COIN_TESTNET
 staking=0
-whitelist=144.202.87.185
-whitelist=95.179.178.244
-whitelist=198.13.42.84
-whitelist=95.30.197.214
-addnode=144.202.87.185
-addnode=95.179.178.244
-addnode=198.13.42.84
-addnode=95.30.197.214
-connect=144.202.87.185
-connect=95.179.178.244
-connect=198.13.42.84
-connect=95.30.197.214
+connect=95.217.9.89
+whitelist=95.217.9.89
 EOL
 
 echo 'RPC configuration has been applied'

@@ -34,13 +34,16 @@ const config = {
     timeout: 8000, // 8 seconds
   },
   coin:{
-    testnet: '$COIN_TESTNET' || true,
+    testnet: 'MainNet' || 'MainNet',
     oracle_payout_address: '$ORACLE_PAYOUT_ADDRESS' || 'TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2', // testnet address, replace with mainnet
     dev_payout_address: '$DEV_PAYOUT_ADDRESS' || 'TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY', // testnet address, replace with mainnet
   },
   redis:{
     host: '$REDIS_HOST' || 'localhost',
-  }
+  },
+  crons: {
+    start: '$START_HEIGHT',
+  },
 };
 
 module.exports = config;

@@ -70,6 +70,8 @@ config.js
 /public/*.gz
 /public/*.html
 /public/bundle.js.map
+/public/fetch.worker.js.map
+/public/*.map
 
 data
 volumes

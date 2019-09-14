@@ -27,6 +27,11 @@ const Proposal = require('../../model/proposal');
 const Statistic = require('../../model/statistic');
 const Betspread = require('../../model/betspread');
 const Bettotal = require('../../model/bettotal');
+// Lotto models
+const LottoEvent = require('../../model/lottoevent');
+const LottoBet = require('../../model/lottobet');
+const LottoResult = require('../../model/lottoresult');
+
 
 /**
  * Get transactions and unspent transactions by address.
@@ -689,6 +694,31 @@ const getBetTotals = async (req, res) => {
   }
 }
 
+const getData = async (Model, req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+
+    if (req.query.eventId) {
+      const eventId = req.query.eventId
+      const total = await Model.find({eventId: `${eventId}`}).sort({createdAt: 1}).countDocuments()
+      const results = await Model.find({eventId: `${eventId}`}).skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    } else {
+      const total = await Model.find().sort({createdAt: 1}).countDocuments()
+      const results = await Model.find().skip(skip).limit(limit).sort({createdAt: 1})
+      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+}
+
+const getLottoEvents = async (req, res) =>  getData(LottoEvent, req, res)
+const getLottoBets = async (req, res) =>  getData(LottoBet, req, res)
+const getLottoResults = async (req, res) =>  getData(LottoResult, req, res)
+
 const getBetActioinsWeek = () => {
   // When does the cache expire.
   // For now this is hard coded.
@@ -743,7 +773,7 @@ const getBetEventInfo = async (req, res) => {
   let results
   try {
     results = await BetResult.find({eventId: eventId}).sort({createdAt: 1})
-  }catch (e) {
+  } catch (e) {
     console.log("Bet Event Not Publish")
   }
   try {
@@ -757,7 +787,7 @@ const getBetEventInfo = async (req, res) => {
       if (awayTeamNames.indexOf(event.awayTeam) === -1) {
         awayTeamNames.push(event.awayTeam)
       }
-    })
+    });
 
     // We add how home teams are represented in bets with new opCodes
     homeTeamNames.push('Money Line - Home Win');
@@ -1003,4 +1033,7 @@ module.exports =  {
   getStatisticPerWeek,
   getBetspreads,
   getBetTotals,
+  getLottoEvents,
+  getLottoBets,
+  getLottoResults,
 };
