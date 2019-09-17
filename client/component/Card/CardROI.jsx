@@ -30,7 +30,7 @@ const CardROI = ({ coin }) => {
           Estimated ROI
         </div>
       </div>
-      {/*      <div className="mb-3">
+      <div className="mb-3">
         <div className="h3">
           { numeral(coin.supply ? coin.supply : 0.0).format('0,0.00000000') } WGR
         </div>
@@ -38,7 +38,7 @@ const CardROI = ({ coin }) => {
           Coin Supply (Total)
         </div>
       </div>
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <div className="h3">
           { numeral(coin.supply ? coin.supply - (mns * mncoins) : 0.0).format('0,0.00000000') } WGR
         </div>

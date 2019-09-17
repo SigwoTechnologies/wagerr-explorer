@@ -40,9 +40,8 @@ const getBetStatus = async (req, res) => {
 
 const getCustomSupply = async (req, res) => {
   try {
-    const coin = await Coin.findOne().sort({ createdAt: -1 });
-
-    res.json(coin.supply);
+    const info = await rpc.call('getinfo');
+    res.json(info.moneysupply);
   } catch(err) {
     console.log(err);
     res.status(500).send(err.message || err);

@@ -27,8 +27,6 @@ rpcclienttimeout=30
 rpcport=$RPC_PORT
 testnet=$COIN_TESTNET
 staking=0
-connect=95.217.9.89
-whitelist=95.217.9.89
 EOL
 
 echo 'RPC configuration has been applied'
