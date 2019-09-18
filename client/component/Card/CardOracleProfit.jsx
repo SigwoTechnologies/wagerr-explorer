@@ -20,6 +20,7 @@ export default class CardOracleProfit extends Component {
   static propTypes = {
     oracleProfitPerSecond: PropTypes.number,
     btc: PropTypes.number.isRequired,
+    btcPrice: PropTypes.number.isRequired,
     usd: PropTypes.number.isRequired,
     online: PropTypes.number.isRequired,
   };
