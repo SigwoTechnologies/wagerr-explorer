@@ -132,7 +132,7 @@ async function syncCoin() {
     netHash: nethashps,
     peers: info.connections,
     status: 'Online',
-    supply: utxo[0].total + info.zWGRsupply.total,
+    supply: info.moneysupply,
     usd: eurMarket.quotes.USD.price,
     eur: eurMarket.quotes.EUR.price,
     totalBet: totalBet + 99071397.1752,
