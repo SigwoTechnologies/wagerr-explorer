@@ -12,7 +12,7 @@ import numeral from 'numeral'
 export default class CardOracleProfit extends Component {
   static defaultProps = {
     oracleProfitPerSecond: 0,
-    btc: 0.0,
+    btcPrice: 0.0,
     usd: 0.0,
     online: 0,
   };
@@ -26,19 +26,19 @@ export default class CardOracleProfit extends Component {
 
   render() {
     const profitPerDay = this.props.oracleProfitPerSecond * 60 * 60 * 24 / this.props.online;
-    const profitPerDayBtc = profitPerDay * this.props.btc;
+    const profitPerDayBtc = profitPerDay * this.props.btcPrice;
     const profitPerDayUsd = profitPerDay * this.props.usd;
 
     const profitPerWeek = profitPerDay * 7;
-    const profitPerWeekBtc = profitPerWeek * this.props.btc;
+    const profitPerWeekBtc = profitPerWeek * this.props.btcPrice;
     const profitPerWeekUsd = profitPerWeek * this.props.usd;
 
     const profitPerMonth = (profitPerDay * 365.25) / 12;
-    const profitPerMonthBtc = profitPerMonth * this.props.btc;
+    const profitPerMonthBtc = profitPerMonth * this.props.btcPrice;
     const profitPerMonthyUsd = profitPerMonth * this.props.usd;
 
     const profitPerYear = (profitPerDay * 365.25);
-    const profitPerYearyBtc = profitPerYear * this.props.btc;
+    const profitPerYearyBtc = profitPerYear * this.props.btcPrice;
     const profitPerYearUsd = profitPerYear * this.props.usd;
 
     return (
