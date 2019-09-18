@@ -234,7 +234,7 @@ class BetEventTable extends Component {
                   ...action,
                   createdAt: date24Format(action.createdAt),
                   bet: action.homeOdds / 10000,
-                  spread: action.homeOdds > 0 ? `+${action.homeOdds / 10000}` : `+${(action.awayPoints / 10000)}`,
+                  spread: action.homeOdds > 0 ? `+${action.homePoints / 10}` : `+${(action.awayPoints / 10)}`,
                   odds: action.homeOdds / 10000,
                   value: action.betValue
                     ? (<span
