@@ -12,6 +12,7 @@ import numeral from 'numeral'
 export default class CardOracleProfit extends Component {
   static defaultProps = {
     oracleProfitPerSecond: 0,
+    btc: 0.0,
     btcPrice: 0.0,
     usd: 0.0,
     online: 0,
