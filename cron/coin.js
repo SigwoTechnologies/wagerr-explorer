@@ -125,7 +125,7 @@ async function syncCoin() {
     capEur: eurMarket.quotes.EUR.market_cap,
     createdAt: date,
     blocks: info.blocks,
-    btc: btcMarket.quotes.BTC.price,
+    btc: btcMarket.quotes.BTC.market_cap,
     diff: info.difficulty,
     mnsOff: masternodes.total - masternodes.stable,
     mnsOn: masternodes.stable,
