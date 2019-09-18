@@ -126,6 +126,7 @@ async function syncCoin() {
     createdAt: date,
     blocks: info.blocks,
     btc: btcMarket.quotes.BTC.market_cap,
+    btcPrice: btcMarket.quotes.BTC.price,
     diff: info.difficulty,
     mnsOff: masternodes.total - masternodes.stable,
     mnsOn: masternodes.stable,
