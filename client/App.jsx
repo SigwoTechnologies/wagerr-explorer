@@ -25,6 +25,8 @@ import Statistics from './container/Statistics';
 import Top100 from './container/Top100';
 import TX from './container/TX';
 import BetEventList from './container/BetEventList';
+import LottoList from './container/LottoList';
+import LottoEvent from './container/LottoEvent';
 import BetEvent from './container/BetEvent';
 import Governance from './container/Governance';
 
@@ -178,12 +180,14 @@ class App extends Component {
                   <Route exact path="/governance" component={ Governance } />
                   <Route exact path="/masternode" component={ Masternode } />
                   <Route exact path="/betevents" component={ BetEventList } />
+                  <Route exact path="/lottos" component={ LottoList } />
                   <Route exact path="/movement" component={ Movement } />
                   <Route exact path="/peer" component={ Peer } />
                   <Route exact path="/statistics" component={ Statistics } />
                   <Route exact path="/top" component={ Top100 } />
                   <Route exact path="/tx/:hash" component={ TX } />
-                    <Route exact path="/bet/event/:eventId" component={ BetEvent } />
+                  <Route exact path="/bet/event/:eventId" component={ BetEvent } />
+                  <Route exact path="/lotto/event/:eventId" component={ LottoEvent } />
                   <Route component={ Error404 } />
                 </Switch>
               </div>

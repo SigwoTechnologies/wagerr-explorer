@@ -214,6 +214,13 @@ export const getBetEventInfo = (query) => {
     return getFromWorker('beteventinfo', resolve, reject, query);
   });
 };
+
+export const getLottoEventInfo = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('lottoeventinfo', resolve, reject, query);
+  });
+};
+
 export const getBetEventsInfo = (query) => {
   return new promise((resolve, reject) => {
     return getFromWorker('beteventsinfo', resolve, reject, query);
@@ -284,4 +291,5 @@ export default {
   getLottoBets,
   getLottoEvents,
   getLottoResults,
+  getLottoEventInfo,
 };
