@@ -42,6 +42,7 @@ router.get('/statistic/perweek', blockex.getStatisticPerWeek());
 router.get('/lotto/events', blockex.getLottoEvents);
 router.get('/lotto/bets', blockex.getLottoBets);
 router.get('/lotto/results', blockex.getLottoResults);
+router.get('/lotto/event/:eventId/info', blockex.getLottoEventInfo);
 
 // faucet
 router.get('/faucet/donate', faucet.donate);

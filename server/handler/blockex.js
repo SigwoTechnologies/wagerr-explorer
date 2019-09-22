@@ -695,7 +695,12 @@ const getData = async (Model, req, res) => {
     } else {
       const total = await Model.find().sort({createdAt: 1}).countDocuments()
       const results = await Model.find().skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      res.json({
+        data: results,
+        actions: results,
+        results,
+        pages: total <= limit ? 1 : Math.ceil(total / limit),
+      })
     }
   } catch (err) {
     console.log(err);
@@ -703,7 +708,128 @@ const getData = async (Model, req, res) => {
   }
 }
 
-const getLottoEvents = async (req, res) =>  getData(LottoEvent, req, res)
+const getDataListing = async (Model, actions, results,  req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+  try {
+    const total = await Model.aggregate([
+      {
+        $group: {
+          _id: '$eventId',
+        },
+      }, {
+        $count: 'count'
+      }])
+    const result = await Model.aggregate([
+      {
+        $group: {
+          _id: '$eventId',
+          events: {
+            $push: '$$ROOT'
+          },
+        },
+      },
+      {
+        $project: {
+          _id: '$_id',
+          events: '$events',
+          timeStamp: {$arrayElemAt: [ "$events.timeStamp", 0 ]}
+        }
+      },
+      {
+        $sort: {
+          timeStamp: -1,
+          "_id": -1
+        }
+      }, {
+        $skip: skip
+      }, {
+        $limit: limit
+      }, {
+        $lookup: {
+          from: actions,
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'actions'
+        }
+      }, {
+        $lookup: {
+          from: results,
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'results'
+        }
+      }
+    ])
+    res.json({data:result, pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count/ limit)})
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
+const getAltDataListing = async (Model, actions, results,  req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+  try {
+    const total = await Model.aggregate([
+      {
+        $group: {
+          _id: '$eventId',
+        },
+      }, {
+        $count: 'count'
+      }])
+    const result = await Model.aggregate([
+      {
+        $group: {
+          _id: '$eventId',
+          events: {
+            $push: '$$ROOT'
+          },
+        },
+      },
+      {
+        $project: {
+          _id: '$_id',
+          events: '$events',
+          createdAt: {$arrayElemAt: [ "$events.createdAt", 0 ]}
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1,
+          "_id": -1
+        }
+      }, {
+        $skip: skip
+      }, {
+        $limit: limit
+      }, {
+        $lookup: {
+          from: actions,
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'actions'
+        }
+      }, {
+        $lookup: {
+          from: results,
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'results'
+        }
+      }
+    ])
+    res.json({data:result, pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count/ limit)})
+  } catch (err) {
+    console.log(err)
+    res.status(500).send(err.message || err)
+  }
+}
+
+const getLottoEvents = async (req, res)=> getAltDataListing(LottoEvent, 'lottobets', 'lottoresults', req, res)
+// const getLottoEvents = async (req, res) =>  getData(LottoEvent, req, res)
 const getLottoBets = async (req, res) =>  getData(LottoBet, req, res)
 const getLottoResults = async (req, res) =>  getData(LottoResult, req, res)
 
@@ -835,65 +961,30 @@ const getBetEventInfo = async (req, res) => {
   }
 }
 
-const getBetEventsInfo = async (req, res) => {
-  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+const getLottoEventInfo = async (req, res) => {
+  const eventId = req.params.eventId
+  let results
   try {
-    const total = await BetEvent.aggregate([
-      {
-        $group: {
-          _id: '$eventId',
-        },
-      }, {
-        $count: 'count'
-      }])
-    const result = await BetEvent.aggregate([
-      {
-        $group: {
-          _id: '$eventId',
-          events: {
-            $push: '$$ROOT'
-          },
-        },
-      },
-      {
-        $project: {
-          _id: '$_id',
-          events: '$events',
-          timeStamp: {$arrayElemAt: [ "$events.timeStamp", 0 ]}
-        }
-      },
-      {
-        $sort: {
-          timeStamp: -1,
-          "_id": -1
-        }
-      }, {
-        $skip: skip
-      }, {
-        $limit: limit
-      }, {
-        $lookup: {
-          from: 'betactions',
-          localField: '_id',
-          foreignField: 'eventId',
-          as: 'actions'
-        }
-      }, {
-        $lookup: {
-          from: 'betresults',
-          localField: '_id',
-          foreignField: 'eventId',
-          as: 'results'
-        }
-      }
-    ])
-    res.json({data:result, pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count/ limit)})
+    results = await LottoResult.find({eventId: eventId}).sort({createdAt: 1})
+  } catch (e) {
+    console.log("Bet Event Not Publish")
+  }
+  try {
+    const events = await LottoEvent.find({eventId: eventId}).sort({createdAt: 1})
+    const bets = await LottoBet.find({ eventId });
+
+    // These will return only one event with the latest updated odds (with possibility of duplicates), 
+    // but contains the original odds the event was created with. We update them to these original
+    // values for the frontend
+
+    res.json({events, bets, results})
   } catch (err) {
     console.log(err)
     res.status(500).send(err.message || err)
   }
 }
+
+const getBetEventsInfo = async (req, res)=> getDataListing(BetEvent, 'betactions', 'betresults', req, res)
 
 const getCurrentProposals = async (req, res) => {
   try {
@@ -1024,4 +1115,5 @@ module.exports =  {
   getLottoEvents,
   getLottoBets,
   getLottoResults,
+  getLottoEventInfo,
 };
