@@ -64,6 +64,36 @@ async function createError(_id, rpctx, block, transaction, transactionType) {
   });
 }
 
+function handleError(msg, e, transaction) {
+  log(msg);
+  log(transaction);
+  log(e);
+}
+
+async function logError(err, dataType, height, transaction, originalRecord, event) {
+  if (err && err.message && err.message.includes('duplicate key error collection')) {
+    return null;
+  }
+
+  if (height) {
+    handleError(
+      `Error ${dataType} at height ${height}`,
+      err,
+      transaction,
+    );
+  }
+
+  if (originalRecord) {
+    log(originalRecord);
+  }
+
+  if (event)  {
+    log(event);
+  }
+
+  return log(err);
+}
+
 async function getEventData(block, eventId) {
   const originalRecord = await BetEvent.findOne({
     eventId,
@@ -115,12 +145,6 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
     }
   }
 
-  const handleError = (msg, e) => {
-    log(msg);
-    log(transaction);
-    log(e);
-  };
-
   if (['peerlessEvent'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
     const eventExists = await recordExists(BetEvent, _id);
@@ -150,11 +174,9 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         matched: true,
       });
     } catch (e) {
-      handleError(
-        `Error creating bet event data at height ${block.height}`,
-        e,
-      );
       createResponse = e;
+
+      logError(e, 'creating bet event', block.height, transaction);
     }
 
     return createResponse;
@@ -188,17 +210,11 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
           try {
             await event.save();
           } catch (e) {
-            handleError(
-              `Error saving bet odds update data at height ${block.height}`,
-              e,
-            );
+            logError(e, 'saving odds update', block.height, transaction);
           }
         }
       } catch (e) {
-        handleError(
-          `Error saving bet odds update data at height ${block.height}`,
-          e,
-        );
+        logError(e, 'finding odds update', block.height, transaction);
       }
     }
 
@@ -216,10 +232,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         matched: true,
       });
     } catch (e) {
-      handleError(
-        `Error saving event update data at height ${block.height}`,
-        e,
-      );
+      logError(e, 'creating event update', block.height, transaction);
     }
 
     return createResponse;
@@ -261,22 +274,14 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         });
 
         if (!event) {
-          log('Error finding event data. Creating transaction error record.');
+          log(`Error finding event data. Creating transaction error record at height ${block.height}`);
           await createError(_id, rpctx, block, transaction, 'BetAction');
         }
       } catch (e) {
-        handleError(
-          `Error creating bet action at height ${block.height}`,
-          e,
-        );
-        log(originalRecord);
-        log(event);
+        logError(e, 'creating bet action ', block.height, transaction, originalRecord, event);
       }
     } catch (e) {
-      handleError(
-        `Error retrieving event data at height ${block.height}`,
-        e,
-      );
+      logError(e, 'retrieving event data ', block.height, transaction);
     }
 
     return createResponse;
@@ -317,10 +322,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         matched: true,
       });
     } catch (e) {
-      handleError(
-        `Error creating event update record at height ${block.height}`,
-        e,
-      );
+      logError(e, 'creating event update', block.height, transaction);
     }
 
     return createResponse;
@@ -351,10 +353,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         matched: true,
       });
     } catch (e) {
-      handleError(
-        `Error creating event update record at height ${block.height}`,
-        e,
-      );
+      logError(e, 'creating peerless totals market', block.height, transaction);
     }
 
     return createResponse;
@@ -385,11 +384,8 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         matched: true,
       });
     } catch (e) {
-      handleError(
-        `Error saving bet result data at height ${block.height}`,
-        e,
-      );
       createResponse = e;
+      logError(e, ' creating bet result', block.height, transaction);
     }
 
     return createResponse;

@@ -27,10 +27,11 @@ rpcclienttimeout=30
 rpcport=$RPC_PORT
 testnet=$COIN_TESTNET
 staking=0
+debug=1
 EOL
 
 echo 'RPC configuration has been applied'
-ls /root/.wagerr
+# ls /root/.wagerr
 cat /root/.wagerr/wagerr.conf
 
 exec "$@"
