@@ -11,6 +11,26 @@ const LottoResult = require('../model/lottoresult');
 
 const { log } = console;
 
+function handleError(msg, transaction) {
+  log(msg);
+  log(transaction);
+}
+
+async function logError(err, info, height, transaction) {
+  if (err && err.message && err.message.includes('duplicate key error collection')) {
+    return null;
+  }
+
+  if (height) {
+    handleError(
+      `Error ${info} at height ${height}`,
+      transaction,
+    );
+  }
+
+  return log(err);
+}
+
 async function migrateTransaction(txType) {
   let Model;
   let params = {};
@@ -55,8 +75,7 @@ async function migrateTransaction(txType) {
     try {
       lottoDataSaved = await Model.create(params);
     } catch(err) {
-      log(`Error saving ${txType} data`);
-      log(err);
+      logError(err, `saving ${txType} data`, transaction.blockHeight, transaction);
     }
 
     try {
@@ -65,7 +84,7 @@ async function migrateTransaction(txType) {
         await transaction.save();
       }
     } catch(err) {
-      log('Error updating transaction record');
+      logError(err, `updating ${txType} transaction data`, transaction.blockHeight, transaction);
     }
   }
 }
@@ -74,6 +93,8 @@ async function syncLottoData() {
   await migrateTransaction('chainGamesLottoEvent');
   await migrateTransaction('chainGamesLottoBet');
   await migrateTransaction('chainGamesLottoResult');
+
+  return true;
 }
 
 /**
@@ -82,15 +103,18 @@ async function syncLottoData() {
 async function update () {
   const type = 'lotto';
   let code = 0;
+  let response;
 
   try {
-    locker.lock(type);
-    await syncLottoData();
+    // locker.lock(type);
+    response = await syncLottoData();
   } catch (err) {
     log('Update() error');
     log(err);
     code = 1;
-  } finally {
+    response = err;
+    throw new Error(err);
+  } /* finally {
     try {
       locker.unlock(type);
     } catch (err) {
@@ -99,7 +123,9 @@ async function update () {
       code = 1;
     }
     exit(code);
-  }
+  } */
+
+  return response;
 }
 
-update()
+module.exports = update;

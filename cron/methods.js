@@ -179,7 +179,6 @@ async function addPoS (block, rpcTx) {
  */
 async function syncBlocksForBet (start, stop, clean = false) {
   const { crons } = config;
-  log(process.env);
 
   const dataStartBlock = crons.start || 756000;
 
@@ -210,9 +209,14 @@ async function syncBlocksForBet (start, stop, clean = false) {
       });
     }
   }
+
+  return true;
 }
 
 async function resolveErrors() {
+  const response = [];
+  let error;
+
   try {
     const errors = await BetError.find({
       completed: false,
@@ -257,6 +261,7 @@ async function resolveErrors() {
                 thisError.completed = true;
                 await thisError.save();
                 log(`Error with ${thisError.txType} eventId#${thisError.eventId} has been resolved`);
+                response.push(thisError);
               }
             }
           }
@@ -266,7 +271,10 @@ async function resolveErrors() {
   } catch (e) {
     log('Error running resolveErrors function');
     log(e);
+    error = e;
   }
+
+  return { records: response, error };
 }
 
 module.exports = {

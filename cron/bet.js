@@ -19,6 +19,8 @@ async function update () {
   const type = 'bet';
   let code = 0;
 
+  let response;
+
   try {
     const {
       betEvent,
@@ -55,22 +57,27 @@ async function update () {
       dbHeight = 1;
     }
 
-    locker.lock(type);
-    await syncBlocksForBet(dbHeight, blockDbHeight, clean);
+    // locker.lock(type);
+   response = await syncBlocksForBet(dbHeight, blockDbHeight, clean);
   } catch (err) {
     log('Update() error');
     log(err);
     code = 1;
-  } finally {
+    response = err;
+    throw new Error(err);
+  } /* finally {
     try {
-      locker.unlock(type);
+      // locker.unlock(type);
     } catch (err) {
       log('Update() error: finally');
       log(err);
       code = 1;
+      throw new Error(err);
     }
-    exit(code);
-  }
+    // exit(code);
+  } */
+
+  return response;
 }
 
-update()
+module.exports = update;
