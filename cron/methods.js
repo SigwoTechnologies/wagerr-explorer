@@ -170,6 +170,8 @@ async function addPoS (block, rpcTx) {
       }
     })
   }
+
+  return true;
 }
 
 /**
@@ -192,22 +194,26 @@ async function syncBlocksForBet (start, stop, clean = false) {
   rpc.timeout(10000); // 10 secs
 
   log(start, stop);
+  try {
+    for (let height = start; height <= stop; height++) {
+      if (height >= dataStartBlock) {
 
-  for (let height = start; height <= stop; height++) {
-    if (height >= dataStartBlock) {
+        const block = (await Block.find({ height }))[0] || {};
 
-      const block = (await Block.find({ height }))[0] || {};
+        let rpcblock = block;
+        let txs = rpcblock.rpctxs ? rpcblock.rpctxs : [];
 
-      let rpcblock = block;
-      let txs = rpcblock.rpctxs ? rpcblock.rpctxs : [];
-
-      await forEachSeries(txs, async (rpctx) => {
-        if (blockchain.isPoS(block)) {
-          // const rpctx = await util.getTX(txhash)
-          await addPoS(block, rpctx);
-        }
-      });
+        await forEachSeries(txs, async (rpctx) => {
+          if (blockchain.isPoS(block)) {
+            // const rpctx = await util.getTX(txhash)
+            await addPoS(block, rpctx);
+          }
+        });
+      }
     }
+    log('Finished sync process');
+  } catch (e) {
+    log(e);
   }
 
   return true;
@@ -229,7 +235,8 @@ async function resolveErrors() {
         let rpcblock = block;
 
         let txs = rpcblock.rpctxs ? rpcblock.rpctxs : [];
-
+        let needsResync = false;
+        let blockToUpdate = 756001;
         await forEachSeries(txs, async (rpctx) => {
           if (blockchain.isPoS(block)) {
             if (thisError.txType === 'BetAction') {
@@ -250,9 +257,10 @@ async function resolveErrors() {
                 betaction.matched = true;
                 completed = await betaction.save();
               } else {
-                log('Event not found');
+                log(`Event# ${thisError.eventId} not found`);
                 // If not found, we use the the syncBlocksForBet method to try to complete missed records
-                await syncBlocksForBet(756000, thisError.blockHeight, false);
+                needsResync = true;
+                blockToUpdate = thisError.blockHeight;
               }
 
               // We terminate the function when betSync record is completed
@@ -266,6 +274,11 @@ async function resolveErrors() {
             }
           }
         });
+
+        if (needsResync) {
+          log('Missing events...running blok sync function...');
+          await syncBlocksForBet(756000, blockToUpdate, false);
+        }
       }
     }
   } catch (e) {
@@ -273,7 +286,7 @@ async function resolveErrors() {
     log(e);
     error = e;
   }
-
+  log('Sending response objet now');
   return { records: response, error };
 }
 

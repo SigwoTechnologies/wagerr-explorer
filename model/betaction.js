@@ -24,7 +24,8 @@ const BetAction = mongoose.model('BetAction', new mongoose.Schema({
   overOdds: { required: false, type: Number },
   underOdds: { required: false, type: Number },
   transaction: { required: false, type: Map },
-  matched: { required: false, type: Boolean, default: false }
+  matched: { required: false, type: Boolean, default: false },
+  visibility: { required: false, type: Boolean, default: true }
 }, { versionKey: false }), 'betactions');
 
 

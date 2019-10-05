@@ -294,7 +294,7 @@ async function saveOPTransaction(block, rpctx, vout, transaction) {
     const spreadExists = await recordExists(Betspread, _id);
 
     if (spreadExists) {
-      console.log(`Bet spread ${_id} already on record`);
+      // console.log(`Bet spread ${_id} already on record`);
       return spreadExists;
     }
 

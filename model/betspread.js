@@ -17,7 +17,8 @@ const Betspread = mongoose.model('Betspread', new mongoose.Schema({
     txType: { required: false, type: String },
     betValue: { required: false, type: Number },
     value: { required: false, type: Number },
-    matched: { required: false, type: Boolean, default: false }
+    matched: { required: false, type: Boolean, default: false },
+    visibility: { required: false, type: Boolean, default: true }
   }, { versionKey: false }), 'betspreads');
   
   module.exports =  Betspread;
