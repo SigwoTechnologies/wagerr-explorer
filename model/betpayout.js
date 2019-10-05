@@ -38,7 +38,8 @@ const betPayoutSchema = new mongoose.Schema({
   txId: { index: true, required: true, type: String },
   version: { required: true, type: Number },
   vin: { required: true, type: [BetPayoutIn] },
-  vout: { required: true, type: [BetPayoutOut] }
+  vout: { required: true, type: [BetPayoutOut] },
+  visibility: { required: false, type: Boolean, default: true }
 }, { versionKey: false });
 
 /**

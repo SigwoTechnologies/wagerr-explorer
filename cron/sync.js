@@ -40,7 +40,6 @@ async function exec() {
         log('Update() error: finally');
         log(err);
         code = 1;
-        throw new Error(err);
       }
       return exit(code);
     })

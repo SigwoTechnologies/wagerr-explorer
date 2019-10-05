@@ -17,7 +17,8 @@ const BetError = mongoose.model('BetError', new mongoose.Schema({
   transaction: { required: false, type: Map },
   completed: { required: true, type: Boolean, default: false },
   txType: { required: false, type: String},
-  txErrorId: { required: true, type: String }
+  txErrorId: { required: true, type: String },
+  visibility: { required: false, type: Boolean, default: true }
 }, { versionKey: false }), 'beterrors');
 
 

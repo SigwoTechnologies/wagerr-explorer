@@ -43,11 +43,6 @@ services:
       MONGODB_USERNAME: ${MONGODB_USERNAME}
       MONGODB_PASSWORD: ${MONGODB_PASSWORD}
       MONGODB_DATABASE: ${MONGODB_DATABASE}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:27017"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     volumes:
       - ./mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
       - ./data/db:/data/db
@@ -74,11 +69,6 @@ services:
       - "8087:8087"
       - "8081:8081"
       - "9051:9051"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://mongo:27017"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     restart: always
     command: script/start.sh
     volumes:

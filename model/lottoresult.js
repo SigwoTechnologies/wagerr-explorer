@@ -15,7 +15,8 @@ const LottoResult = mongoose.model('LottoResult', new mongoose.Schema({
   opString: { required: true, type: String },
   opCode: { required: false, type: String},
   transaction: { required: false, type: Map },
-  matched: { required: false, type: Boolean, default: false }
+  matched: { required: false, type: Boolean, default: false },
+  visibility: { required: false, type: Boolean, default: true }
 }, { versionKey: false }), 'lottoresults');
 
 

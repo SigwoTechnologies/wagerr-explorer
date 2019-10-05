@@ -584,12 +584,12 @@ const getBetEvents = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const eventId = req.query.eventId
-      const total = await BetEvent.find({eventId: eventId}).sort({createdAt: 1}).countDocuments()
-      const events = await BetEvent.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await BetEvent.find({eventId, visibility: true }).sort({createdAt: 1}).countDocuments()
+      const events = await BetEvent.find({eventId, visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
-      const total = await BetEvent.find().sort({createdAt: 1}).countDocuments()
-      const events = await BetEvent.find().skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await BetEvent.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
+      const events = await BetEvent.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
 
@@ -605,12 +605,12 @@ const getBetActions = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const eventId = req.query.eventId
-      const total = await BetAction.find({eventId: eventId}).sort({createdAt: 1}).countDocuments()
-      const actions = await BetAction.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await BetAction.find({eventId, visibility: true }).sort({createdAt: 1}).countDocuments()
+      const actions = await BetAction.find({eventId, visibility: true}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
-      const total = await BetAction.find().sort({createdAt: 1}).countDocuments()
-      const actions = await BetAction.find().skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await BetAction.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
+      const actions = await BetAction.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
   } catch (err) {
@@ -625,12 +625,12 @@ const getBetResults = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const eventId = req.query.eventId
-      const total = await BetResult.find({eventId: eventId}).sort({createdAt: 1}).countDocuments()
-      const results = await BetResult.find({eventId: eventId}).skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await BetResult.find({eventId, visibility: true}).sort({createdAt: 1}).countDocuments()
+      const results = await BetResult.find({eventId, visibility: true}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
-      const total = await BetResult.find().sort({createdAt: 1}).countDocuments()
-      const results = await BetResult.find().skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await BetResult.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
+      const results = await BetResult.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
 
@@ -646,12 +646,12 @@ const getBetspreads = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const eventId = req.query.eventId
-      const total = await Betspread.find({eventId: `${eventId}`}).sort({createdAt: 1}).countDocuments()
-      const results = await Betspread.find({eventId: `${eventId}`}).skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await Betspread.find({eventId: `${eventId}`, visibility: true }).sort({createdAt: 1}).countDocuments()
+      const results = await Betspread.find({eventId: `${eventId}`, visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
-      const total = await Betspread.find().sort({createdAt: 1}).countDocuments()
-      const results = await Betspread.find().skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await Betspread.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
+      const results = await Betspread.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
 
@@ -667,12 +667,12 @@ const getBetTotals = async (req, res) => {
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
     if (req.query.eventId) {
       const eventId = req.query.eventId
-      const total = await Bettotal.find({eventId: `${eventId}`}).sort({createdAt: 1}).countDocuments()
-      const results = await Bettotal.find({eventId: `${eventId}`}).skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await Bettotal.find({eventId: `${eventId}`, visibility: true}).sort({createdAt: 1}).countDocuments()
+      const results = await Bettotal.find({eventId: `${eventId}`, visibility: true}).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
-      const total = await Bettotal.find().sort({createdAt: 1}).countDocuments()
-      const results = await Bettotal.find().skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await Bettotal.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
+      const results = await Bettotal.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     }
 
@@ -689,12 +689,12 @@ const getData = async (Model, req, res) => {
 
     if (req.query.eventId) {
       const eventId = req.query.eventId
-      const total = await Model.find({eventId: `${eventId}`}).sort({createdAt: 1}).countDocuments()
-      const results = await Model.find({eventId: `${eventId}`}).skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await Model.find({eventId: `${eventId}`, visibility: true}).sort({createdAt: 1}).countDocuments()
+      const results = await Model.find({eventId: `${eventId}`, visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
     } else {
-      const total = await Model.find().sort({createdAt: 1}).countDocuments()
-      const results = await Model.find().skip(skip).limit(limit).sort({createdAt: 1})
+      const total = await Model.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
+      const results = await Model.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
       res.json({
         data: results,
         actions: results,
@@ -886,12 +886,12 @@ const getBetEventInfo = async (req, res) => {
   const eventId = req.params.eventId
   let results
   try {
-    results = await BetResult.find({eventId: eventId}).sort({createdAt: 1})
+    results = await BetResult.find({eventId, visibility: true }).sort({createdAt: 1})
   } catch (e) {
     console.log("Bet Event Not Publish")
   }
   try {
-    const events = await BetEvent.find({eventId: eventId}).sort({createdAt: 1})
+    const events = await BetEvent.find({eventId, visibility: true }).sort({createdAt: 1})
     const homeTeamNames = []
     const awayTeamNames = []
     events.forEach( event => {
@@ -912,9 +912,9 @@ const getBetEventInfo = async (req, res) => {
     // We create the array that contains draw values
     const drawResults = ['DRW', 'Money Line - Draw'];
 
-    const homeBets = await BetAction.find({eventId: eventId, betChoose: {$in:homeTeamNames}})
-    const awayBets = await BetAction.find({eventId: eventId, betChoose: {$in:awayTeamNames}})
-    const drawBets = await BetAction.find({eventId: eventId, betChoose: {$in: drawResults}})
+    const homeBets = await BetAction.find({eventId, visibility: true, betChoose: {$in:homeTeamNames}})
+    const awayBets = await BetAction.find({eventId, visibility: true, betChoose: {$in:awayTeamNames}})
+    const drawBets = await BetAction.find({eventId, visibility: true, betChoose: {$in: drawResults}})
 
     // These will return only one event with the latest updated odds (with possibility of duplicates), 
     // but contains the original odds the event was created with. We update them to these original
@@ -933,7 +933,7 @@ const getBetEventInfo = async (req, res) => {
       });
 
       // We also query event updates
-      const updates = await BetUpdate.find({eventId: `${eventId}`}).sort({createdAt: 1}) 
+      const updates = await BetUpdate.find({eventId: `${eventId}`, visibility: true }).sort({createdAt: 1}) 
  
       await updates.forEach((u) => {
         const update = JSON.parse(JSON.stringify(u));
@@ -965,13 +965,13 @@ const getLottoEventInfo = async (req, res) => {
   const eventId = req.params.eventId
   let results
   try {
-    results = await LottoResult.find({eventId: eventId}).sort({createdAt: 1})
+    results = await LottoResult.find({eventId, visibility: true }).sort({createdAt: 1})
   } catch (e) {
     console.log("Bet Event Not Publish")
   }
   try {
-    const events = await LottoEvent.find({eventId: eventId}).sort({createdAt: 1})
-    const bets = await LottoBet.find({ eventId });
+    const events = await LottoEvent.find({eventId, visibility: true }).sort({createdAt: 1})
+    const bets = await LottoBet.find({ eventId, visibility: true });
 
     // These will return only one event with the latest updated odds (with possibility of duplicates), 
     // but contains the original odds the event was created with. We update them to these original
