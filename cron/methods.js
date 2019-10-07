@@ -220,12 +220,14 @@ async function syncBlocksForBet (start, stop, clean = false) {
 }
 
 async function resolveErrors() {
+  const maximumTries = 10;
   const response = [];
   let error;
 
   try {
     const errors = await BetError.find({
       completed: false,
+      reviewed: { $lt: maximumTries },
     });
     log(`${errors.length} errors found`);
     if (errors.length > 0) {
@@ -269,6 +271,12 @@ async function resolveErrors() {
                 thisError.completed = true;
                 await thisError.save();
                 log(`Error with ${thisError.txType} eventId#${thisError.eventId} has been resolved`);
+                response.push(thisError);
+              } else {
+                thisError.reviewed += 1;
+
+                await thisError.save();
+                log(`Error with ${thisError.txType} eventId#${thisError.eventId} has not yet been resolved. ${ maximumTries - thisError.reviewed } tries left for resolution.`);
                 response.push(thisError);
               }
             }
