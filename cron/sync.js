@@ -37,15 +37,30 @@ async function exec() {
       try {
         locker.unlock(type);
       } catch (err) {
-        log('Update() error: finally');
-        log(err);
+        if (err && err.message && err.message.includes("no such file or directory, unlink '/explorer/tmp/sync.cron_lock")) {
+          // log(err)
+        } else {
+          log('Update() error: finally');
+          log(err);
+        }
         code = 1;
       }
       return exit(code);
     })
     .catch((err) => {
-      log(err);
+      log('ERROR EXECUTING SYNC FUNCTIONS');
+      log(err)
       code = 1;
+      try {
+        locker.unlock(type);
+      } catch (err) {
+        log('Update() error: finally');
+        if (err && err.message && err.message.includes("no such file or directory, unlink '/explorer/tmp/sync.cron_lock")) {
+          // log(err)
+        } else {
+          log(err);
+        }
+      }
       return exit(code);
     });
 }
