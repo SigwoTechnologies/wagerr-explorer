@@ -6,7 +6,7 @@ const config = {
     host: '$API_SERVER',
     port: '$SERVER_API_PORT' || '8087',
     prefix: '/api',
-    timeout: '10s'
+    timeout: '30s'
   },
   coinMarketCap: {
     tickerId: '1779'
