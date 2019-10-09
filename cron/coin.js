@@ -87,17 +87,21 @@ async function syncCoin() {
 
   let totalBet = 0;
   let totalMint = 0;
+
   queryResults.forEach(queryResult => {
     queryResult.actions.forEach(action => {
       totalBet += action.betValue
     })
     queryResult.results.forEach(result => {
-      let startIndex = 2
-      if (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address) {
-        startIndex = 3
-      }
-      for (let i = startIndex; i < result.payoutTx.vout.length - 1; i++) {
-        totalMint += result.payoutTx.vout[i].value
+      const { payoutTx } = result;
+      if (payoutTx && payoutTx.vout) {
+        let startIndex = 2
+        if (payoutTx  && payoutTx.vout[1] && payoutTx.vout[2] && (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address)) {
+          startIndex = 3
+        }
+        for (let i = startIndex; i < result.payoutTx.vout.length - 1; i++) {
+          totalMint += result.payoutTx.vout[i].value
+        }
       }
     })
 
