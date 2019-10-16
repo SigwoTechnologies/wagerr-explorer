@@ -65,6 +65,7 @@ services:
       - dbnet
     volumes:
       - ./docker/node/start.sh:/usr/local/bin/start.sh
+      - ./server:/explorer/server
     ports:
       - "8087:8087"
       - "8081:8081"

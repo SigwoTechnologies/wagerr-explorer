@@ -16,7 +16,7 @@ const { log } = console;
  * Handle locking.
  */
 async function update () {
-  const type = 'bet';
+  const type = 'betfunc';
   let code = 0;
 
   let response;
@@ -77,3 +77,6 @@ async function update () {
 
   return response;
 }
+
+
+update()

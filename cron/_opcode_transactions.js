@@ -125,7 +125,12 @@ async function getEventData(block, eventId) {
 
   if (betTotals && betTotals.length > 0) {
     const lastTotal = betTotals[betTotals.length - 1];
-
+    if (event === null) {
+      const recheck = await BetEvent.findOne({
+        eventId,
+      });
+      event = recheck;
+    }
     event.points = lastTotal.points;
     event.overOdds = lastTotal.overOdds;
     event.underOdds = lastTotal.underOdds;

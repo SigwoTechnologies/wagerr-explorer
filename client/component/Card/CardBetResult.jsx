@@ -7,20 +7,85 @@ import numeral from 'numeral'
 import { compose } from 'redux'
 import { translate } from 'react-i18next'
 
-const CardBetResult = ({eventInfo, t}) => {
+const CardBetResult = ({eventInfo, data, t}) => {
   if (eventInfo.results.length !== 0) {
     const results = eventInfo.results
     let totalBet = 0
     let totalMint = 0
-    eventInfo.homeBets.forEach(action => {
-      totalBet += action.betValue
-    })
-    eventInfo.drawBets.forEach(action => {
-      totalBet += action.betValue
-    })
-    eventInfo.awayBets.forEach(action => {
-      totalBet += action.betValue
-    })
+
+    // Money Line
+
+    let MoneyLineBets = { home: [], away: [], draw: [] };
+
+    eventInfo.homeBets.map((event) => {
+      if (event.betChoose == 'Money Line - Home Win') {
+        MoneyLineBets.home.push(event);
+      }
+    });
+    
+    eventInfo.awayBets.map((event) => {
+      if (event.betChoose == 'Money Line - Away Win') {
+        MoneyLineBets.away.push(event);
+      }
+    });
+    
+    eventInfo.drawBets.map((event) => {
+      if (event.betChoose == 'Money Line - Draw') {
+        MoneyLineBets.draw.push(event);
+      }
+    });
+
+    const MLHomeBetAmount = MoneyLineBets.home.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const MLAwayBetAmount = MoneyLineBets.away.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const MLDrawBetAmount = MoneyLineBets.draw.reduce((acc, bet) => acc + bet.betValue, 0.0);
+
+    totalBet += MLHomeBetAmount + MLAwayBetAmount + MLDrawBetAmount;
+
+    // Spreads
+    let SpreadsBets = { home: [], away: [], draw: [] };
+
+    eventInfo.homeBets.map((event) => {
+      if (event.betChoose.includes('Spreads - Home')) {
+        SpreadsBets.home.push(event);
+      }
+    });
+    eventInfo.awayBets.map((event) => {
+      if (event.betChoose.includes('Spreads - Away')) {
+        SpreadsBets.away.push(event);
+      }
+    });
+    
+    eventInfo.drawBets.map((event) => {
+      if (event.betChoose.includes('Spreads - Draw')) {
+        MoneyLineBets.draw.push(event);
+      }
+    });
+
+    const SHomeBetAmount = SpreadsBets.home.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const SAwayBetAmount = SpreadsBets.away.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const SDrawBetAmount = SpreadsBets.draw.reduce((acc, bet) => acc + bet.betValue, 0.0);
+
+    totalBet +=  SHomeBetAmount + SAwayBetAmount + SDrawBetAmount;
+
+    // Over / Under
+    let over = [];
+    let under = [];
+
+    data.betActions.map((event) => {
+      if (event.betChoose.includes('Totals - Over')) {
+        over.push(event);
+      } else if (event.betChoose.includes('Totals - Under')) {
+        under.push(event);
+      }
+    });
+
+    const THomeBetAmount = over.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    const TAwayBetAmount = under.reduce((acc, bet) => acc + bet.betValue, 0.0);
+    
+    totalBet += THomeBetAmount + TAwayBetAmount;
+
+    // End of calculations here
+  
     if (eventInfo.results.length > 0) {
       eventInfo.results.forEach(result =>{
         let startIndex = 2
@@ -32,6 +97,7 @@ const CardBetResult = ({eventInfo, t}) => {
         }
       })
     }
+
     const supplyChange = totalMint - totalBet
     const resultDisplay = (resultData) => {
       const { transaction } = resultData;

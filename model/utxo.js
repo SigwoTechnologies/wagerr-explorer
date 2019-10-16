@@ -13,7 +13,8 @@ const UTXO = mongoose.model('UTXO', new mongoose.Schema({
   blockHeight: { index: true, required: true, type: Number },
   n: { required: true, type: Number },
   txId: { required: true, type: String },
-  value: { required: true, type: Number }
+  value: { required: true, type: Number },
+  hide: { required: false, type: Boolean, default: null }
 }, { versionKey: false }), 'utxo');
 
 module.exports =  UTXO;
