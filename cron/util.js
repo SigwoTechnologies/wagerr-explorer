@@ -128,7 +128,11 @@ async function vout(rpctx, blockHeight) {
       try {
         await UTXO.insertMany(utxo);
       } catch (e) {
-        console.log(e)
+        if (e && e.message && e.message.includes('duplicate key error collection')) {
+          // console.log('Error right here');
+        } else {
+          console.log(e)
+        }
       }
     }
   }

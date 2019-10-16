@@ -184,7 +184,7 @@ class BetEvent extends Component {
                       <CardMoneyLineEvent eventInfo={this.state.eventInfo}/>
                     </div>
                     <div className="col-sm-12 col-md-6">
-                      <CardBetResult eventInfo={this.state.eventInfo}/>
+                      <CardBetResult eventInfo={this.state.eventInfo} data={tableData} />
                     </div>
                   </div>
                 </Col>
@@ -201,7 +201,7 @@ class BetEvent extends Component {
                       <CardSpreadEvent eventInfo={this.state.eventInfo}/>
                     </div>
                     <div className="col-sm-12 col-md-6">
-                      <CardBetResult eventInfo={this.state.eventInfo}/>
+                      <CardBetResult eventInfo={this.state.eventInfo} data={tableData}/>
                     </div>
                   </div>
                 </Col>
@@ -216,7 +216,7 @@ class BetEvent extends Component {
                   <CardOverUnderEvent eventInfo={this.state.eventInfo} data={tableData}/>
                 </div>
                 <div className="col-sm-12 col-md-6">
-                  <CardBetResult eventInfo={this.state.eventInfo}/>
+                  <CardBetResult eventInfo={this.state.eventInfo} data={tableData}/>
                 </div>
               </Row>
               <Row>

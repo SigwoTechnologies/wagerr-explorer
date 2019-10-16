@@ -10,67 +10,8 @@ const Coin = require('../model/coin');
 const UTXO = require('../model/utxo');
 const BetResult = require('../model/betresult');
 const BetAction = require('../model/betaction');
-const blockchain = require('../lib/blockchain');
 
-const { forEachSeries } = require('p-iteration');
-
-const util = require('./util');
-// Models.
-const Block = require('../model/block');
-
-const { log } = console;
-
-log('Running coin cron job');
-
-async function syncPayoutData() {
-  const betresults = await BetResult.find({ payoutTx: null });
-
-  for (let x = 0; x < betresults.length; x += 1) {
-    let result = betresults[x];
-
-    let resultPayoutTxs = await TX.find({blockHeight: result.blockHeight+1});
-    if (resultPayoutTxs.length === 0) {
-      const block = await Block.findOne({ height: (result.blockHeight + 1) }).sort({ height: -1});
-      for (let y = 0; y < block.rpctxs.length; y += 1) {
-        const rpctx = block.rpctxs[y];
-        if (blockchain.isPoS(block)) {
-          try {
-            await util.addPoS(block, rpctx);
-            log('Ran addPoS');
-          } catch (e) {
-            log('Error adding PoS');
-          }
-        } else {
-          try {
-            await util.addPoW(block, rpctx);
-            log('Ran addPoW');
-          } catch (e) {
-            log('Error adding PoW');
-          }
-        }
-      }
-
-      // log('Attaching to result');
-      resultPayoutTxs = await TX.find({blockHeight: block.height+1});
-      // log(resultPayoutTxs);
-    
-      result.payoutTx = resultPayoutTxs[0];
-    } else {
-      result.payoutTx = resultPayoutTxs[0];
-    }
-
-    try {
-      await result.save();
-      log(`betResult at height ${result.blockHeight} updated`);
-    } catch (e) {
-      log(e);
-    }
-  }
-
-
-  log(betresults.length);
-}
-
+console.log('Running coin cron job');
 
 /**
  * Get the coin related information including things
@@ -152,12 +93,10 @@ async function syncCoin() {
       totalBet += action.betValue
     })
     queryResult.results.forEach(result => {
-      // const { payoutTx } = result;
-      let startIndex = 2
-      if (result.payoutTx && result.payoutTx.vout.length < 3) {
-        console.log(result.payoutTx);
-      } else {
-        if (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address) {
+      const { payoutTx } = result;
+      if (payoutTx && payoutTx.vout) {
+        let startIndex = 2
+        if (payoutTx  && payoutTx.vout[1] && payoutTx.vout[2] && (result.payoutTx.vout[1].address === result.payoutTx.vout[2].address)) {
           startIndex = 3
         }
         for (let i = startIndex; i < result.payoutTx.vout.length - 1; i++) {
@@ -208,7 +147,6 @@ async function syncCoin() {
   });
 
   await coin.save();
-  console.log('Finished coin sync function');
 }
 
 /**
@@ -220,16 +158,15 @@ async function update() {
 
   try {
     locker.lock(type);
-    await syncPayoutData();
     await syncCoin();
   } catch(err) {
-    log(err);
+    console.log(err);
     code = 1;
   } finally {
     try {
       locker.unlock(type);
     } catch(err) {
-      log(err);
+      console.log(err);
       code = 1;
     }
     exit(code);
