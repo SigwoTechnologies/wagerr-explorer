@@ -1,12 +1,8 @@
-const _ =  require('lodash')
-
-const { getSubsidy } =  require('../../lib/blockchain')
-
-const { BigNumber } = require('bignumber.js')
-
-const chain = require('../../lib/blockchain');
-const { forEach } = require('p-iteration');
+const _ = require('lodash');
 const moment = require('moment');
+const { BigNumber } = require('bignumber.js');
+const { getSubsidy } = require('../../lib/blockchain');
+const chain = require('../../lib/blockchain');
 const { rpc } = require('../../lib/cron');
 
 // System models for query and etc.
@@ -42,49 +38,54 @@ const getAddress = async (req, res) => {
   try {
     const txs = await TX
       .aggregate([
-        {$match: {$or: [{'vout.address': req.params.hash},{'vin.address': req.params.hash}]}},
-        {$sort: {blockHeight: -1}}
+        { $match: { $or: [{ 'vout.address': req.params.hash }, { 'vin.address': req.params.hash }] } },
+        { $sort: { blockHeight: -1 } },
       ])
       .allowDiskUse(true)
-      .exec()
+      .exec();
 
-    const sent = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
+    const sent = txs.filter((tx) => tx.vout[0].address !== 'NON_STANDARD')
       .reduce((acc, tx) => acc.plus(tx.vin.reduce((a, t) => {
-      if (t.address === req.params.hash) {
-        return a.plus(BigNumber(t.value))
-      } else {
-        return a
-      }
-    }, BigNumber(0.0))), BigNumber(0.0))
+        if (t.address === req.params.hash) {
+          return a.plus(BigNumber(t.value));
+        }
 
-    const received = txs.filter(tx => tx.vout[0].address !== 'NON_STANDARD')
+        return a;
+      }, BigNumber(0.0))), BigNumber(0.0));
+
+    const received = txs.filter((tx) => tx.vout[0].address !== 'NON_STANDARD')
       .reduce((acc, tx) => acc.plus(tx.vout.reduce((a, t) => {
-      if (t.address === req.params.hash) {
-        return a.plus(BigNumber(t.value))
-      } else {
-        return a
-      }
-    }, BigNumber(0.0))), BigNumber(0.0))
+        if (t.address === req.params.hash) {
+          return a.plus(BigNumber(t.value));
+        }
 
-    const staked = txs.filter(tx => tx.vout[0].address === 'NON_STANDARD')
+        return a;
+      }, BigNumber(0.0))), BigNumber(0.0));
+
+    const staked = txs.filter((tx) => tx.vout[0].address === 'NON_STANDARD')
       .reduce((acc, tx) => acc.minus(tx.vin.reduce((a, t) => {
         if (t.address === req.params.hash) {
-          return a.plus(BigNumber(t.value))
-        } else {
-          return a
+          return a.plus(BigNumber(t.value));
         }
-      }, BigNumber(0.0))).plus(tx.vout.reduce((a, t) => {
-      if (t.address === req.params.hash) {
-        return a.plus(BigNumber(t.value))
-      } else {
-        return a
-      }
-    }, BigNumber(0.0))), BigNumber(0.0))
 
-    const balance = received.plus(staked).minus(sent)
-    res.json({balance:balance.toNumber(), sent:sent.toNumber(), staked:staked.toNumber(),
-      received:received.toNumber(), txs });
-  } catch(err) {
+        return a;
+      }, BigNumber(0.0))).plus(tx.vout.reduce((a, t) => {
+        if (t.address === req.params.hash) {
+          return a.plus(BigNumber(t.value));
+        }
+
+        return a;
+      }, BigNumber(0.0))), BigNumber(0.0));
+
+    const balance = received.plus(staked).minus(sent);
+    res.json({
+      balance: balance.toNumber(),
+      sent: sent.toNumber(),
+      staked: staked.toNumber(),
+      received: received.toNumber(),
+      txs,
+    });
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -113,7 +114,7 @@ const getAvgBlockTime = () => {
 
       cache = seconds / blocks.length;
       cutOff = moment().utc().add(60, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       if (!cache) {
@@ -162,7 +163,7 @@ const getAvgMNTime = () => {
 
       cache = (24.0 / (blocks.length / mns.length));
       cutOff = moment().utc().add(5, 'minutes').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       if (!cache) {
@@ -207,7 +208,7 @@ const getBlock = async (req, res) => {
     const txs = await TX.find({ txId: { $in: block.txs }});
 
     res.json({ block, txs });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -222,7 +223,7 @@ const getCoin = (req, res) => {
   Coin.findOne()
     .sort({ createdAt: -1 })
     .then((doc) => {
-      res.json({...doc._doc,wgr:1});
+      res.json({ ...doc._doc, wgr: 1 });
     })
     .catch((err) => {
       console.log(err);
@@ -278,7 +279,7 @@ const getCoinsWeek = () => {
 
       cache = await Coin.aggregate(qry);
       cutOff = moment().utc().add(90, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       loading = false;
@@ -316,7 +317,7 @@ const getIsBlock = async (req, res) => {
     }
 
     res.json(isBlock);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -335,7 +336,7 @@ const getMasternodes = async (req, res) => {
     const mns = await Masternode.find().skip(skip).limit(limit).sort({ lastPaidAt: -1, status: 1 });
 
     res.json({ mns, pages: total <= limit ? 1 : Math.ceil(total / limit) });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -348,11 +349,11 @@ const getMasternodes = async (req, res) => {
  */
 const getMasternodeByAddress = async (req, res) => {
   try {
-    const hash = req.params.hash;
-    const mns = await Masternode.findOne({ addr: hash});
+    const { hash } = req.params;
+    const mns = await Masternode.findOne({ addr: hash });
 
     res.json({ mns });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -368,7 +369,7 @@ const getMasternodeCount = async (req, res) => {
     const coin = await Coin.findOne().sort({ createdAt: -1 });
 
     res.json({ enabled: coin.mnsOn, total: coin.mnsOff + coin.mnsOn });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -403,7 +404,7 @@ const getSupply = async (req, res) => {
   try {
     const info = await rpc.call('getinfo');
     res.json(info.moneysupply);
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -465,13 +466,13 @@ const getTX = async (req, res) => {
     // vin section of the tx.
     const vin = [];
     await forEach(tx.vin, async (vi) => {
-      if (tx.vout[0].address === 'NON_STANDARD' && !vi.coinbase){
-        vin.push({coinstake:true});
-      } else if(vi.isZcSpend){
-        vin.push({isZcSpend:true, value: vi.sequence});
-      }else if (vi.txId) {
+      if (tx.vout[0].address === 'NON_STANDARD' && !vi.coinbase) {
+        vin.push({ coinstake: true });
+      } else if (vi.isZcSpend) {
+        vin.push({ isZcSpend: true, value: vi.sequence });
+      } else if (vi.txId) {
         const t = await TX.findOne({ txId: vi.txId });
-        if (!!t) {
+        if (t) {
           t.vout.forEach((vo) => {
             if (vo.n === vi.vout) {
               vin.push({ address: vo.address, value: vo.value });
@@ -484,7 +485,7 @@ const getTX = async (req, res) => {
     });
 
     res.json({ ...tx.toObject(), vin });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -503,7 +504,7 @@ const getTXs = async (req, res) => {
     const txs = await TX.find().skip(skip).limit(limit).sort({ blockHeight: -1 });
 
     res.json({ txs, pages: total <= limit ? 1 : Math.ceil(total / limit) });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -527,8 +528,10 @@ const getTXsWeek = () => {
     loading = true;
 
     try {
-      const start = moment().utc().startOf('day').subtract(7, 'days').toDate();
-      const end = moment().utc().endOf('day').subtract(1, 'days').toDate();
+      const start = moment().utc().startOf('day').subtract(7, 'days')
+        .toDate();
+      const end = moment().utc().endOf('day').subtract(1, 'days')
+        .toDate();
       const qry = [
         // Select last 7 days of txs.
         { $match: { createdAt: { $gt: start, $lt: end } } },
@@ -542,7 +545,7 @@ const getTXsWeek = () => {
 
       cache = await TX.aggregate(qry);
       cutOff = moment().utc().add(90, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       loading = false;
@@ -572,7 +575,7 @@ const getListEvents = async (req, res) => {
     const events = await ListEvent.find().skip(skip).limit(limit).sort({ starting: 1});
 
     res.json({ events, pages: total <= limit ? 1 : Math.ceil(total / limit) });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
@@ -580,22 +583,34 @@ const getListEvents = async (req, res) => {
 
 const getBetEvents = async (req, res) => {
   try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
     if (req.query.eventId) {
-      const eventId = req.query.eventId
-      const total = await BetEvent.find({eventId, visibility: true }).sort({createdAt: 1}).countDocuments()
-      const events = await BetEvent.find({eventId, visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const { eventId } = req.query;
+      const total = await BetEvent.find({
+        eventId,
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const events = await BetEvent.find({
+        eventId,
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({
+        events,
+        pages: total <= limit ? 1 : Math.ceil(total / limit),
+      });
     } else {
-      const total = await BetEvent.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
-      const events = await BetEvent.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({events, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const total = await BetEvent.find({
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const events = await BetEvent.find({
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ events, pages: total <= limit ? 1 : Math.ceil(total / limit) });
     }
-
   } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
+    console.log(err);
+    res.status(500).send(err.message || err);
   }
 };
 
@@ -644,116 +659,164 @@ const getBetQuery = async (req, res) => {
 
 const getBetActions = async (req, res) => {
   try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
     if (req.query.eventId) {
-      const eventId = req.query.eventId
-      const total = await BetAction.find({eventId, visibility: true }).sort({createdAt: 1}).countDocuments()
-      const actions = await BetAction.find({eventId, visibility: true}).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+      const { eventId } = req.query;
+      const total = await BetAction.find({
+        eventId,
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const actions = await BetAction.find({
+        eventId,
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ actions, pages: total <= limit ? 1 : Math.ceil(total / limit) });
     } else {
-      const total = await BetAction.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
-      const actions = await BetAction.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({actions, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    }
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
-  }
-}
-
-const getBetResults = async (req, res) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
-    if (req.query.eventId) {
-      const eventId = req.query.eventId
-      const total = await BetResult.find({eventId, visibility: true}).sort({createdAt: 1}).countDocuments()
-      const results = await BetResult.find({eventId, visibility: true}).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    } else {
-      const total = await BetResult.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
-      const results = await BetResult.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    }
-
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
-  }
-}
-
-const getBetspreads = async (req, res) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
-    if (req.query.eventId) {
-      const eventId = req.query.eventId
-      const total = await Betspread.find({eventId: `${eventId}`, visibility: true }).sort({createdAt: 1}).countDocuments()
-      const results = await Betspread.find({eventId: `${eventId}`, visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    } else {
-      const total = await Betspread.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
-      const results = await Betspread.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    }
-
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
-  }
-}
-
-const getBetTotals = async (req, res) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
-    if (req.query.eventId) {
-      const eventId = req.query.eventId
-      const total = await Bettotal.find({eventId: `${eventId}`, visibility: true}).sort({createdAt: 1}).countDocuments()
-      const results = await Bettotal.find({eventId: `${eventId}`, visibility: true}).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    } else {
-      const total = await Bettotal.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
-      const results = await Bettotal.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    }
-
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
-  }
-}
-
-const getData = async (Model, req, res) => {
-  try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
-
-    if (req.query.eventId) {
-      const eventId = req.query.eventId
-      const total = await Model.find({eventId: `${eventId}`, visibility: true}).sort({createdAt: 1}).countDocuments()
-      const results = await Model.find({eventId: `${eventId}`, visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({results, pages: total <= limit ? 1 : Math.ceil(total / limit)})
-    } else {
-      const total = await Model.find({ visibility: true }).sort({createdAt: 1}).countDocuments()
-      const results = await Model.find({ visibility: true }).skip(skip).limit(limit).sort({createdAt: 1})
-      res.json({
-        data: results,
-        actions: results,
-        results,
-        pages: total <= limit ? 1 : Math.ceil(total / limit),
-      })
+      const total = await BetAction.find({
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const actions = await BetAction.find({
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ actions, pages: total <= limit ? 1 : Math.ceil(total / limit) });
     }
   } catch (err) {
     console.log(err);
     res.status(500).send(err.message || err);
   }
-}
+};
 
-const getDataListing = async (Model, actions, results,  req, res) => {
-  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+const getBetResults = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+    if (req.query.eventId) {
+      const { eventId } = req.query;
+      const total = await BetResult.find({
+        eventId,
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await BetResult.find({
+        eventId,
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    } else {
+      const total = await BetResult.find({
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await BetResult.find({
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+};
+
+const getBetspreads = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+    if (req.query.eventId) {
+      const { eventId } = req.query;
+      const total = await Betspread.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await Betspread.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    } else {
+      const total = await Betspread.find({
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await Betspread.find({
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+};
+
+const getBetTotals = async (req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+    if (req.query.eventId) {
+      const { eventId } = req.query;
+      const total = await Bettotal.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await Bettotal.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    } else {
+      const total = await Bettotal.find({
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await Bettotal.find({
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+};
+
+const getData = async (Model, req, res) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+
+    if (req.query.eventId) {
+      const { eventId } = req.query;
+      const total = await Model.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await Model.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+    } else {
+      const total = await Model.find({
+        visibility: true,
+      }).sort({ createdAt: 1 }).countDocuments();
+      const results = await Model.find({
+        visibility: true,
+      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      res.json({
+        data: results,
+        actions: results,
+        results,
+        pages: total <= limit ? 1 : Math.ceil(total / limit),
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+};
+
+// Modified this a bit - kyle h
+const getDataListing = async (Model, actions, results, req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
   try {
     const total = await Model.aggregate([
       {
@@ -761,14 +824,15 @@ const getDataListing = async (Model, actions, results,  req, res) => {
           _id: '$eventId',
         },
       }, {
-        $count: 'count'
-      }])
+        $count: 'count',
+      },
+    ]);
     const result = await Model.aggregate([
       {
         $group: {
           _id: '$eventId',
           events: {
-            $push: '$$ROOT'
+            $push: '$$ROOT',
           },
         },
       },
@@ -776,44 +840,47 @@ const getDataListing = async (Model, actions, results,  req, res) => {
         $project: {
           _id: '$_id',
           events: '$events',
-          timeStamp: {$arrayElemAt: [ "$events.timeStamp", 0 ]}
-        }
+          timeStamp: { $arrayElemAt: ['$events.timeStamp', 0] },
+        },
       },
       {
         $sort: {
           timeStamp: -1,
-          "_id": -1
-        }
+          _id: -1,
+        },
       }, {
-        $skip: skip
+        $skip: skip,
       }, {
-        $limit: limit
+        $limit: limit,
       }, {
         $lookup: {
           from: actions,
           localField: '_id',
           foreignField: 'eventId',
-          as: 'actions'
-        }
+          as: 'actions',
+        },
       }, {
         $lookup: {
           from: results,
           localField: '_id',
           foreignField: 'eventId',
-          as: 'results'
-        }
-      }
-    ])
-    res.json({data:result, pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count/ limit)})
+          as: 'results',
+        },
+      },
+    ]);
+    res.json({
+      data: result,
+      pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count / limit),
+    });
   } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
+    console.log(err);
+    res.status(500).send(err.message || err);
   }
-}
+};
 
-const getAltDataListing = async (Model, actions, results,  req, res) => {
-  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+const getAltDataListing = async (Model, actions, results, req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
   try {
     const total = await Model.aggregate([
       {
@@ -821,14 +888,15 @@ const getAltDataListing = async (Model, actions, results,  req, res) => {
           _id: '$eventId',
         },
       }, {
-        $count: 'count'
-      }])
+        $count: 'count',
+      },
+    ]);
     const result = await Model.aggregate([
       {
         $group: {
           _id: '$eventId',
           events: {
-            $push: '$$ROOT'
+            $push: '$$ROOT',
           },
         },
       },
@@ -836,45 +904,48 @@ const getAltDataListing = async (Model, actions, results,  req, res) => {
         $project: {
           _id: '$_id',
           events: '$events',
-          createdAt: {$arrayElemAt: [ "$events.createdAt", 0 ]}
-        }
+          createdAt: { $arrayElemAt: ['$events.createdAt', 0] },
+        },
       },
       {
         $sort: {
           createdAt: -1,
-          "_id": -1
-        }
+          _id: -1,
+        },
       }, {
-        $skip: skip
+        $skip: skip,
       }, {
-        $limit: limit
+        $limit: limit,
       }, {
         $lookup: {
           from: actions,
           localField: '_id',
           foreignField: 'eventId',
-          as: 'actions'
-        }
+          as: 'actions',
+        },
       }, {
         $lookup: {
           from: results,
           localField: '_id',
           foreignField: 'eventId',
-          as: 'results'
-        }
-      }
-    ])
-    res.json({data:result, pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count/ limit)})
+          as: 'results',
+        },
+      },
+    ]);
+    res.json({
+      data: result,
+      pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count / limit),
+    });
   } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
+    console.log(err);
+    res.status(500).send(err.message || err);
   }
-}
+};
 
-const getLottoEvents = async (req, res)=> getAltDataListing(LottoEvent, 'lottobets', 'lottoresults', req, res)
-// const getLottoEvents = async (req, res) =>  getData(LottoEvent, req, res)
-const getLottoBets = async (req, res) =>  getData(LottoBet, req, res)
-const getLottoResults = async (req, res) =>  getData(LottoResult, req, res)
+const getLottoEvents = async (req, res) => getAltDataListing(LottoEvent, 'lottobets', 'lottoresults', req, res);
+// const getLottoEvents = async (req, res) =>  getData(LottoEvent, req, res);
+const getLottoBets = async (req, res) => getData(LottoBet, req, res);
+const getLottoResults = async (req, res) => getData(LottoResult, req, res);
 
 const getBetActioinsWeek = () => {
   // When does the cache expire.
@@ -888,8 +959,16 @@ const getBetActioinsWeek = () => {
     loading = true;
 
     try {
-      const start = moment().utc().startOf('day').subtract(7, 'days').toDate();
-      const end = moment().utc().endOf('day').subtract(1, 'days').toDate();
+      const start = moment()
+        .utc()
+        .startOf('day')
+        .subtract(7, 'days')
+        .toDate();
+      const end = moment()
+        .utc()
+        .endOf('day')
+        .subtract(1, 'days')
+        .toDate();
       const qry = [
         // Select last 7 days of bets.
         { $match: { createdAt: { $gt: start, $lt: end } } },
@@ -898,12 +977,12 @@ const getBetActioinsWeek = () => {
         // Group by date string and build total/sum.
         { $group: { _id: '$date', total: { $sum: 1 } } },
         // Sort by _id/date field in ascending order (order -> newer)
-        { $sort: { _id: 1 } }
+        { $sort: { _id: 1 } },
       ];
 
       cache = await BetAction.aggregate(qry);
       cutOff = moment().utc().add(90, 'seconds').unix();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
     } finally {
       loading = false;
@@ -926,23 +1005,29 @@ const getBetActioinsWeek = () => {
 };
 
 const getBetEventInfo = async (req, res) => {
-  const eventId = req.params.eventId
-  let results
+  const { eventId } = req.params;
+  let results;
   try {
-    results = await BetResult.find({eventId, visibility: true }).sort({createdAt: 1})
+    results = await BetResult.find({
+      eventId,
+      visibility: true,
+    }).sort({ createdAt: 1 });
   } catch (e) {
-    console.log("Bet Event Not Publish")
+    console.log('Bet Event Not Publish');
   }
   try {
-    const events = await BetEvent.find({eventId, visibility: true }).sort({createdAt: 1})
-    const homeTeamNames = []
-    const awayTeamNames = []
-    events.forEach( event => {
+    const events = await BetEvent.find({
+      eventId,
+      visibility: true,
+    }).sort({ createdAt: 1 });
+    const homeTeamNames = [];
+    const awayTeamNames = [];
+    events.forEach((event) => {
       if (homeTeamNames.indexOf(event.homeTeam) === -1) {
-        homeTeamNames.push(event.homeTeam)
+        homeTeamNames.push(event.homeTeam);
       }
       if (awayTeamNames.indexOf(event.awayTeam) === -1) {
-        awayTeamNames.push(event.awayTeam)
+        awayTeamNames.push(event.awayTeam);
       }
     });
 
@@ -955,16 +1040,29 @@ const getBetEventInfo = async (req, res) => {
     // We create the array that contains draw values
     const drawResults = ['DRW', 'Money Line - Draw'];
 
-    const homeBets = await BetAction.find({eventId, visibility: true, betChoose: {$in:homeTeamNames}})
-    const awayBets = await BetAction.find({eventId, visibility: true, betChoose: {$in:awayTeamNames}})
-    const drawBets = await BetAction.find({eventId, visibility: true, betChoose: {$in: drawResults}})
+    const homeBets = await BetAction.find({
+      eventId,
+      visibility: true,
+      betChoose: { $in: homeTeamNames },
+    });
+    const awayBets = await BetAction.find({
+      eventId,
+      visibility: true,
+      betChoose: { $in: awayTeamNames },
+    });
+    const drawBets = await BetAction.find({
+      eventId,
+      visibility: true,
+      betChoose: { $in: drawResults },
+    });
 
-    // These will return only one event with the latest updated odds (with possibility of duplicates), 
-    // but contains the original odds the event was created with. We update them to these original
+    // These will return only one event with the latest updated odds
+    // (with possibility of duplicates), but contains the original odds the event was created with.
+    // We update them to these original
     // values for the frontend
-    const formattedEvents =  [];
+    const formattedEvents = [];
 
-    if (events.length  > 0) {
+    if (events.length > 0) {
       await events.forEach((e) => {
         const event = JSON.parse(JSON.stringify(e));
 
@@ -976,8 +1074,11 @@ const getBetEventInfo = async (req, res) => {
       });
 
       // We also query event updates
-      const updates = await BetUpdate.find({eventId: `${eventId}`, visibility: true }).sort({createdAt: 1}) 
- 
+      const updates = await BetUpdate.find({
+        eventId: `${eventId}`,
+        visibility: true,
+      }).sort({ createdAt: 1 });
+
       await updates.forEach((u) => {
         const update = JSON.parse(JSON.stringify(u));
 
@@ -997,60 +1098,76 @@ const getBetEventInfo = async (req, res) => {
       });
     }
 
-    res.json({events: formattedEvents, homeBets: homeBets, awayBets: awayBets, drawBets: drawBets,results})
+    res.json({
+      events: formattedEvents,
+      homeBets,
+      awayBets,
+      drawBets,
+      results,
+    });
   } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
+    console.log(err);
+    res.status(500).send(err.message || err);
   }
-}
+};
 
 const getLottoEventInfo = async (req, res) => {
-  const eventId = req.params.eventId
-  let results
+  const { eventId } = req.params;
+  let results;
   try {
     results = await LottoResult.find({eventId, visibility: true }).sort({createdAt: 1})
   } catch (e) {
-    console.log("Bet Event Not Publish")
+    console.log('Bet Event Not Publish');
   }
   try {
-    const events = await LottoEvent.find({eventId, visibility: true }).sort({createdAt: 1})
+    const events = await LottoEvent.find({
+      eventId,
+      visibility: true,
+    }).sort({ createdAt: 1 });
     const bets = await LottoBet.find({ eventId, visibility: true });
 
-    // These will return only one event with the latest updated odds (with possibility of duplicates), 
-    // but contains the original odds the event was created with. We update them to these original
-    // values for the frontend
+    // These will return only one event with the latest updated odds
+    // (with possibility of duplicates), but contains the original odds the event was created with.
+    // We update them to these original values for the frontend
 
-    res.json({events, bets, results})
+    res.json({ events, bets, results });
   } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
+    console.log(err);
+    res.status(500).send(err.message || err);
   }
-}
+};
 
-const getBetEventsInfo = async (req, res)=> getDataListing(BetEvent, 'betactions', 'betresults', req, res)
+const getBetEventsInfo = async (req, res) => getDataListing(BetEvent, 'betactions', 'betresults', req, res);
 
 const getCurrentProposals = async (req, res) => {
   try {
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
-    const total = await Proposal.find().sort({createdAt: -1}).countDocuments()
-    const pps = await Proposal.find().skip(skip).limit(limit).sort({createdAt: -1})
-    const block = await Block.findOne().sort({height: -1})
-    const coin = await Coin.findOne().sort({ createdAt: -1 })
-    let allocatedPps = _.filter(pps, function (o) { return o.alloted })
-    let totalAllocated = 0
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+    const total = await Proposal.find().sort({ createdAt: -1 }).countDocuments();
+    const pps = await Proposal.find().skip(skip).limit(limit).sort({ createdAt: -1 });
+    const block = await Block.findOne().sort({ height: -1 });
+    const coin = await Coin.findOne().sort({ createdAt: -1 });
+    const allocatedPps = _.filter(pps, (o) => o.alloted);
+    let totalAllocated = 0;
     if (allocatedPps.length > 0) {
-      totalAllocated = allocatedPps[0].totalBudgetAlloted
+      totalAllocated = allocatedPps[0].totalBudgetAlloted;
     }
-    console.log(coin)
-    const nextSuperBlock = coin.nextSuperBlock
-    const totalBudget = ((getSubsidy(block.height) / 100) * 10) * 1440 * 30
-    res.json({pps,currentBlock: block.height, nextSuperBlock:nextSuperBlock,totalBudget:totalBudget,totalAllocated:totalAllocated, pages: total <= limit ? 1 : Math.ceil(total / limit)})
+    console.log(coin);
+    const { nextSuperBlock } = coin;
+    const totalBudget = ((getSubsidy(block.height) / 100) * 10) * 1440 * 30;
+    res.json({
+      pps,
+      currentBlock: block.height,
+      nextSuperBlock,
+      totalBudget,
+      totalAllocated,
+      pages: total <= limit ? 1 : Math.ceil(total / limit)
+    });
   } catch (err) {
-    console.log(err)
-    res.status(500).send(err.message || err)
+    console.log(err);
+    res.status(500).send(err.message || err);
   }
-}
+};
 
 const getStatisticPerWeek = () => {
   // When does the cache expire.
@@ -1064,46 +1181,57 @@ const getStatisticPerWeek = () => {
     loading = true;
 
     try {
-      const start = moment().utc().startOf('week').subtract(7, 'weeks').toDate();
-      const end = moment().utc().endOf('week').toDate();
+      const start = moment()
+        .utc()
+        .startOf('week')
+        .subtract(7, 'weeks')
+        .toDate();
+      const end = moment()
+        .utc()
+        .endOf('week')
+        .toDate();
       const qry = [
         // Select last 7 weeks of bets.
-        {$match: {createdAt: {$gt: start, $lt: end}}},
+        { $match: { createdAt: { $gt: start, $lt: end } } },
         // Convert createdAt date field to date string.
         {
           $project: {
             week: {
-              $dateToString:
-                {format: '%Y-%U', date: '$createdAt'}
+              $dateToString: {
+                format: '%Y-%U',
+                date: '$createdAt',
+              },
             },
             date: {
               $dateToString: {
                 format: '%Y-%m-%d',
-                date: '$createdAt'
-              }
+                date: '$createdAt',
+              },
             },
             totalBet: '$totalBet',
-            totalMint: '$totalMint'
-          }
+            totalMint: '$totalMint',
+          },
         },
         // Group by date string and build total/sum.
         {
           $group: {
             _id: '$week',
-            date: {$first: '$date'},
-            totalBet: {$first: '$totalBet'},
-            totalMint: {$first: '$totalMint'},
-
-          }
+            date: { $first: '$date' },
+            totalBet: { $first: '$totalBet' },
+            totalMint: { $first: '$totalMint' },
+          },
         },
         // Sort by _id/date field in ascending order (order -> newer)
-        {$sort: {_id: 1}}
-      ]
+        { $sort: { _id: 1 } },
+      ];
 
       cache = await Statistic.aggregate(qry);
-      console.log(cache)
-      cutOff = moment().utc().add(90, 'seconds').unix();
-    } catch(err) {
+      console.log(cache);
+      cutOff = moment()
+        .utc()
+        .add(90, 'seconds')
+        .unix();
+    } catch (err) {
       console.log(err);
     } finally {
       loading = false;
@@ -1125,7 +1253,7 @@ const getStatisticPerWeek = () => {
   };
 };
 
-module.exports =  {
+module.exports = {
   getAddress,
   getAvgBlockTime,
   getAvgMNTime,

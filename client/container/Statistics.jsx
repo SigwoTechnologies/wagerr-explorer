@@ -59,6 +59,8 @@ class Statistics extends Component {
       return this.renderLoading();
     }
 
+    console.log(this.state);
+
     let tTX = 0;
     this.state.txs.forEach((tx) => {
       tTX += tx.total;
