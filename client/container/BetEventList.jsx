@@ -35,7 +35,7 @@ class BetEventList extends Component {
       events: [],
       pages: 0,
       page: 1,
-      size: 50
+      size: 50,
     }
   };
 
@@ -67,9 +67,7 @@ class BetEventList extends Component {
               data.map(item => {
                 let totalBet = 0;
                 let totalMint = 0;
-                item.actions.forEach(action => {
-                  totalBet += action.betValue
-                })
+                item.actions.forEach(action => totalBet += action.betValue)
                 if (item.results) {
                   item.results.forEach(result => {
                     let startIndex = 2
@@ -131,6 +129,12 @@ class BetEventList extends Component {
         options={selectOptions} />
     )
 
+    console.log(this.state.events[0].events[0].transaction);
+    console.log(this.state.events);
+    const filterEvents = this.state.events.filter((event) => {
+      return event.events[0].transaction.sport === 'Football';
+    });
+    console.log(filterEvents);
     return (
       <div>
         <HorizontalRule
