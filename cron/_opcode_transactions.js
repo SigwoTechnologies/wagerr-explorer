@@ -19,9 +19,9 @@ const TX = require('../model/tx');
 const { log } = console;
 
 async function getBetData() {
-  const betEvent = await BetEvent.findOne().sort({blockHeight: -1});
-  const betAction = await BetAction.findOne().sort({blockHeight: -1});
-  const betResult = await BetResult.findOne().sort({blockHeight: -1});
+  const betEvent = await BetEvent.findOne().sort({ blockHeight: -1 });
+  const betAction = await BetAction.findOne().sort({ blockHeight: -1 });
+  const betResult = await BetResult.findOne().sort({ blockHeight: -1 });
 
   return {
     betEvent,
@@ -87,11 +87,81 @@ async function logError(err, dataType, height, transaction, originalRecord, even
     log(originalRecord);
   }
 
-  if (event)  {
+  if (event) {
     log(event);
   }
 
   return log(err);
+}
+
+async function verifyBetOdds(record, rtype) {
+  const { eventId } = record;
+
+  try {
+    if (rtype === 'update' || rtype === 'create') {
+      const updates = await Betupdate.find({
+        eventId,
+        createdAt: { $gt: record.createdAt },
+      });
+
+      const nextUpdate = updates[0];
+      const queryParams = { $gt: record.createdAt };
+
+      if (nextUpdate) {
+        queryParams['$lt'] = nextUpdate.createdAt;
+      }
+
+      const actions = await BetAction.find({
+        eventId,
+        createdAt: queryParams,
+      });
+
+      if (actions.length > 0) {
+        for (let x = 0; x < actions.length; x += 1) {
+          const thisAction = actions[0];
+          let updated = false;
+          const { opObject } = record;
+
+          if (thisAction.homeOdds != opObject.get('homeOdds')) {
+            updated = true;
+            thisAction.homeOdds = opObject.get('homeOdds');
+          }
+
+          if (thisAction.drawOdds != opObject.get('drawOdds')) {
+            updated = true;
+            thisAction.drawOdds = opObject.get('drawOdds');
+          }
+
+          if (thisAction.awayOdds != opObject.get('awayOdds')) {
+            updated = true;
+            thisAction.awayOdds = opObject.get('awayOdds');
+          }
+
+          if (updated) {
+            await thisAction.save()
+            if (rtype == 'create') {
+              log('Event create update');
+            }
+            log(`Odds for event#${thisAction.eventId} action were updated`);
+          }
+        }
+      }
+
+      return record;
+    }
+
+
+    if (rtype === 'action') {
+      await Betupdate.find({
+        eventId,
+        createdAt: { $gt: record.createdAt },
+      });
+    }
+  } catch (e) {
+    log(e)
+  }
+
+  return record;
 }
 
 async function getEventData(block, eventId) {
@@ -111,7 +181,7 @@ async function getEventData(block, eventId) {
     createdAt: { $lt: block.createdAt },
   });
 
-  if(updates && updates.length > 0) {
+  if (updates && updates.length > 0) {
     const lastRecord = updates[updates.length - 1].opObject;
 
     event = {
@@ -165,19 +235,21 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         blockHeight: block.height,
         createdAt: block.createdAt,
         eventId: transaction.eventId,
-        timeStamp:  transaction.timestamp,
-        league:  transaction.tournament,
-        info:  `R${transaction.round}`,
-        homeTeam:  transaction.homeTeam,
-        awayTeam:  transaction.awayTeam,
-        homeOdds:  transaction.homeOdds,
-        awayOdds:  transaction.awayOdds,
+        timeStamp: transaction.timestamp,
+        league: transaction.tournament,
+        info: `R${transaction.round}`,
+        homeTeam: transaction.homeTeam,
+        awayTeam: transaction.awayTeam,
+        homeOdds: transaction.homeOdds,
+        awayOdds: transaction.awayOdds,
         drawOdds: transaction.drawOdds,
         opString: JSON.stringify(transaction),
         opCode: transaction.opCode,
         transaction,
         matched: true,
       });
+
+      verifyBetOdds(createResponse, 'create');
     } catch (e) {
       createResponse = e;
 
@@ -201,17 +273,17 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         const event = await BetEvent.findOne({
           eventId: `${transaction.eventId}`,
         });
-  
+
         if (event) {
           event.homeOdds = `${transaction.homeOdds}`;
           event.awayOdds = `${transaction.awayOdds}`;
           event.drawOdds = `${transaction.drawOdds}`;
-  
+
           if (event.homeOdds == 0 || event.awayOdds == 0 || event.drawOdds == 0) {
             // log('Invalid transaction data');
             // log(transaction);
           }
-  
+
           try {
             await event.save();
           } catch (e) {
@@ -224,7 +296,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
     }
 
     try {
-      createResponse = Betupdate.create({
+      createResponse = await Betupdate.create({
         _id,
         txId: rpctx.get('txid'),
         blockHeight: block.height,
@@ -236,6 +308,8 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
         opObject: transaction,
         matched: true,
       });
+
+      verifyBetOdds(createResponse, 'update');
     } catch (e) {
       logError(e, 'creating event update', block.height, transaction);
     }
@@ -246,14 +320,14 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
   if (['peerlessBet'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${transaction.outcome}${rpctx.get('txid')}${block.height}`;
     const betExists = await recordExists(BetAction, _id);
-    
+
     if (betExists) {
       // log(`Bet update ${_id} already on record`);
       return betExists;
     }
 
     try {
-      const { event, originalRecord }  = await getEventData(block, transaction.eventId);
+      const { event, originalRecord } = await getEventData(block, transaction.eventId);
 
       const eventRecord = event || {};
 
@@ -301,13 +375,13 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
       return spreadExists;
     }
 
-    const { spreadPoints } = transaction; 
+    const { spreadPoints } = transaction;
 
     const homePoints = (transaction.homeOdds < transaction.awayOdds) ? -(spreadPoints) : spreadPoints;
     const awayPoints = (transaction.homeOdds > transaction.awayOdds) ? -(spreadPoints) : spreadPoints;
 
     try {
-      createResponse = Betspread.create({
+      createResponse = await Betspread.create({
         _id,
         txId: rpctx.get('txid'),
         blockHeight: block.height,
@@ -342,7 +416,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
     }
 
     try {
-      createResponse = Bettotal.create({
+      createResponse = await Bettotal.create({
         _id,
         txId: rpctx.get('txid'),
         blockHeight: block.height,
@@ -371,10 +445,10 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
     if (resultExists) {
       return resultExists;
     }
-    
+
 
     try {
-      let resultPayoutTxs = await TX.find({blockHeight: block.height+1});
+      let resultPayoutTxs = await TX.find({ blockHeight: block.height + 1 });
 
       createResponse = await BetResult.create({
         _id,
