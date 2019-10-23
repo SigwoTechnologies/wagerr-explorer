@@ -24,7 +24,7 @@ class BetEventList extends Component {
     getBetEventsInfo: PropTypes.func.isRequired
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { t } = props;
 
@@ -39,11 +39,11 @@ class BetEventList extends Component {
     }
   };
 
-  componentDidMount () {
+  componentDidMount() {
     this.getBetEventsInfo()
   };
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     if (this.debounce) {
       clearTimeout(this.debounce)
       this.debounce = null
@@ -51,7 +51,7 @@ class BetEventList extends Component {
   };
 
   getBetEventsInfo = () => {
-    this.setState({loading: true}, () => {
+    this.setState({ loading: true }, () => {
       if (this.debounce) {
         clearTimeout(this.debounce)
       }
@@ -62,16 +62,16 @@ class BetEventList extends Component {
             limit: this.state.size,
             skip: (this.state.page - 1) * this.state.size
           })
-          .then(({data, pages}) => {
+          .then(({ data, pages }) => {
             if (this.debounce) {
-              data.map(item =>{
+              data.map(item => {
                 let totalBet = 0;
                 let totalMint = 0;
                 item.actions.forEach(action => {
                   totalBet += action.betValue
                 })
                 if (item.results) {
-                  item.results.forEach(result =>{
+                  item.results.forEach(result => {
                     let startIndex = 2
                     if (
                       result.payoutTx.vout[1] &&
@@ -88,34 +88,34 @@ class BetEventList extends Component {
                 item.totalBet = totalBet
                 item.totalMint = totalMint
               })
-              this.setState({events:data, pages, loading: false})
+              this.setState({ events: data, pages, loading: false })
             }
           })
-          .catch(error => this.setState({error, loading: false}))
+          .catch(error => this.setState({ error, loading: false }))
       }, 800)
     })
   }
 
-  handlePage = page => this.setState({page}, this.getBetEventsInfo)
+  handlePage = page => this.setState({ page }, this.getBetEventsInfo)
 
-  handleSize = size => this.setState({size, page: 1}, this.getBetEventsInfo)
+  handleSize = size => this.setState({ size, page: 1 }, this.getBetEventsInfo)
 
-  render () {
+  render() {
     const { t } = this.props;
     const cols = [
-      {key: 'start', title: t('startingnow')},
-      {key: 'event', title: t('eventId')},
-      {key: 'name', title: t('name')},
+      { key: 'start', title: t('startingnow') },
+      { key: 'event', title: t('eventId') },
+      { key: 'name', title: t('name') },
       // {key: 'round', title: t('round')},
-      {key: 'homeTeam', title: t('homeTeam')},
-      {key: 'awayTeam', title: t('awayTeam')},
-      {key: 'homeOdds', title: '1'},
-      {key: 'drawOdds', title: 'x'},
-      {key: 'awayOdds', title: '2'},
-      {key: 'supplyChange', title: t('supplyChange')},
-      {key: 'betAmount', title: t('betAmount')},
-      {key: 'betStatus', title: t('betStatus')},
-      {key: 'seeDetail', title: t('detail')},
+      { key: 'homeTeam', title: t('homeTeam') },
+      { key: 'awayTeam', title: t('awayTeam') },
+      { key: 'homeOdds', title: '1' },
+      { key: 'drawOdds', title: 'x' },
+      { key: 'awayOdds', title: '2' },
+      { key: 'supplyChange', title: t('supplyChange') },
+      { key: 'betAmount', title: t('betAmount') },
+      { key: 'betStatus', title: t('betStatus') },
+      { key: 'seeDetail', title: t('detail') },
     ]
     if (!!this.state.error) {
       return this.renderError(this.state.error)
@@ -128,33 +128,38 @@ class BetEventList extends Component {
       <Select
         onChange={value => this.handleSize(value)}
         selectedValue={this.state.size}
-        options={selectOptions}/>
+        options={selectOptions} />
     )
 
     return (
       <div>
         <HorizontalRule
           select={select}
-          title={t('title')}/>
+          title={t('title')} />
         <Table
           className={'table-responsive table--for-betevents'}
           cols={cols}
           data={this.state.events.map((event) => {
             const betAmount = event.actions.reduce((acc, action) => {
-                  return acc+ action.betValue
-              },0.0
+              return acc + action.betValue
+            }, 0.0
             )
 
-            
+
             let betStatus = t('open')
             const eventTime = parseInt(event.events[0].timeStamp);
             const eventData = event.events[0];
+
+            if (event.events[0].eventId == 1545) {
+              console.log(event.events[0])
+              console.log(event);
+            }
             if ((eventTime - (20 * 60 * 1000)) < Date.now()) {
               betStatus = t('waitForStart')
               if (eventTime < Date.now()) {
                 betStatus = t('started')
                 if (event.results.length === 0) {
-                  betStatus = <span className={ `badge badge-warning` }>{t('waitingForOracle')}</span>
+                  betStatus = <span className={`badge badge-warning`}>{t('waitingForOracle')}</span>
                 }
                 if (event.results.length > 0) {
                   for (const result of event.results) {
@@ -174,6 +179,10 @@ class BetEventList extends Component {
                       outcome = 'Draw';
                     }
 
+                    if (result.result && result.result.includes('Refund')) {
+                      outcome = 'Refund';
+                    }
+
                     if (outcome) {
                       betStatus = <span className={`badge badge-info`}>{outcome}</span>
                     }
@@ -188,9 +197,9 @@ class BetEventList extends Component {
                 }
               }
             }
-            let homeOdds = (event.events[event.events.length -1].homeOdds / 10000)
-            let drawOdds = (event.events[event.events.length -1].drawOdds / 10000)
-            let awayOdds = (event.events[event.events.length -1].awayOdds / 10000)
+            let homeOdds = (event.events[event.events.length - 1].homeOdds / 10000)
+            let drawOdds = (event.events[event.events.length - 1].drawOdds / 10000)
+            let awayOdds = (event.events[event.events.length - 1].awayOdds / 10000)
             if (event.events.length > 1) {
               const lastHomeOdds = (event.events[event.events.length - 2].homeOdds / 10000)
               const lastDrawOdds = (event.events[event.events.length - 2].drawOdds / 10000)
@@ -213,37 +222,37 @@ class BetEventList extends Component {
             }
             return {
               ...event,
-              start: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+              start: <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>
                 {timeStamp24Format(event.events[0].timeStamp)} </Link>
               ,
               event: (
-                <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+                <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>
                   {event.events[0].eventId}
                 </Link>
               ),
-              name: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
+              name: <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>
                 {event.events[0].league}</Link>,
-              round: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>
-                </Link>,
-              homeTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].homeTeam}</Link>,
-              awayTeam: <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{event.events[0].awayTeam}</Link>,
+              round: <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>
+              </Link>,
+              homeTeam: <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>{event.events[0].homeTeam}</Link>,
+              awayTeam: <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>{event.events[0].awayTeam}</Link>,
               homeOdds: homeOdds,
               drawOdds: drawOdds,
               awayOdds: awayOdds,
-              supplyChange:         <span className={`badge badge-${ event.totalMint - event.totalBet < 0 ? 'danger' : 'success' }`}>
+              supplyChange: <span className={`badge badge-${event.totalMint - event.totalBet < 0 ? 'danger' : 'success'}`}>
                 {numeral(event.totalMint - event.totalBet).format('0,0.00')}
               </span>,
-              betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.00') }</span>,
+              betAmount: <span className={`badge badge-danger`}>{numeral(betAmount).format('0,0.00')}</span>,
               betStatus: betStatus,
-              seeDetail:  <Link to={`/bet/event/${ encodeURIComponent(event.events[0].eventId) }`}>{t('seeDetail')}</Link>
+              seeDetail: <Link to={`/bet/event/${encodeURIComponent(event.events[0].eventId)}`}>{t('seeDetail')}</Link>
             }
-          })}/>
+          })} />
         <Pagination
           current={this.state.page}
           className="float-right"
           onPage={this.handlePage}
-          total={this.state.pages}/>
-        <div className="clearfix"/>
+          total={this.state.pages} />
+        <div className="clearfix" />
       </div>
     )
   };

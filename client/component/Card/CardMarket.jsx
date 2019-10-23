@@ -14,14 +14,16 @@ export default class CardStatus extends Component {
     btc: 0.0,
     usd: 0.0,
     xAxis: [],
-    yAxis: []
+    yAxis: [],
+    btcPrice: 0.0,
   };
 
   static propTypes = {
     btc: PropTypes.number.isRequired,
     usd: PropTypes.number.isRequired,
     xAxis: PropTypes.array.isRequired,
-    yAxis: PropTypes.array.isRequired
+    yAxis: PropTypes.array.isRequired,
+    btcPrice: PropTypes.number.isRequired,
   };
 
   render() {
@@ -38,38 +40,38 @@ export default class CardStatus extends Component {
 
     return (
       <div className="animated fadeInUp">
-      <Card className="card--market" title="Market">
-        <p className="card__data-main bariol">
-          <CountUp
-            decimals={ 2 }
-            duration={ 1 }
-            end={ this.props.usd }
-            prefix={ 'WGR $' }
-            start={ 0 } />
-        </p>
-        <p className="card__data-sub">{ this.props.btc } BTC</p>
-        <div className="card__info row">
-          <div className="col-sm-12 col-md-6 col-lg-4">
-            <p>
-              <span
-                className={ `u--text-${ isPos ? 'green' : 'red' }` }
-                key={ dirArrow }>
-                <Icon className="card__icon--arrow" name={ dirArrow } />
-                <span>{ numeral(growth * 100.0).format('0,0.00') }% &nbsp;</span>
-              </span>
-              <span>In { this.props.xAxis.length * 5 } minutes</span>
-            </p>
-            <p className="card__info-source">Data from CoinMarketCap</p>
+        <Card className="card--market" title="Market">
+          <p className="card__data-main bariol">
+            <CountUp
+              decimals={2}
+              duration={1}
+              end={this.props.usd}
+              prefix={'WGR $'}
+              start={0} />
+          </p>
+          <p className="card__data-sub">{this.props.btcPrice.toFixed(8)} BTC</p>
+          <div className="card__info row">
+            <div className="col-sm-12 col-md-6 col-lg-4">
+              <p>
+                <span
+                  className={`u--text-${isPos ? 'green' : 'red'}`}
+                  key={dirArrow}>
+                  <Icon className="card__icon--arrow" name={dirArrow} />
+                  <span>{numeral(growth * 100.0).format('0,0.00')}% &nbsp;</span>
+                </span>
+                <span>In {this.props.xAxis.length * 5} minutes</span>
+              </p>
+              <p className="card__info-source">Data from CoinMarketCap</p>
+            </div>
+            <div className="col-sm-12 col-md-6 col-lg-8">
+              <GraphLine
+                color={isPos ? '#61d75e' : '#ed1c24'}
+                data={this.props.yAxis.reverse()}
+                height="77px"
+                labels={this.props.xAxis.reverse()} />
+            </div>
           </div>
-          <div className="col-sm-12 col-md-6 col-lg-8">
-            <GraphLine
-              color={ isPos ? '#61d75e' : '#ed1c24' }
-              data={ this.props.yAxis.reverse() }
-              height="77px"
-              labels={ this.props.xAxis.reverse() } />
-          </div>
-        </div>
-      </Card>
+        </Card>
       </div>
     );
   };

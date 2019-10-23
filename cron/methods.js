@@ -26,23 +26,23 @@ const TX = require('../model/tx');
 
 const { log } = console;
 
-function hexToString (hexx) {
+function hexToString(hexx) {
   var hex = hexx.toString(); //force conversion
   var str = '';
   for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2);
-    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
   return str;
 }
 
 function getOPCode(voutData) {
   const { type, asm } = voutData.scriptPubKey;
-  
+
   if (!type || type !== 'nulldata') {
     return { error: false, message: 'Incorrect type', type };
   }
 
   if (!asm) {
-    return { error: false, message: 'Missing asm data', asm};
+    return { error: false, message: 'Missing asm data', asm };
   }
 
   const hexValue = asm.replace('OP_RETURN ', '');
@@ -74,25 +74,25 @@ async function preOPCode(block, rpctx, vout) {
   let datas = opString.split('|');
   if (datas[0] === '1' && datas.length === 11) {
     BetEvent.create({
-      _id: datas[2]+rpctx.txid,
+      _id: datas[2] + rpctx.txid,
       txId: rpctx.txid,
       blockHeight: block.height,
       createdAt: block.createdAt,
       eventId: datas[2],
-      timeStamp:  datas[3],
-      league:  datas[4],
-      info:  datas[5],
-      homeTeam:  datas[6],
-      awayTeam:  datas[7],
-      homeOdds:  datas[8],
-      awayOdds:  datas[9],
+      timeStamp: datas[3],
+      league: datas[4],
+      info: datas[5],
+      homeTeam: datas[6],
+      awayTeam: datas[7],
+      homeOdds: datas[8],
+      awayOdds: datas[9],
       drawOdds: datas[10],
       opString: opString,
     });
   } else if (datas[0] === '2' && datas.length === 4) {
     try {
       await BetAction.create({
-        _id: datas[2]+datas[3]+rpctx.txid,
+        _id: datas[2] + datas[3] + rpctx.txid,
         txId: rpctx.txid,
         blockHeight: block.height,
         createdAt: block.createdAt,
@@ -105,9 +105,9 @@ async function preOPCode(block, rpctx, vout) {
       //log('Error saving bet action with old decryption method');
     }
   } else if (datas[0] === '3' && datas.length === 4) {
-    let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
+    let resultPayoutTxs = await TX.find({ blockHeight: block.height + 1 })
     BetResult.create({
-      _id: datas[2]+rpctx.txid,
+      _id: datas[2] + rpctx.txid,
       txId: rpctx.txid,
       blockHeight: block.height,
       createdAt: block.createdAt,
@@ -116,22 +116,22 @@ async function preOPCode(block, rpctx, vout) {
       opString: opString,
       payoutTx: resultPayoutTxs[0],
     });
-  } else if (datas[0] === '4' && datas.length === 4){
-    let resultPayoutTxs = await TX.find({blockHeight: block.height+1})
+  } else if (datas[0] === '4' && datas.length === 4) {
+    let resultPayoutTxs = await TX.find({ blockHeight: block.height + 1 })
     BetResult.create({
-      _id: datas[2]+rpctx.txid,
+      _id: datas[2] + rpctx.txid,
       txId: rpctx.txid,
       blockHeight: block.height,
       createdAt: block.createdAt,
       eventId: datas[2],
-      result: 'REFUND '+datas[3],
+      result: 'REFUND ' + datas[3],
       opString: opString,
       payoutTx: resultPayoutTxs[0],
     });
   }
 }
 
-async function addPoS (block, rpcTx) {
+async function addPoS(block, rpcTx) {
   const rpctx = rpcTx;
   // We will ignore the empty PoS txs.
   // Setup the outputs for the transaction.
@@ -179,7 +179,7 @@ async function addPoS (block, rpcTx) {
  * @param {Number} start The current starting block height.
  * @param {Number} stop The current block height at the tip of the chain.
  */
-async function syncBlocksForBet (start, stop, clean = false) {
+async function syncBlocksForBet(start, stop, clean = false) {
   const { crons } = config;
 
   const dataStartBlock = crons.start || 756000;
@@ -238,7 +238,10 @@ async function resolveErrors() {
 
         let txs = rpcblock.rpctxs ? rpcblock.rpctxs : [];
         let needsResync = false;
+        let blockFromUpdate;
         let blockToUpdate = 756001;
+        let searchDepth = 1000;
+
         await forEachSeries(txs, async (rpctx) => {
           if (blockchain.isPoS(block)) {
             if (thisError.txType === 'BetAction') {
@@ -251,17 +254,20 @@ async function resolveErrors() {
                 const betaction = await BetAction.findById(thisError.txErrorId.replace('error-', ''));
 
                 betaction.homeOdds = event.homeOdds,
-                betaction.awayOdds = event.awayOdds,
-                betaction.drawOdds = event.drawOdds,
-                betaction.points = event.points,
-                betaction.overOdds = event.overOdds,
-                betaction.underOdds = event.underOdds,
-                betaction.matched = true;
+                  betaction.awayOdds = event.awayOdds,
+                  betaction.drawOdds = event.drawOdds,
+                  betaction.points = event.points,
+                  betaction.overOdds = event.overOdds,
+                  betaction.underOdds = event.underOdds,
+                  betaction.matched = true;
                 completed = await betaction.save();
               } else {
                 log(`Event# ${thisError.eventId} not found`);
                 // If not found, we use the the syncBlocksForBet method to try to complete missed records
                 needsResync = true;
+                if (!blockFromUpdate) {
+                  blockFromUpdate = thisError.blockHeight - searchDepth;
+                }
                 blockToUpdate = thisError.blockHeight;
               }
 
@@ -276,7 +282,7 @@ async function resolveErrors() {
                 thisError.reviewed += 1;
 
                 await thisError.save();
-                log(`Error with ${thisError.txType} eventId#${thisError.eventId} has not yet been resolved. ${ maximumTries - thisError.reviewed } tries left for resolution.`);
+                log(`Error with ${thisError.txType} eventId#${thisError.eventId} has not yet been resolved. ${maximumTries - thisError.reviewed} tries left for resolution.`);
                 response.push(thisError);
               }
             }
@@ -285,7 +291,7 @@ async function resolveErrors() {
 
         if (needsResync) {
           log('Missing events...running blok sync function...');
-          await syncBlocksForBet(756000, blockToUpdate, false);
+          await syncBlocksForBet((blockFromUpdate || (blockToUpdate - searchDepth)), blockToUpdate, false);
         }
       }
     }
@@ -294,7 +300,7 @@ async function resolveErrors() {
     log(e);
     error = e;
   }
-  log('Sending response objet now');
+  log('Sending response object now');
   return { records: response, error };
 }
 

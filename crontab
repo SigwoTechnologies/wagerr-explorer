@@ -27,6 +27,6 @@
 */5 * * * * cd /explorer && node ./cron/coin.js >> ./tmp/coin.log 2>&1
 */3 * * * * cd /explorer && node ./cron/sync.js >> ./tmp/sync.log 2>&1
 */1 * * * * cd /explorer && node ./cron/statistic.js >> ./tmp/statistic.log 2>&1
-*/1 * * * * cd /explorer && node ./cron/listevent.js >> ./tmp/listevent.log 2>&1
+#*/1 * * * * cd /explorer && node ./cron/listevent.js >> ./tmp/listevent.log 2>&1
 */1 * * * * cd /explorer && node ./cron/proposal.js >> ./tmp/proposal.log 2>&1
 

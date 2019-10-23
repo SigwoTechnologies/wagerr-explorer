@@ -45,40 +45,41 @@ class CoinSummary extends Component {
             <div className="row">
               <div className="col-md-12 col-lg-6">
                 <CardStatus
-                  avgBlockTime={ coin.avgBlockTime?coin.avgBlockTime:0 }
-                  avgMNTime={ coin.avgMNTime?coin.avgMNTime:0 }
-                  blocks={ height }
-                  peers={ coin.peers }
-                  online={ coin.mnsOn }
-                  status={ coin.status }
-                  supply={ coin.supply } />
+                  avgBlockTime={coin.avgBlockTime ? coin.avgBlockTime : 0}
+                  avgMNTime={coin.avgMNTime ? coin.avgMNTime : 0}
+                  blocks={height}
+                  peers={coin.peers}
+                  online={coin.mnsOn}
+                  status={coin.status}
+                  supply={coin.supply} />
               </div>
               <div className="col-md-12 col-lg-6">
                 <CardOracleProfit
                   oracleProfitPerSecond={coin.oracleProfitPerSecond}
-                  online={ coin.mnsOn }
-                  btc={ coin.btc }
-                  usd={ coin.usd }/>
+                  online={coin.mnsOn}
+                  btc={coin.btc}
+                  usd={coin.usd} />
               </div>
             </div>
             <div className="row">
               <div className="col-md-12 col-lg-6">
                 <CardMarket
-                  btc={ coin.btc }
-                  usd={ coin.usd }
-                  xAxis={ this.props.coins.map(c => c.createdAt) }
-                  yAxis={ this.props.coins.map(c => c.usd ? c.usd : 0.0) } />
+                  btcPrice={coin.btcPrice}
+                  btc={coin.btc}
+                  usd={coin.usd}
+                  xAxis={this.props.coins.map(c => c.createdAt)}
+                  yAxis={this.props.coins.map(c => c.usd ? c.usd : 0.0)} />
               </div>
               <div className="col-md-12 col-lg-6">
-                <CardBetStatus totalBet={coin.totalBet} totalMint={coin.totalMint}/>
+                <CardBetStatus totalBet={coin.totalBet} totalMint={coin.totalMint} />
               </div>
             </div>
           </div>
           <div className="col-md-12 col-lg-3">
             <WatchList
-              items={ watchlist }
-              onSearch={ this.props.onSearch }
-              onRemove={ this.props.onRemove } />
+              items={watchlist}
+              onSearch={this.props.onSearch}
+              onRemove={this.props.onRemove} />
           </div>
         </div>
       </div>
