@@ -10,7 +10,16 @@ export const API_BASE = location.origin;
 export const PAGINATION_PAGE_SIZE = [
   { label: '10', value: 10 },
   { label: '25', value: 25 },
-  { label: '50', value: 50 }
+  { label: '50', value: 50 },
+];
+
+export const FILTER_EVENTS_OPTIONS = [
+  { label: 'Sports', value: 'Sports' },
+  { label: 'Baseball', value: 'Baseball' },
+  { label: 'Football', value: 'Football' },
+  { label: 'Basketball', value: 'Basketball' },
+  { label: 'Hockey', value: 'Hockey' },
+  { label: 'Soccer', value: 'Soccer' },
 ];
 
 export default {
@@ -21,6 +30,6 @@ export default {
   TXS,
   WATCH_ADD,
   WATCH_REMOVE,
-
-  API_BASE
+  FILTER_EVENTS_OPTIONS,
+  API_BASE,
 };

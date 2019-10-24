@@ -13,7 +13,7 @@ import Table from '../component/SuperTable'
 import Select from '../component/Select'
 import _ from 'lodash'
 
-import { PAGINATION_PAGE_SIZE } from '../constants'
+import { PAGINATION_PAGE_SIZE, FILTER_EVENTS_OPTIONS } from '../constants'
 import { timeStamp24Format } from '../../lib/date'
 import numeral from 'numeral'
 import { compose } from 'redux'
@@ -36,6 +36,7 @@ class BetEventList extends Component {
       pages: 0,
       page: 1,
       size: 50,
+      filterBy: 'Sports'
     }
   };
 
@@ -86,7 +87,11 @@ class BetEventList extends Component {
                 item.totalBet = totalBet
                 item.totalMint = totalMint
               })
+<<<<<<< HEAD
               this.setState({ events: data, pages, loading: false })
+=======
+              this.setState({events: data, pages, loading: false})
+>>>>>>> 0c21f3c... Added filtering list by Sport - basic functionality
             }
           })
           .catch(error => this.setState({ error, loading: false }))
@@ -98,7 +103,13 @@ class BetEventList extends Component {
 
   handleSize = size => this.setState({ size, page: 1 }, this.getBetEventsInfo)
 
+<<<<<<< HEAD
   render() {
+=======
+  handleFilterBy = value => this.setState({filterBy: value}, this.getBetEventsInfo)
+
+  render () {
+>>>>>>> 0c21f3c... Added filtering list by Sport - basic functionality
     const { t } = this.props;
     const cols = [
       { key: 'start', title: t('startingnow') },
@@ -121,6 +132,7 @@ class BetEventList extends Component {
       return this.renderLoading()
     }
     const selectOptions = PAGINATION_PAGE_SIZE
+    const selectFilterOptions = FILTER_EVENTS_OPTIONS
 
     const select = (
       <Select
@@ -129,21 +141,44 @@ class BetEventList extends Component {
         options={selectOptions} />
     )
 
-    console.log(this.state.events[0].events[0].transaction);
-    console.log(this.state.events);
-    const filterEvents = this.state.events.filter((event) => {
-      return event.events[0].transaction.sport === 'Football';
-    });
-    console.log(filterEvents);
+    const filterSport = (
+      <Select
+          onChange={value => this.handleFilterBy(value)}
+          selectedValue={this.state.filterBy}
+          options={selectFilterOptions}
+        />
+    );
+
+    // console.log(this.state.events[0].events[0].transaction);
+    // console.log(this.state.events);
+    // const filterEvents = this.state.events.filter((event) => {
+    //   if (this.state.filterBy == 'Sports') {
+    //     return event;
+    //   }
+    //   return event.events[0].transaction.sport === this.state.filterBy;
+    // });
+    const filterEvents = this.state.filterBy === 'Sports'
+      ? this.state.events
+      : this.state.events.filter((event) => {
+        return event.events[0].transaction.sport === this.state.filterBy
+      });
+
+    console.log(filterEvents)
+
     return (
       <div>
         <HorizontalRule
           select={select}
+<<<<<<< HEAD
           title={t('title')} />
+=======
+          filterSport={filterSport}
+          title={t('title')}/>
+>>>>>>> 0c21f3c... Added filtering list by Sport - basic functionality
         <Table
           className={'table-responsive table--for-betevents'}
           cols={cols}
-          data={this.state.events.map((event) => {
+          data={filterEvents.map((event) => {
             const betAmount = event.actions.reduce((acc, action) => {
               return acc + action.betValue
             }, 0.0
