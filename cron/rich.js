@@ -13,7 +13,7 @@ console.log('Running rich cron job');
  * unspent transactions.
  */
 async function syncRich() {
-  await Rich.deleteMany({});
+  await Rich.remove({});
 
   const addresses = await UTXO.aggregate([
     {
@@ -22,14 +22,14 @@ async function syncRich() {
         address: { $not: /_/ },
       },
     },
-    { 
+    {
       $group: { _id: '$address', sum: { $sum: '$value' } }
     },
     { $sort: { sum: -1 } },
-    { $limit: 100 }
+    { $limit: 101 }
   ]);
 
-  await Rich.insertMany(addresses.map(addr => ({
+  await Rich.insertMany(addresses.filter(addr => addr._id !== 'ZEROCOIN').map(addr => ({
     address: addr._id,
     value: addr.sum
   })));
@@ -45,13 +45,13 @@ async function update() {
   try {
     locker.lock(type);
     await syncRich();
-  } catch(err) {
+  } catch (err) {
     console.log(err);
     code = 1;
   } finally {
     try {
       locker.unlock(type);
-    } catch(err) {
+    } catch (err) {
       console.log(err);
       code = 1;
     }
