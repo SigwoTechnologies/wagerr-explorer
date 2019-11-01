@@ -131,7 +131,7 @@ async function preOPCode(block, rpctx, vout) {
   }
 }
 
-async function addPoS(block, rpcTx) {
+async function addPoS(block, rpcTx, waitTime = 50) {
   const rpctx = rpcTx;
   // We will ignore the empty PoS txs.
   // Setup the outputs for the transaction.
@@ -161,7 +161,7 @@ async function addPoS(block, rpcTx) {
         if (transaction.error || !transaction.prefix) {
           success = await preOPCode(block, rpctx, vout);
         } else {
-          success = await saveOPTransaction(block, rpctx, vout, transaction);
+          success = await saveOPTransaction(block, rpctx, vout, transaction, waitTime);
         }
 
         if (!transaction.error && success && !success.error) {
@@ -179,7 +179,7 @@ async function addPoS(block, rpcTx) {
  * @param {Number} start The current starting block height.
  * @param {Number} stop The current block height at the tip of the chain.
  */
-async function syncBlocksForBet(start, stop, clean = false) {
+async function syncBlocksForBet(start, stop, clean = false, waitTime = 50) {
   const { crons } = config;
 
   const dataStartBlock = crons.start || 756000;
@@ -206,7 +206,7 @@ async function syncBlocksForBet(start, stop, clean = false) {
         await forEachSeries(txs, async (rpctx) => {
           if (blockchain.isPoS(block)) {
             // const rpctx = await util.getTX(txhash)
-            await addPoS(block, rpctx);
+            await addPoS(block, rpctx, waitTime);
           }
         });
       }
@@ -291,7 +291,7 @@ async function resolveErrors() {
 
         if (needsResync) {
           log('Missing events...running blok sync function...');
-          await syncBlocksForBet((blockFromUpdate || (blockToUpdate - searchDepth)), blockToUpdate, false);
+          await syncBlocksForBet((blockFromUpdate || (blockToUpdate - searchDepth)), blockToUpdate, false, 80);
         }
       }
     }

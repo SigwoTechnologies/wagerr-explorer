@@ -190,6 +190,11 @@ export const getBetEvents = (query) => {
     return getFromWorker('betevents', resolve, reject, query);
   });
 };
+export const getBetQuery = (query) => {
+  return new promise((resolve, reject) => {
+    return getFromWorker('beteventquery', resolve, reject, query);
+  });
+};
 export const getBetActions = (query) => {
   return new promise((resolve, reject) => {
     return getFromWorker('betactions', resolve, reject, query);
@@ -277,6 +282,7 @@ export default {
   getListEvents,
   getBetActionsWeek,
   getBetEvents,
+  getBetQuery,
   getBetActions,
   getBetResults,
   getBetEventInfo,

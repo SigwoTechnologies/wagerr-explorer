@@ -58,7 +58,12 @@ async function update () {
     }
 
     // locker.lock(type);
-   response = await syncBlocksForBet(dbHeight, blockDbHeight, clean);
+    log(`-- First sync --`);
+    const firstSync = await syncBlocksForBet(dbHeight, blockDbHeight, clean);
+    log(`-- Second sync --`);
+    const secondSync = await syncBlocksForBet(dbHeight, blockDbHeight, false, 70);
+
+    response = { firstSync, secondSync };
   } catch (err) {
     log('Update() error');
     log(err);
