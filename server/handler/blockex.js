@@ -597,7 +597,50 @@ const getBetEvents = async (req, res) => {
     console.log(err)
     res.status(500).send(err.message || err)
   }
-}
+};
+
+const getBetQuery = async (req, res) => {
+  try {
+    const { query } = req;
+    const { search } = query;
+
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+
+    if (!query) {
+      return res.status(500).json({ error: true, message: 'No search specified' });
+    }
+
+    const params = [];
+
+    if (isNaN(search)) {
+      params.push({ txId: search },);
+      params.push({ homeTeam: { $regex: `.*${search}.*` } });
+      params.push({ awayTeam: { $regex: `.*${search}.*` } });
+      params.push({ tournament: { $regex: `.*${search}.*` } });
+      params.push({ 'transaction.sport': { $regex: `.*${search}.*` } });
+      params.push({ 'transaction.tournament': search });
+      params.push({ 'transaction.tournament': { $regex: `.*${search}.*` } });
+    } else {
+      params.push({ blockHeight: search });
+      params.push({ eventId: search });
+    }
+
+    const total = await BetEvent.find({
+      $or: params,
+    }).sort({createdAt: 1}).countDocuments()
+
+    const results = await BetEvent.find({
+      $or: params,
+    }).skip(skip).limit(limit).sort({createdAt: 1});
+
+
+    return res.json({ results, count: results.length, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+  } catch (err) {
+    console.log(err)
+    return res.status(500).send(err.message || err)
+  }
+};
 
 const getBetActions = async (req, res) => {
   try {
@@ -1103,6 +1146,7 @@ module.exports =  {
   getTXsWeek,
   getListEvents,
   getBetEvents,
+  getBetQuery,
   getBetActions,
   getBetResults,
   getBetActioinsWeek,

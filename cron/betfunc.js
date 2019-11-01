@@ -28,7 +28,6 @@ async function update () {
       betResult,
     }= await getBetData();
 
-    let clean = true // Always clear for now.
     let dbEventHeight = betEvent && betEvent.blockHeight ? betEvent.blockHeight : 1;
     let dbActionHeight = betAction && betAction.blockHeight ? betAction.blockHeight : 1;
     let dbResultHeight = betResult && betResult.blockHeight ? betResult.blockHeight : 1;
@@ -40,11 +39,9 @@ async function update () {
 
     // If heights provided then use them instead.
     if (!isNaN(process.argv[2])) {
-      clean = true;
       dbHeight = parseInt(process.argv[2], 10);
     }
     if (!isNaN(process.argv[3])) {
-      clean = true;
       blockDbHeight = parseInt(process.argv[3], 10);
     }
     //log(dbHeight, blockDbHeight, clean)
@@ -58,7 +55,7 @@ async function update () {
     }
 
    locker.lock(type);
-   response = await syncBlocksForBet(dbHeight, blockDbHeight, clean);
+   response = await syncBlocksForBet(dbHeight, blockDbHeight, false, 80);
   } catch (err) {
     log('Update() error');
     log(err);

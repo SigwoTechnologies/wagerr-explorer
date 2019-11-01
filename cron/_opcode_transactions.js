@@ -16,6 +16,8 @@ const BetError = require('../model/beterror');
 
 const TX = require('../model/tx');
 
+const invalidIds = require('./_invalid_ids.js');
+
 const { log } = console;
 
 async function getBetData() {
@@ -37,13 +39,19 @@ async function deleteBetData(start, stop) {
 }
 
 
-async function recordExists(rType, val, recordType = '_id') {
+async function recordCheck(rType, val, recordType = '_id') {
   let response;
   try {
     response = await rType.findOne({ [recordType]: val });
   } catch (e) {
-    log('bet.js:recordExists');
+    log('bet.js:recordCheck');
     log(e);
+  }
+
+  if (!response && recordType === '_id') {
+    if (invalidIds.includes(val)) {
+      return true;
+    }
   }
 
   return response;
@@ -183,13 +191,13 @@ async function waitForData(eventId, time = 50) {
   });
 }
 
-async function getEventData(block, eventId) {
+async function getEventData(block, eventId, waitTime = 50) {
   let originalRecord = await BetEvent.findOne({
     eventId: `${eventId}`,
   });
 
   if (originalRecord == null || originalRecord == undefined) {
-    const data = await waitForData(eventId, 50);
+    const data = await waitForData(eventId, waitTime);
     originalRecord = data[0];
   }
 
@@ -233,8 +241,7 @@ async function getEventData(block, eventId) {
   return { event, updates, betTotals, originalRecord };
 }
 
-
-async function saveOPTransaction(block, rpcTx, vout, transaction) {
+async function saveOPTransaction(block, rpcTx, vout, transaction, waitTime = 50) {
   const rpctx = rpcTx;
   let createResponse;
 
@@ -246,10 +253,10 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
   if (['peerlessEvent'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
-    const eventExists = await recordExists(BetEvent, _id);
+    const skipRecord = await recordCheck(BetEvent, _id);
 
-    if (eventExists) {
-      return eventExists;
+    if (skipRecord) {
+      return skipRecord;
     }
 
     try {
@@ -285,12 +292,14 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
   if (['peerlessUpdateOdds'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
-    const updateExists = await recordExists(Betupdate, _id);
-    const resultExists = await recordExists(BetResult, `${transaction.eventId}`, 'eventId');
+
+    const updateExists = await recordCheck(Betupdate, _id);
 
     if (updateExists) {
       return updateExists;
     }
+
+    const resultExists = await recordCheck(BetResult, `${transaction.eventId}`, 'eventId');
 
     if (!resultExists) {
       try {
@@ -343,7 +352,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
   if (['peerlessBet'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${transaction.outcome}${rpctx.get('txid')}${block.height}`;
-    const betExists = await recordExists(BetAction, _id);
+    const betExists = await recordCheck(BetAction, _id);
 
     if (betExists) {
       // log(`Bet update ${_id} already on record`);
@@ -351,7 +360,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
     }
 
     try {
-      const { event, originalRecord } = await getEventData(block, transaction.eventId);
+      const { event, originalRecord } = await getEventData(block, transaction.eventId, waitTime);
 
       const eventRecord = event || {};
 
@@ -392,7 +401,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
   if (['peerlessSpreadsMarket'].includes(transaction.txType)) {
     const _id = `SM${transaction.eventId}${rpctx.get('txid')}${block.height}`;
-    const spreadExists = await recordExists(Betspread, _id);
+    const spreadExists = await recordCheck(Betspread, _id);
     let mhomeOdds;
     let mawayOdds;
     let matched;
@@ -469,7 +478,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
   if (['peerlessTotalsMarket'].includes(transaction.txType)) {
     const _id = `TM${transaction.eventId}${rpctx.get('txid')}${block.height}`;
-    const spreadExists = await recordExists(Bettotal, _id);
+    const spreadExists = await recordCheck(Bettotal, _id);
 
     if (spreadExists) {
       return spreadExists;
@@ -500,7 +509,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
   if (['peerlessResult'].includes(transaction.txType)) {
     const _id = `${transaction.eventId}${rpctx.get('txid')}${block.height}`;
-    const resultExists = await recordExists(BetResult, _id);
+    const resultExists = await recordCheck(BetResult, _id);
 
     if (resultExists) {
       return resultExists;
@@ -531,7 +540,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
   }
 
   const transactionId = `${transaction.txType}-${rpctx.get('txid')}${block.height}`;
-  const transactionsExists = await recordExists(Transaction, transactionId);
+  const transactionsExists = await recordCheck(Transaction, transactionId);
 
   if (transactionsExists) {
     return transactionsExists;
@@ -552,7 +561,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction) {
 
 module.exports = {
   deleteBetData,
-  recordExists,
+  recordCheck,
   saveOPTransaction,
   getBetData,
   getEventData,
