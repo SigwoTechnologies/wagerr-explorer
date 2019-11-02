@@ -87,11 +87,7 @@ class BetEventList extends Component {
                 item.totalBet = totalBet
                 item.totalMint = totalMint
               })
-<<<<<<< HEAD
               this.setState({ events: data, pages, loading: false })
-=======
-              this.setState({events: data, pages, loading: false})
->>>>>>> 0c21f3c... Added filtering list by Sport - basic functionality
             }
           })
           .catch(error => this.setState({ error, loading: false }))
@@ -99,17 +95,27 @@ class BetEventList extends Component {
     })
   }
 
-  handlePage = page => this.setState({ page }, this.getBetEventsInfo)
-
-  handleSize = size => this.setState({ size, page: 1 }, this.getBetEventsInfo)
-
-<<<<<<< HEAD
-  render() {
-=======
   handleFilterBy = value => this.setState({filterBy: value}, this.getBetEventsInfo)
 
+  handlePage = page => this.setState({page})
+
+  handleSize = size => this.setState({size, page: 1})
+
+  handleFilterBy = value => this.setState({filterBy: value})
+
+  TestMyFilter = (data, type) => {
+    let results = [];
+    if (type === 'Sports') {
+      results = data;
+    } else {
+      results = data.filter((event) => {
+        return event.events[0].transaction.sport === type
+      });
+    }
+    return results;
+  }
+
   render () {
->>>>>>> 0c21f3c... Added filtering list by Sport - basic functionality
     const { t } = this.props;
     const cols = [
       { key: 'start', title: t('startingnow') },
@@ -143,10 +149,9 @@ class BetEventList extends Component {
 
     const filterSport = (
       <Select
-          onChange={value => this.handleFilterBy(value)}
-          selectedValue={this.state.filterBy}
-          options={selectFilterOptions}
-        />
+        onChange={value => this.handleFilterBy(value)}
+        selectedValue={this.state.filterBy}
+        options={selectFilterOptions} />
     );
 
     // console.log(this.state.events[0].events[0].transaction);
@@ -157,24 +162,18 @@ class BetEventList extends Component {
     //   }
     //   return event.events[0].transaction.sport === this.state.filterBy;
     // });
-    const filterEvents = this.state.filterBy === 'Sports'
-      ? this.state.events
-      : this.state.events.filter((event) => {
-        return event.events[0].transaction.sport === this.state.filterBy
-      });
+    const filterEvents = () => {
+      return this.TestMyFilter(this.state.events, this.state.filterBy)
+    }
 
-    console.log(filterEvents)
+    console.log('filterEvents', filterEvents)
 
     return (
       <div>
         <HorizontalRule
           select={select}
-<<<<<<< HEAD
-          title={t('title')} />
-=======
           filterSport={filterSport}
           title={t('title')}/>
->>>>>>> 0c21f3c... Added filtering list by Sport - basic functionality
         <Table
           className={'table-responsive table--for-betevents'}
           cols={cols}
@@ -183,8 +182,7 @@ class BetEventList extends Component {
               return acc + action.betValue
             }, 0.0
             )
-
-
+            console.log('inData', event)
             let betStatus = t('open')
             const eventTime = parseInt(event.events[0].timeStamp);
             const eventData = event.events[0];
