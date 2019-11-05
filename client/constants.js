@@ -14,7 +14,8 @@ export const PAGINATION_PAGE_SIZE = [
 ];
 
 export const FILTER_EVENTS_OPTIONS = [
-  { label: 'Sports', value: 'Sports' },
+  { label: 'All', value: 'All' },
+  // { label: 'Sports', value: 'Sports' },
   { label: 'Baseball', value: 'Baseball' },
   { label: 'Football', value: 'Football' },
   { label: 'Basketball', value: 'Basketball' },

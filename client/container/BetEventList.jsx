@@ -11,6 +11,9 @@ import HorizontalRule from '../component/HorizontalRule'
 import Pagination from '../component/Pagination'
 import Table from '../component/SuperTable'
 import Select from '../component/Select'
+
+import Icon from '../component/Icon';
+
 import _ from 'lodash'
 
 import { PAGINATION_PAGE_SIZE, FILTER_EVENTS_OPTIONS } from '../constants'
@@ -20,8 +23,14 @@ import { compose } from 'redux'
 import { translate } from 'react-i18next'
 
 class BetEventList extends Component {
+  static defaultProps = {
+    placeholder: 'Find team names, event ids, sports or tournaments.',
+  }
+
   static propTypes = {
-    getBetEventsInfo: PropTypes.func.isRequired
+    getBetEventsInfo: PropTypes.func.isRequired,
+    getBetQuery: PropTypes.func.isRequired,
+    placeholder: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -36,7 +45,8 @@ class BetEventList extends Component {
       pages: 0,
       page: 1,
       size: 50,
-      filterBy: 'Sports'
+      filterBy: 'All',
+      search: '',
     }
   };
 
@@ -57,12 +67,28 @@ class BetEventList extends Component {
         clearTimeout(this.debounce)
       }
 
+      const searchValue = this.state.search;
+
+      let getMethod = this.props.getBetEventsInfo;
+
+      const params = {
+        limit: this.state.size,
+        skip: (this.state.page - 1) * this.state.size
+      };
+
+      if (this.state.filterBy !== 'All') {
+        getMethod = this.props.getBetQuery;
+        params.sport = this.state.filterBy;
+      }
+
+
+      if (this.state.search) {
+        getMethod = this.props.getBetQuery;
+        params.search = this.state.search;
+      }
+
       this.debounce = setTimeout(() => {
-        this.props
-          .getBetEventsInfo({
-            limit: this.state.size,
-            skip: (this.state.page - 1) * this.state.size
-          })
+        getMethod(params)
           .then(({ data, pages }) => {
             if (this.debounce) {
               data.map(item => {
@@ -95,17 +121,34 @@ class BetEventList extends Component {
     })
   }
 
-  handleFilterBy = value => this.setState({filterBy: value}, this.getBetEventsInfo)
+  handleKeyPress = (ev) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+
+      const term = ev.target.value.trim();
+      ev.target.value = '';
+      this.setState({
+        search: term,
+      }, () => {
+        this.getBetEventsInfo();
+      });
+     /* if (!!term) {
+        this.props.onSearch(term);
+      }*/
+    }
+  };
+
+  handleFilterBy = value => this.setState({filterBy: value},() => this.getBetEventsInfo())
 
   handlePage = page => this.setState({page})
 
   handleSize = size => this.setState({size, page: 1})
 
-  handleFilterBy = value => this.setState({filterBy: value})
+  // handleFilterBy = value => this.setState({filterBy: value})
 
   TestMyFilter = (data, type) => {
     let results = [];
-    if (type === 'Sports') {
+    if (type === 'All') {
       results = data;
     } else {
       results = data.filter((event) => {
@@ -116,7 +159,9 @@ class BetEventList extends Component {
   }
 
   render () {
-    const { t } = this.props;
+    const { props } = this;
+
+    const { t } = props;
     const cols = [
       { key: 'start', title: t('startingnow') },
       { key: 'event', title: t('eventId') },
@@ -154,22 +199,21 @@ class BetEventList extends Component {
         options={selectFilterOptions} />
     );
 
-    // console.log(this.state.events[0].events[0].transaction);
-    // console.log(this.state.events);
-    // const filterEvents = this.state.events.filter((event) => {
-    //   if (this.state.filterBy == 'Sports') {
-    //     return event;
-    //   }
-    //   return event.events[0].transaction.sport === this.state.filterBy;
-    // });
-    const filterEvents = () => {
-      return this.TestMyFilter(this.state.events, this.state.filterBy)
-    }
-
-    console.log('filterEvents', filterEvents)
+    const searchBar = (
+      <div className="animated fadeIn" style={{ width: '100%' }}>
+        <div className={ `search ${ props.className ? props.className : '' }` }>
+          <input
+            className="search__input"
+            onKeyPress={ e => this.handleKeyPress(e) }
+            placeholder={ this.state.search || props.placeholder } />
+          <Icon name="search" className="search__icon" />
+        </div>
+      </div>
+    );
 
     return (
       <div>
+        {searchBar}
         <HorizontalRule
           select={select}
           filterSport={filterSport}
@@ -177,20 +221,15 @@ class BetEventList extends Component {
         <Table
           className={'table-responsive table--for-betevents'}
           cols={cols}
-          data={filterEvents.map((event) => {
+          data={this.state.events.map((event) => {
             const betAmount = event.actions.reduce((acc, action) => {
               return acc + action.betValue
             }, 0.0
             )
-            console.log('inData', event)
             let betStatus = t('open')
             const eventTime = parseInt(event.events[0].timeStamp);
             const eventData = event.events[0];
 
-            if (event.events[0].eventId == 1545) {
-              console.log(event.events[0])
-              console.log(event);
-            }
             if ((eventTime - (20 * 60 * 1000)) < Date.now()) {
               betStatus = t('waitForStart')
               if (eventTime < Date.now()) {
@@ -296,7 +335,8 @@ class BetEventList extends Component {
 }
 
 const mapDispatch = dispatch => ({
-  getBetEventsInfo: query => Actions.getBetEventsInfo(query)
+  getBetEventsInfo: query => Actions.getBetEventsInfo(query),
+  getBetQuery: query => Actions.getBetQuery(query),
 })
 
 export default compose(

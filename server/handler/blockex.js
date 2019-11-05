@@ -614,49 +614,6 @@ const getBetEvents = async (req, res) => {
   }
 };
 
-const getBetQuery = async (req, res) => {
-  try {
-    const { query } = req;
-    const { search } = query;
-
-    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
-    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
-
-    if (!query) {
-      return res.status(500).json({ error: true, message: 'No search specified' });
-    }
-
-    const params = [];
-
-    if (isNaN(search)) {
-      params.push({ txId: search },);
-      params.push({ homeTeam: { $regex: `.*${search}.*` } });
-      params.push({ awayTeam: { $regex: `.*${search}.*` } });
-      params.push({ tournament: { $regex: `.*${search}.*` } });
-      params.push({ 'transaction.sport': { $regex: `.*${search}.*` } });
-      params.push({ 'transaction.tournament': search });
-      params.push({ 'transaction.tournament': { $regex: `.*${search}.*` } });
-    } else {
-      params.push({ blockHeight: search });
-      params.push({ eventId: search });
-    }
-
-    const total = await BetEvent.find({
-      $or: params,
-    }).sort({createdAt: 1}).countDocuments()
-
-    const results = await BetEvent.find({
-      $or: params,
-    }).skip(skip).limit(limit).sort({createdAt: 1});
-
-
-    return res.json({ results, count: results.length, pages: total <= limit ? 1 : Math.ceil(total / limit) });
-  } catch (err) {
-    console.log(err)
-    return res.status(500).send(err.message || err)
-  }
-};
-
 const getBetActions = async (req, res) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
@@ -818,7 +775,7 @@ const getDataListing = async (Model, actions, results, req, res) => {
   const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
   const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
   try {
-    const total = await Model.aggregate([
+    const totalParams = [
       {
         $group: {
           _id: '$eventId',
@@ -826,8 +783,10 @@ const getDataListing = async (Model, actions, results, req, res) => {
       }, {
         $count: 'count',
       },
-    ]);
-    const result = await Model.aggregate([
+    ];
+    const total = await Model.aggregate(totalParams);
+
+    const resultParams = [
       {
         $group: {
           _id: '$eventId',
@@ -867,7 +826,10 @@ const getDataListing = async (Model, actions, results, req, res) => {
           as: 'results',
         },
       },
-    ]);
+    ];
+
+    const result = await Model.aggregate(resultParams);
+
     res.json({
       data: result,
       pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count / limit),
@@ -1138,6 +1100,156 @@ const getLottoEventInfo = async (req, res) => {
 };
 
 const getBetEventsInfo = async (req, res) => getDataListing(BetEvent, 'betactions', 'betresults', req, res);
+
+
+const getBetQuery2 = async (req, res) => {
+  try {
+    const { query } = req;
+    const { search } = query;
+
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000
+    const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0
+
+    if (!query) {
+      return res.status(500).json({ error: true, message: 'No search specified' });
+    }
+
+    const params = [];
+
+    if (isNaN(search)) {
+      params.push({ txId: search },);
+      params.push({ homeTeam: { $regex: `.*${search}.*` } });
+      params.push({ awayTeam: { $regex: `.*${search}.*` } });
+      params.push({ tournament: { $regex: `.*${search}.*` } });
+      params.push({ 'transaction.sport': { $regex: `.*${search}.*` } });
+      params.push({ 'transaction.tournament': search });
+      params.push({ 'transaction.tournament': { $regex: `.*${search}.*` } });
+    } else {
+      params.push({ blockHeight: search });
+      params.push({ eventId: search });
+    }
+
+    const total = await BetEvent.find({
+      $or: params,
+    }).sort({createdAt: 1}).countDocuments()
+
+    const results = await BetEvent.find({
+      $or: params,
+    }).skip(skip).limit(limit).sort({createdAt: 1});
+
+
+    return res.json({ results, count: results.length, pages: total <= limit ? 1 : Math.ceil(total / limit) });
+  } catch (err) {
+    console.log(err)
+    return res.status(500).send(err.message || err)
+  }
+};
+
+// Modified this a bit - kyle h
+const getDataQuery = async (Model, actions, results, req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
+  const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
+  const { query } = req;
+  const { search } = query;
+  const { sport } = query;
+
+  const orParams = [];
+
+  if (isNaN(search)) {
+    orParams.push({ txId: search },);
+    orParams.push({ homeTeam: { $regex: `.*${search}.*` } });
+    orParams.push({ awayTeam: { $regex: `.*${search}.*` } });
+    orParams.push({ tournament: { $regex: `.*${search}.*` } });
+    orParams.push({ 'transaction.tournament': search });
+    orParams.push({ 'transaction.tournament': { $regex: `.*${search}.*` } });
+  } else {
+    orParams.push({ blockHeight: search });
+    orParams.push({ eventId: search });
+  }
+
+
+  if (isNaN(sport) || isNaN(search)) {
+    orParams.push({ 'transaction.sport': { $regex: `.*${sport || search}.*` } });
+  }
+  
+
+  try {
+    const totalParams = [
+      {
+        $match: {
+          $or: orParams,
+        },
+      },
+      {
+        $group: {
+          _id: '$eventId',
+        },
+      }, {
+        $count: 'count',
+      },
+    ];
+    const total = await Model.aggregate(totalParams);
+
+    const resultParams = [
+      {
+        $match: {
+          $or: orParams,
+        },
+      },
+      {
+        $group: {
+          _id: '$eventId',
+          events: {
+            $push: '$$ROOT',
+          },
+        },
+      },
+      {
+        $project: {
+          _id: '$_id',
+          events: '$events',
+          timeStamp: { $arrayElemAt: ['$events.timeStamp', 0] },
+        },
+      },
+      {
+        $sort: {
+          timeStamp: -1,
+          _id: -1,
+        },
+      }, {
+        $skip: skip,
+      }, {
+        $limit: limit,
+      }, {
+        $lookup: {
+          from: actions,
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'actions',
+        },
+      }, {
+        $lookup: {
+          from: results,
+          localField: '_id',
+          foreignField: 'eventId',
+          as: 'results',
+        },
+      },
+    ];
+
+    const result = await Model.aggregate(resultParams);
+
+    res.json({
+      data: result,
+      pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count / limit),
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
+};
+
+const getBetQuery = (req, res) => getDataQuery(BetEvent, 'betactions', 'betresults', req, res);
 
 const getCurrentProposals = async (req, res) => {
   try {
