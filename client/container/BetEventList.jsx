@@ -140,8 +140,8 @@ class BetEventList extends Component {
 
   handleFilterBy = value => this.setState({filterBy: value},() => this.getBetEventsInfo())
 
-  handlePage = page => this.setState({page})
-
+  handlePage = page => this.setState({ page }, this.getBetEventsInfo)
+  
   handleSize = size => this.setState({size, page: 1})
 
   // handleFilterBy = value => this.setState({filterBy: value})
