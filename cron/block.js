@@ -11,12 +11,36 @@ const TX = require('../model/tx');
 const UTXO = require('../model/utxo');
 const STXO = require('../model/stxo');
 
+const { log } = console;
+
+function handleError(msg, e) {
+  log(msg);
+  log(e);
+}
+
+async function logError(err, height) {
+  if (err && err.message && err.message.includes('duplicate key error collection')) {
+    return null;
+  }
+
+  if (height) {
+    return handleError(
+      `Error recording block data at height ${height}`,
+      err,
+    );
+  }
+
+  return log(err);
+}
+
 /**
  * Process the blocks and transactions.
  * @param {Number} start The current starting block height.
  * @param {Number} stop The current block height at the tip of the chain.
  */
 async function syncBlocks(start, stop, clean = false) {
+  log(start, stop);
+
   if (clean) {
     await Block.deleteMany({ height: { $gte: start, $lte: stop } });
     await TX.deleteMany({ blockHeight: { $gte: start, $lte: stop } });
@@ -57,10 +81,12 @@ async function syncBlocks(start, stop, clean = false) {
     });
 
     block.rpctxs = rpctxs;
-
-    await block.save();
-
-    console.log(`Height: ${ block.height } Hash: ${ block.hash }`);
+    try {
+      await block.save();
+      log(`Height: ${ block.height } Hash: ${ block.hash }`);
+    } catch (e) {
+      logError(e, block.height);
+    }
   }
 }
 
@@ -75,20 +101,19 @@ async function update() {
     const info = await rpc.call('getinfo');
     const block = await Block.findOne().sort({ height: -1});
 
-    let clean = true; // Always clear for now.
+    // let clean = true; // Always clear for now.
     let dbHeight = block && block.height ? block.height : 1;
     let rpcHeight = info.blocks;
 
     // If heights provided then use them instead.
     if (!isNaN(process.argv[2])) {
-      clean = true;
+      // clean = true;
       dbHeight = parseInt(process.argv[2], 10);
     }
     if (!isNaN(process.argv[3])) {
-      clean = true;
+      // clean = true;
       rpcHeight = parseInt(process.argv[3], 10);
     }
-    console.log(dbHeight, rpcHeight, clean);
     // If nothing to do then exit.
     if (dbHeight >= rpcHeight) {
       return;
@@ -99,15 +124,15 @@ async function update() {
     }
 
     locker.lock(type);
-    await syncBlocks(dbHeight, rpcHeight, clean);
+    await syncBlocks(dbHeight, rpcHeight);
   } catch(err) {
-    console.log(err);
+    logError(err);
     code = 1;
   } finally {
     try {
       locker.unlock(type);
     } catch(err) {
-      console.log(err);
+      logError(err);
       code = 1;
     }
     exit(code);

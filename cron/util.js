@@ -14,6 +14,27 @@ function hexToString(hexx) {
   return str
 }
 
+function handleError(msg, e) {
+  log(msg);
+  log('Duplicate')
+  // log(e);
+}
+
+async function logError(err, height, dataType) {
+  if (err && err.message && err.message.includes('duplicate key error collection')) {
+    return null;
+  }
+
+  if (height) {
+    return handleError(
+      `Error recording ${dataType} data at height ${height}`,
+      err,
+    );
+  }
+
+  return log(err);
+}
+
 /**
  * Process the inputs for the tx.
  * @param {Object} rpctx The rpc tx object.
@@ -70,7 +91,7 @@ async function vin(rpctx, blockHeight) {
       try {
         await STXO.insertMany(stxo);
       }catch (e) {
-        console.log(e)
+        logError(e, blockHeight,'STXO');
       }
     }
     // Remove spent transactions.
@@ -152,16 +173,20 @@ async function addPoS(block, rpctx) {
   const txin = await vin(rpctx, block.height);
   const txout = await vout(rpctx, block.height);
 
-  await TX.create({
-    _id: rpctx.txid,
-    blockHash: block.hash,
-    blockHeight: block.height,
-    createdAt: block.createdAt,
-    txId: rpctx.txid,
-    version: rpctx.version,
-    vin: txin,
-    vout: txout
-  });
+  try {
+    await TX.create({
+      _id: rpctx.txid,
+      blockHash: block.hash,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      txId: rpctx.txid,
+      version: rpctx.version,
+      vin: txin,
+      vout: txout
+    });
+  } catch(e) {
+    logError(e, block.height, 'TX');
+  }
 }
 
 /**
@@ -173,16 +198,20 @@ async function addPoW(block, rpctx) {
   const txin = await vin(rpctx, block.height);
   const txout = await vout(rpctx, block.height);
 
-  await TX.create({
-    _id: rpctx.txid,
-    blockHash: block.hash,
-    blockHeight: block.height,
-    createdAt: block.createdAt,
-    txId: rpctx.txid,
-    version: rpctx.version,
-    vin: txin,
-    vout: txout
-  });
+  try {
+    await TX.create({
+      _id: rpctx.txid,
+      blockHash: block.hash,
+      blockHeight: block.height,
+      createdAt: block.createdAt,
+      txId: rpctx.txid,
+      version: rpctx.version,
+      vin: txin,
+      vout: txout
+    });
+  } catch(e) {
+    logError(e, block.height, 'TX');
+  }
 }
 
 /**
