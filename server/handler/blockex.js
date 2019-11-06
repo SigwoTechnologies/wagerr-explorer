@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const moment = require('moment');
 const { BigNumber } = require('bignumber.js');
+const { forEach } = require('p-iteration');
+
 const { getSubsidy } = require('../../lib/blockchain');
 const chain = require('../../lib/blockchain');
 const { rpc } = require('../../lib/cron');
