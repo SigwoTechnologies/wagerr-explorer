@@ -21,6 +21,9 @@ export const FILTER_EVENTS_OPTIONS = [
   { label: 'Basketball', value: 'Basketball' },
   { label: 'Hockey', value: 'Hockey' },
   { label: 'Soccer', value: 'Soccer' },
+  { label: 'MMA', value: 'MMA' },
+  { label: 'Rugby Union', value: 'Rugby Union' },
+  { label: 'Esports', value: 'Esports' },
 ];
 
 export default {
