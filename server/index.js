@@ -9,6 +9,8 @@ if (cluster.isMaster) {
     cpus = 4;
   }
 
+  // cpus = 1;
+
   if (process.argv.length > 2 && !isNaN(process.argv[2])) {
     cpus = parseInt(process.argv[2], 10);
   }

@@ -7,6 +7,9 @@ const { getSubsidy } = require('../../lib/blockchain');
 const chain = require('../../lib/blockchain');
 const { rpc } = require('../../lib/cron');
 
+const { CarverAddressType, CarverMovementType, CarverTxType } = require('../../lib/carver2d');
+const { CarverAddress, CarverMovement, CarverAddressMovement } = require('../../model/carver2d');
+
 // System models for query and etc.
 const Block = require('../../model/block');
 const Coin = require('../../model/coin');
@@ -428,6 +431,47 @@ const getTop100 = (req, res) => {
       console.log(err);
       res.status(500).send(err.message || err);
     });
+};
+
+const getTop1002 = async (req, res) => {
+  try {
+    const docs = await cache.getFromCache("top100", moment().utc().add(1, 'hours').unix(), async () => {
+      const top100Addresses = await CarverAddress.find({ carverAddressType: CarverAddressType.Address }, { sequence: 0 })
+        .limit(100)
+        .sort({ balance: -1 }).populate({ path: "lastMovement", select: { carverMovement: 1 }, populate: { path: 'carverMovement', select: { date: 1 } } }); //@todo remove lastMovement;
+
+      // For each address split them into 3 address (MN,POS,POW). Add each address to an array.
+      const addressesToFetch = top100Addresses.reduce((addressesToFetch, address) => {
+        return [
+          ...addressesToFetch,
+          `${address.label}:MN`,
+          `${address.label}:POS`,
+          `${address.label}:POW`
+        ]
+      }, []);
+      const rewardAddressBalances = await CarverAddress.find({ label: { $in: addressesToFetch } }, { _id: 0, label: 1, valueOut: 1 })
+
+      // For each top 100 address find any matching rewards addresses and calculate the total rewards for that address
+      const addressesWithBalances = top100Addresses.map((address) => {
+        // Calculate the total rewards sum for a specific address
+        const rewardsSumValue = rewardAddressBalances.reduce((sum, rewardAddress) => {
+          return sum + ([`${address.label}:MN`, `${address.label}:POS`, `${address.label}:POW`].includes(rewardAddress.label) ? rewardAddress.valueOut : 0);
+        }, 0);
+
+        return {
+          ...address.toObject(),
+          rewardsSumValue
+        }
+      });
+
+      return addressesWithBalances;
+    });
+
+    res.json(docs);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err.message || err);
+  }
 };
 
 /**
@@ -1159,28 +1203,38 @@ const getDataQuery = async (Model, actions, results, req, res) => {
 
   if (isNaN(search)) {
     orParams.push({ txId: search },);
-    orParams.push({ homeTeam: { $regex: `.*${search}.*` } });
-    orParams.push({ awayTeam: { $regex: `.*${search}.*` } });
-    orParams.push({ tournament: { $regex: `.*${search}.*` } });
-    orParams.push({ 'transaction.tournament': search });
-    orParams.push({ 'transaction.tournament': { $regex: `.*${search}.*` } });
+    orParams.push({ homeTeam: { $regex: `.*${search}.*`, $options: 'i' } });
+    orParams.push({ awayTeam: { $regex: `.*${search}.*`, $options: 'i' } });
+    orParams.push({ tournament: { $regex: `.*${search}.*`, $options: 'i' } });
+    orParams.push({ 'transaction.tournament': { $regex: `.*${search}.*`, $options: 'i' } });
   } else {
     orParams.push({ blockHeight: search });
     orParams.push({ eventId: search });
   }
 
+  const totalMatches = {
+    $and: [],
+  };
 
-  if (isNaN(sport) || isNaN(search)) {
-    orParams.push({ 'transaction.sport': { $regex: `.*${sport || search}.*` } });
-  }
+  const resultMatches = {
+    $and: [],
+  };
   
+  if (sport) {
+    totalMatches.$and.push({ 'transaction.sport': { $regex: `.*${sport || search}.*`, $options: 'i' }});
+    resultMatches.$and.push({ 'transaction.sport': { $regex: `.*${sport || search}.*`, $options: 'i' }});
+  }
+
+  if (search) {
+    totalMatches.$and.push({ $or: orParams });
+    resultMatches.$and.push({ $or: orParams })
+  }
+
 
   try {
     const totalParams = [
       {
-        $match: {
-          $or: orParams,
-        },
+        $match: totalMatches,
       },
       {
         $group: {
@@ -1190,13 +1244,10 @@ const getDataQuery = async (Model, actions, results, req, res) => {
         $count: 'count',
       },
     ];
-    const total = await Model.aggregate(totalParams);
 
     const resultParams = [
       {
-        $match: {
-          $or: orParams,
-        },
+        $match: resultMatches,
       },
       {
         $group: {
@@ -1239,11 +1290,15 @@ const getDataQuery = async (Model, actions, results, req, res) => {
       },
     ];
 
+    const total = await Model.aggregate(totalParams);
     const result = await Model.aggregate(resultParams);
+
+
+    const pages = total && total[0] ? (total[0].count <= limit ? 1 : Math.ceil(total[0].count / limit)) : 1;
 
     res.json({
       data: result,
-      pages: total[0].count <= limit ? 1 : Math.ceil(total[0].count / limit),
+      pages,
     });
   } catch (err) {
     console.log(err);

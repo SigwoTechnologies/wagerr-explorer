@@ -4,6 +4,7 @@ const locker = require('../lib/locker');
 const betUpdate = require('./bet');
 const lottoUpdate = require('./lotto');
 const errorUpdates = require('./errors');
+const unmatchedSpreads = require('./spreads');
 
 const { log } = console;
 
@@ -28,6 +29,11 @@ async function exec() {
       log('------------------------------');
       log('[3] RUNNING ERRORS CHECK WORKER..');
       return errorUpdates();
+    })
+    .then(() => {
+      log('------------------------------');
+      log('[4]Checking unmatched spreads..');
+      return unmatchedSpreads();
     })
     .then(() => {
       log('------------------------------');
