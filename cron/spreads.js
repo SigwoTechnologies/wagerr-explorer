@@ -6,10 +6,68 @@ const { log } = console;
 const Betupdate = require('../model/betupdate');
 const Betspread = require('../model/betspread');
 const BetEvent = require('../model/betevent');
+const BetAction = require('../model/betaction');
 
-/**
- * Handle locking.
- */
+
+async function resyncActions(spread) {
+  // We first get the next spread
+  const nextSpreads = await Betspread.find({
+    eventId: spread.eventId,
+    createdAt: { $gt: spread.createdAt },
+  });
+  const nextSpread = nextSpreads[0];
+
+  const query = {
+    $gte: spread.createdAt,
+  };
+
+  if (nextSpread) {
+    query['$lt'] = nextSpread.createdAt;
+  }
+
+  // We find the actions that are between this spread
+  // and the next spread
+  const actions = await BetAction.find({
+    eventId: spread.eventId,
+    createdAt: query,
+    'transaction.outcome': { $in: [4, 5] },
+  });
+  
+  // log(`Bet Actions to resync => ${actions.length}`);
+
+  for (let x = 0; x < actions.length; x += 1) {
+    const thisAction = actions[x];
+
+    let updated = false;
+
+    if (thisAction.spreadHomeOdds != spread.homeOdds) {
+      updated = true;
+      thisAction.homeOdds = spread.homeOdds;
+    }
+
+    if (thisAction.spreadAwayOdds != spread.awayOdds) {
+      updated = true;
+      thisAction.spreadAwayOdds = spread.awayOdds;
+    }
+
+    if (thisAction.spreadHomePoints != spread.homePoints) {
+      updated = true;
+      thisAction.spreadHomePoints = spread.homePoints;
+    }
+
+
+    if (thisAction.spreadAwayPoints != spread.awayPoints) {
+      updated = true;
+      thisAction.spreadAwayPoints = spread.awayPoints;
+    }
+
+    if (updated) {
+      thisAction.fixed = true;
+      await thisAction.save()
+    }
+  }
+}
+
 async function update () {
   let response;
 
@@ -17,6 +75,8 @@ async function update () {
     // We find the betspreads that have not been matched yet
     const spreads = await Betspread.find({ matched: false });
     const events = {};
+
+    log(`Spreads to resync => ${spreads.length}`);
 
     if (spreads.length > 0) {
       for(let x = 0; x < spreads.length; x +=1) {
@@ -67,6 +127,10 @@ async function update () {
         thisSpread.synced = true;
 
         await thisSpread.save();
+
+
+        // After the spread is saved, we are to update
+        await resyncActions(thisSpread);
       }
     } else {
       log('No spreads to match');
