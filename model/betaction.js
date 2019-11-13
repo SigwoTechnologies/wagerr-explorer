@@ -25,6 +25,7 @@ const BetAction = mongoose.model('BetAction', new mongoose.Schema({
   underOdds: { required: false, type: Number },
   transaction: { required: false, type: Map },
   matched: { required: false, type: Boolean, default: false },
+  fixed: { required: false, type: Boolean, default: false },
   visibility: { required: false, type: Boolean, default: true },
   spreadHomePoints: { required: false, type: Number },
   spreadAwayPoints: { required: false, type: Number },
