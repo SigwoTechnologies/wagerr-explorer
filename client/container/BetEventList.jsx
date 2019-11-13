@@ -125,26 +125,28 @@ class BetEventList extends Component {
     if (ev.key === 'Enter') {
       ev.preventDefault();
 
-      const term = ev.target.value.trim();
-      ev.target.value = '';
-      this.setState({
-        search: term,
-      }, () => {
-        this.getBetEventsInfo();
-      });
-     /* if (!!term) {
-        this.props.onSearch(term);
-      }*/
+      this.getBetEventsInfo();
     }
   };
 
-  handleFilterBy = value => this.setState({filterBy: value},() => this.getBetEventsInfo())
+  handleChange = (e) => {
+    this.setState({
+      search: e.target.value,
+    });
+  }
+
+  handleFilterBy = value => this.setState({filterBy: value}, () => {
+    this.setState({
+      search: '',
+    }, () => {
+      this.getBetEventsInfo()
+    });
+  });
 
   handlePage = page => this.setState({ page }, this.getBetEventsInfo)
   
   handleSize = size => this.setState({size, page: 1})
 
-  // handleFilterBy = value => this.setState({filterBy: value})
 
   TestMyFilter = (data, type) => {
     let results = [];
@@ -205,7 +207,10 @@ class BetEventList extends Component {
           <input
             className="search__input"
             onKeyPress={ e => this.handleKeyPress(e) }
-            placeholder={ this.state.search || props.placeholder } />
+            onChange={ e => this.handleChange(e) }
+            placeholder={ props.placeholder }
+            value={this.state.search}
+          />
           <Icon name="search" className="search__icon" />
         </div>
       </div>

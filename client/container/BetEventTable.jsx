@@ -170,6 +170,12 @@ class BetEventTable extends Component {
     // console.log('EEEEEEEE', this.props.data.betTotals)
     // console.log('FFFFFFFF', this.state.Totals)
 
+    const displayNum = (num, divider) => {
+      const value = num > 0 ? `+${num / divider}` : `${num / divider}`;
+      
+      return value;
+    };
+
     return (
       <div className="col-sm-12 col-md-12">
       {
@@ -215,11 +221,12 @@ class BetEventTable extends Component {
             <Table
               cols={topTwoCols}
               data={sortBy(this.props.data.betSpreads.map((action) => {
+                console.log(action);
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
                   homeOdds: action.homeOdds / 10000,
-                  spread: `${action.homePoints / 10}/${action.awayPoints / 10}`,
+                  spread: `${displayNum(action.homePoints, 10)}/${displayNum(action.awayPoints, 10)}`,
                   awayOdds: action.awayOdds / 10000,
                   txId: (
                     <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
@@ -230,12 +237,14 @@ class BetEventTable extends Component {
             <Table
               cols={bottomTwoCols}
               data={sortBy(this.state.Spreads.map((action) => {
+                const betChoose = action.betChoose.replace('Spreads - ', '');
+                const spreadNum = Math.abs(parseInt(action.spreadAwayPoints, 10)) / 10;
                 return {
                   ...action,
                   createdAt: date24Format(action.createdAt),
-                  bet: action.homeOdds / 10000,
-                  spread: action.homeOdds > 0 ? `+${action.homeOdds / 10000}` : `+${(action.awayPoints / 10000)}`,
-                  odds: action.homeOdds / 10000,
+                  bet: betChoose, // `${action.homeOdds / 10000}/${action.awayOdds / 10000}`,
+                  spread: action.homeOdds < action.awayOdds ? `-${spreadNum}` : `+${spreadNum}`,
+                  odds: betChoose == 'Away' ? action.spreadAwayOdds / 10000 : action.spreadHomeOdds / 10000,
                   value: action.betValue
                     ? (<span
                       className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',

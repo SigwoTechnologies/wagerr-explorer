@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 const Betspread = mongoose.model('Betspread', new mongoose.Schema({
-    _id: { required: true, select: false, type: String },
+    _id: { required: true, type: String },
     txId: { index: true, required: true, type: String },
     blockHeight: { index: true, required: true, type: Number },
     createdAt: { required: true, type: Date },
@@ -18,7 +18,10 @@ const Betspread = mongoose.model('Betspread', new mongoose.Schema({
     betValue: { required: false, type: Number },
     value: { required: false, type: Number },
     matched: { required: false, type: Boolean, default: false },
-    visibility: { required: false, type: Boolean, default: true }
+    synced: { required: false, type: Boolean, default: false },
+    visibility: { required: false, type: Boolean, default: true },
+    mhomeOdds: { required: false, type: Number },
+    mawayOdds: { required: false, type: Number }
   }, { versionKey: false }), 'betspreads');
   
   module.exports =  Betspread;
