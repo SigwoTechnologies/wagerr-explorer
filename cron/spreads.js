@@ -68,6 +68,79 @@ async function resyncActions(spread) {
   }
 }
 
+async function resyncRemainingActions() {
+  // We first find all the actions that don't have the synced flag set to true
+  const actions = await BetAction.find({
+    fixed: false,
+    'transaction.outcome': { $in: [4, 5] },
+  });
+  
+  log(`${actions.length} betactions found that need to be resynced`);
+
+  // Once we have the actions, we are going to loop through each of them
+  // We are going to store eventIds into a dictionary to reduce the amount of calls being made
+
+  const events = { };
+
+  for (let x = 0; x < actions.length; x += 1) {
+    const thisAction = actions[x];
+
+
+    /* let event;
+
+    // We get the original event data through this
+    if (events[thisAction.eventId]) {
+      event = events[thisAction.eventId];
+    } else {
+      event = await BetAction.findOne({ eventId: `${thisAction.eventId}` });
+      events[thisAction.eventId] = event;
+    } */
+
+    // We are going to locate the spreads that apply to the particular betaction
+    const spread = await Betspread.findOne({
+      eventId: thisAction.eventId,
+      createdAt: { $lte: thisAction.createdAt },
+    })
+    .sort({ createdAt: -1 });
+
+    let updated = false;
+
+
+    if (!spread) {
+      console.log(spread);
+      console.log(thisAction);
+    }
+
+    if (thisAction.spreadHomeOdds != spread.homeOdds) {
+      updated = true;
+      thisAction.homeOdds = spread.homeOdds;
+    }
+
+    if (thisAction.spreadAwayOdds != spread.awayOdds) {
+      updated = true;
+      thisAction.spreadAwayOdds = spread.awayOdds;
+    }
+
+    if (thisAction.spreadHomePoints != spread.homePoints) {
+      updated = true;
+      thisAction.spreadHomePoints = spread.homePoints;
+    }
+
+
+    if (thisAction.spreadAwayPoints != spread.awayPoints) {
+      updated = true;
+      thisAction.spreadAwayPoints = spread.awayPoints;
+    }
+
+    if (updated) {
+      thisAction.fixed = true;
+      await thisAction.save()
+    }  
+  }
+
+  log(`Betactions resynced`);
+}
+
 async function update () {
   let response;
 
@@ -136,6 +209,7 @@ async function update () {
       log('No spreads to match');
     }
 
+    await resyncRemainingActions();
   } catch (err) {
     log('Update() error');
     log(err);

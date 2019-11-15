@@ -32,7 +32,7 @@ async function exec() {
     })
     .then(() => {
       log('------------------------------');
-      log('[4]Checking unmatched spreads..');
+      log('[4]CHECKING UNMATCHED SPREADS...');
       return unmatchedSpreads();
     })
     .then(() => {

@@ -326,15 +326,16 @@ async function getEventData(block, eventId, waitTime = 50) {
   }
 
   let event = {};
-
+  // Getting money line updates that are less or equal to the block the transaction is contained in
   const updates = await Betupdate.find({
     eventId: `${eventId}`,
-    createdAt: { $lt: block.createdAt },
+    createdAt: { $lte: block.createdAt },
   });
 
+  // Get thebettotals that are less or equal to the block the transaction is contained in
   const betTotals = await Bettotal.find({
     eventId: `${eventId}`,
-    createdAt: { $lt: block.createdAt },
+    createdAt: { $lte: block.createdAt },
   });
 
   if (updates && updates.length > 0) {
