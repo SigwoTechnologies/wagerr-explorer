@@ -780,21 +780,33 @@ const getBetTotals = async (req, res) => {
   }
 };
 
-const getData = async (Model, req, res) => {
+const getData = async (Model, req, res, visibility = true) => {
   try {
     const limit = req.query.limit ? parseInt(req.query.limit, 10) : 1000;
     const skip = req.query.skip ? parseInt(req.query.skip, 10) : 0;
-
+    
     if (req.query.eventId) {
       const { eventId } = req.query;
-      const total = await Model.find({
+
+      const queryParam = {
         eventId: `${eventId}`,
-        visibility: true,
-      }).sort({ createdAt: 1 }).countDocuments();
-      const results = await Model.find({
-        eventId: `${eventId}`,
-        visibility: true,
-      }).skip(skip).limit(limit).sort({ createdAt: 1 });
+      };
+  
+      if (visibility) {
+        queryParam.visibility =  true;
+      }
+
+      const total = await Model
+        .find(queryParam)
+        .sort({ createdAt: 1 })
+        .countDocuments();
+
+      const results = await Model
+      .find(queryParam)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: 1 });
+
       res.json({ results, pages: total <= limit ? 1 : Math.ceil(total / limit) });
     } else {
       const total = await Model.find({
@@ -952,7 +964,7 @@ const getAltDataListing = async (Model, actions, results, req, res) => {
 
 const getLottoEvents = async (req, res) => getAltDataListing(LottoEvent, 'lottobets', 'lottoresults', req, res);
 // const getLottoEvents = async (req, res) =>  getData(LottoEvent, req, res);
-const getLottoBets = async (req, res) => getData(LottoBet, req, res);
+const getLottoBets = async (req, res) => getData(LottoBet, req, res, false);
 const getLottoResults = async (req, res) => getData(LottoResult, req, res);
 
 const getBetActioinsWeek = () => {
@@ -1021,7 +1033,7 @@ const getBetEventInfo = async (req, res) => {
       visibility: true,
     }).sort({ createdAt: 1 });
   } catch (e) {
-    console.log('Bet Event Not Publish');
+    console.log('Bet Event Not Published');
   }
   try {
     const events = await BetEvent.find({
@@ -1123,15 +1135,21 @@ const getLottoEventInfo = async (req, res) => {
   const { eventId } = req.params;
   let results;
   try {
-    results = await LottoResult.find({eventId, visibility: true }).sort({createdAt: 1})
+    results = await LottoResult.find({
+      eventId,
+      visibility: true,
+    }).sort({createdAt: 1})
   } catch (e) {
-    console.log('Bet Event Not Publish');
+    console.log(e);
+    console.log('Lot Event Not Published');
   }
+
   try {
     const events = await LottoEvent.find({
       eventId,
       visibility: true,
     }).sort({ createdAt: 1 });
+
     const bets = await LottoBet.find({ eventId, visibility: true });
 
     // These will return only one event with the latest updated odds

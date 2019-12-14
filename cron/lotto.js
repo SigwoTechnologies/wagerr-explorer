@@ -8,6 +8,7 @@ const Transaction = require('../model/transaction');
 const LottoEvent = require('../model/lottoevent');
 const LottoBet = require('../model/lottobet');
 const LottoResult = require('../model/lottoresult');
+const TX = require('../model/tx');
 
 const { log } = console;
 
@@ -48,6 +49,7 @@ async function migrateTransaction(txType) {
     Model = LottoBet;
   } else if (txType === 'chainGamesLottoResult') {
     Model = LottoResult;
+    
   }
 
   for (let x = 0; x < transactions.length;  x +=1) {
@@ -61,6 +63,7 @@ async function migrateTransaction(txType) {
       txType: opObject.get('txType'),
       eventId: opObject.get('eventId'),
       opString: JSON.stringify(opObject),
+      betValue: transaction.betValue,
       opCode: opObject.get('opCode'),
       transaction: opObject,
       matched: true,
@@ -68,6 +71,13 @@ async function migrateTransaction(txType) {
 
     if (txType === 'chainGamesLottoEvent') {
       params.entryPrice  = transaction.opObject.get('entryPrice');
+    }
+
+    if (txType === 'chainGamesLottoResult') {
+      let resultPayoutTxs = await TX.find({ blockHeight: transaction.blockHeight + 1 });
+
+      params.entryPrice  = transaction.opObject.get('entryPrice');
+      params.payoutTx = resultPayoutTxs[0];
     }
 
     let lottoDataSaved = false;

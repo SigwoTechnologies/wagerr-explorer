@@ -55,7 +55,7 @@ class LottoEventTable extends Component {
 
   sortBetData = () => {
     // Money Line Data
-    const MoneyLineBetData = this.props.data.betActions;
+    const MoneyLineBetData = []// this.props.data.betActions;
     let MoneyLine = [];
     let Totals = [];
     let Spreads = [];
@@ -69,8 +69,6 @@ class LottoEventTable extends Component {
       };
       this.setState({
         MoneyLine,
-        Totals,
-        Spreads,
       });
     });
   };
@@ -82,22 +80,12 @@ class LottoEventTable extends Component {
         this.props.getLottoBets(this.state.eventId),
       ]).then((res) => {
         sortBy(res[0].events,['blockHeight']).forEach(event =>{
-          res[1].actions.filter(action => { return event.blockHeight < action.blockHeight}).forEach(
-            action => {
-              if (action.betChoose.includes('Home')) {
-                action.odds = action.homeOdds / 10000
-              } else if (action.betChoose.includes('Away')) {
-                action.odds = action.awayOdds / 10000
-              } else {
-                action.odds = action.drawOdds / 10000
-              }
-            });
+          res[1].results.filter(action => { return event.blockHeight < action.blockHeight});
+
           this.setState({
             eventInfo: res[0], // 7 days at 5 min = 2016 coins
-            betActions: res[1].actions,
-            betTotals: res[2].results,
-            betSpreads: res[3].results,
-            opObject: res[2].results.opObject,
+            betActions: res[1].results,
+            // opObject: res[2].results.opObject,
             loading: false,
           });
         });
@@ -111,168 +99,33 @@ class LottoEventTable extends Component {
 
     const topOneCols = [
       {key: 'createdAt', title: t('time')},
-      {key: 'homeOdds', title: t('homeOdds')},
+      {key: 'homeOdds', title: t('betAmount')},
       {key: 'drawOdds', title: t('drawOdds')},
       {key: 'awayOdds', title: t('awayOdds')},
       {key: 'txId', title: t('txId')},
     ]
 
-    const topTwoCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'homeOdds', title: t('homeOdds')},
-      {key: 'spread', title: 'spread'},
-      {key: 'awayOdds', title: t('awayOdds')},
-      {key: 'txId', title: t('txId')},
-    ]
-
-    const topThreeCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'overOdds', title: 'over odds'},
-      {key: 'overUnder', title: 'o/u'},
-      {key: 'underOdds', title: 'under odds'},
-      {key: 'txId', title: t('txId')},
-    ]
-
     const bottomOneCols = [
       {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
+      {key: 'value', title: t('Bet Amount')},
       {key: 'txId', title: t('txId')},
     ]
 
-    const bottomTwoCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'spread', title: 'spread'},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
-      {key: 'txId', title: t('txId')},
-    ]
-
-    const bottomThreeCols = [
-      {key: 'createdAt', title: t('time')},
-      {key: 'bet', title: t('bet')},
-      {key: 'overUnder', title: 'o/u'},
-      {key: 'odds', title: t('odds')},
-      {key: 'value', title: t('value')},
-      {key: 'txId', title: t('txId')},
-    ]
-
-    // console.log('AAAAAAAA', this.props.data.eventInfo.events)
-    // console.log('BBBBBBB', this.state.MoneyLine)
-    // console.log('CCCCCCCC', this.props.data.betSpreads)
-    // console.log('DDDDDDDDDD', this.state.Spreads)
-    // console.log('EEEEEEEE', this.props.data.betTotals)
-    // console.log('FFFFFFFF', this.state.Totals)
 
     return (
-      <div className="col-sm-12 col-md-12">
+      <div className="col-sm-12 col-md-12 col-lg-12">
       {
         this.props.data.activeTab == 1 &&
         <div>
           <Table
-            cols={topOneCols}
-            data={sortBy(this.props.data.eventInfo.events.map((event) => {
-              return {
-                ...event,
-                createdAt: date24Format(event.createdAt),
-                homeOdds: event.homeOdds / 10000,
-                drawOdds: event.drawOdds / 10000,
-                awayOdds: event.awayOdds / 10000,
-                txId: (
-                  <Link to={`/tx/${ event.txId }`}>{event.txId}</Link>
-                )
-              }
-            }), ['createdAt'])}
-          />
-          <Table
             cols={bottomOneCols}
-            data={sortBy(this.state.MoneyLine.map((action) => {
+            data={sortBy(this.state.betActions.map((action) => {
               return {
                 ...action,
                 createdAt: date24Format(action.createdAt),
-                bet: action.betChoose.replace('Money Line - ', ''),
-                odds: action.odds,
                 value: action.betValue
                   ? (<span
                     className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : 'd',
-                txId: (
-                  <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
-                )
-              }
-            }), ['createdAt'])}
-          />
-      </div>
-      }
-      {
-        this.props.data.activeTab == 2 &&
-        <div>
-            <Table
-              cols={topTwoCols}
-              data={sortBy(this.props.data.betSpreads.map((action) => {
-                return {
-                  ...action,
-                  createdAt: date24Format(action.createdAt),
-                  homeOdds: action.homeOdds / 10000,
-                  spread: `${action.homePoints / 10}/${action.awayPoints / 10}`,
-                  awayOdds: action.awayOdds / 10000,
-                  txId: (
-                    <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
-                  )
-                }
-              }), ['createdAt'])}
-            />
-            <Table
-              cols={bottomTwoCols}
-              data={sortBy(this.state.Spreads.map((action) => {
-                return {
-                  ...action,
-                  createdAt: date24Format(action.createdAt),
-                  bet: action.homeOdds / 10000,
-                  spread: action.homeOdds > 0 ? `+${action.homeOdds / 10000}` : `+${(action.awayPoints / 10000)}`,
-                  odds: action.homeOdds / 10000,
-                  value: action.betValue
-                    ? (<span
-                      className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
-                  txId: (
-                    <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
-                  )
-                }
-              }), ['createdAt'])}
-            />
-        </div>
-      }
-      {
-        this.props.data.activeTab == 3 &&
-        <div>
-          <Table
-            cols={topThreeCols}
-            data={sortBy(this.props.data.betTotals.map((action) => {
-              return {
-                ...action,
-                createdAt: date24Format(action.createdAt),
-                overOdds: action.overOdds / 10000,
-                overUnder: action.points / 10,
-                underOdds: action.underOdds / 10000,
-                txId: (
-                  <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
-                )
-              }
-            }), ['createdAt'])}
-          />
-          <Table
-            cols={bottomThreeCols}
-            data={sortBy(this.state.Totals.map((action) => {
-              return {
-                ...action,
-                createdAt: date24Format(action.createdAt),
-                bet: action.betChoose.replace('Money Line - ', ''),
-                // overUnder: ((action.homeOdds / action.awayOdds + action.homeOdds) * 100).toFixed(1),
-                overUnder: (action.points / 10).toFixed(1),
-                odds: action.betChoose.includes('Over') ? action.overOdds / 10000 : action.underOdds / 10000,
-                value: action.betValue
-                  ? (<span className="badge badge-danger">-{numeral(action.betValue).format('0,0.00000000')} WGR</span>) : '',
                 txId: (
                   <Link to={`/tx/${ action.txId }`}>{action.txId}</Link>
                 )

@@ -26,6 +26,29 @@ const TX = require('../model/tx');
 
 const { log } = console;
 
+
+async function getBlockData(height) {
+  const blocks= await Block.find({ height });
+  let block = {};
+  if (blocks.length > 1) {
+    let rpctxsCount = 0;
+    
+    for (let x = 0; x < blocks.length; x +=1) {
+      const thisBlock = blocks[x];
+
+      if (thisBlock.rpctxs.length > rpctxsCount) {
+        rpctxsCount = thisBlock.rpctxs.length;
+        block = thisBlock;
+      }
+    }
+    
+  } else {
+    block = blocks[0] || {};
+  }
+
+  return block;
+}
+
 function hexToString(hexx) {
   var hex = hexx.toString(); //force conversion
   var str = '';
@@ -198,7 +221,7 @@ async function syncBlocksForBet(start, stop, clean = false, waitTime = 50) {
     for (let height = start; height <= stop; height++) {
       if (height >= dataStartBlock) {
 
-        const block = (await Block.find({ height }))[0] || {};
+        const block = await getBlockData(height);
 
         let rpcblock = block;
         let txs = rpcblock.rpctxs ? rpcblock.rpctxs : [];
@@ -233,7 +256,7 @@ async function resolveErrors() {
     if (errors.length > 0) {
       for (let x = 0; x < errors.length; x += 1) {
         const thisError = errors[x];
-        const block = (await Block.find({ height: thisError.blockHeight }))[0] || {};
+        const block = await getBlockData(thisError.blockHeight);
         let rpcblock = block;
 
         let txs = rpcblock.rpctxs ? rpcblock.rpctxs : [];
