@@ -11,6 +11,7 @@ const LottoBet = mongoose.model('LottoBet', new mongoose.Schema({
   blockHeight: { index: true, required: true, type: Number },
   createdAt: { required: true, type: Date },
   txType: { required: true, type: String },
+  betValue: { required: true, type: Number },
   eventId: { index: true,  required: true, type: String },
   opString: { required: true, type: String },
   opCode: { required: false, type: String},

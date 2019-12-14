@@ -19,6 +19,71 @@ import numeral from 'numeral'
 import { compose } from 'redux'
 import { translate } from 'react-i18next'
 
+const getClosestValue = (approxValue, vout, full) => {
+  let currentDifference;
+  let record = {};
+
+  for (let x = 0; x < vout.length; x += 1) {
+    const thisVout = vout[x];
+
+    if (thisVout.address && thisVout.address !== 'NON_STANDARD') {
+      if (currentDifference === undefined) {
+        record = thisVout;
+        currentDifference = Math.abs(approxValue - thisVout.value);
+      } else {
+        const difference = Math.abs(approxValue - thisVout.value);
+    
+        if (currentDifference > difference) {
+          currentDifference = difference;
+          record = thisVout;
+        }
+      }
+    }
+  }
+
+  if (full)  {
+    return record;
+  }
+  return record.value;
+};
+
+const getResultCompilation = (eventInfo, results, betActions) => {
+  let totalBet = 0
+  let totalMint = 0
+
+  const betActionsValue = betActions.reduce((acc, bet) => acc + bet.betValue, 0.0);
+
+  totalBet = betActionsValue;
+
+  let payoutBlock;
+  let address = 'Pending';
+  let prizeAmount = 0;
+  let OraclePortion = 0;
+  let payoutTx = {};
+  let vout;
+
+
+  // End of calculations here
+
+  if (results.length > 0) {
+    payoutTx  = results[0].payoutTx || { };
+    payoutBlock = payoutTx.blockHeight;
+    prizeAmount = totalBet * 0.80;
+    OraclePortion = totalBet * 0.02;
+
+    if (payoutTx.vout) {
+      vout = payoutTx.vout;
+
+      const PrizeObject = getClosestValue(prizeAmount, vout, true);
+      address = PrizeObject.address;
+      prizeAmount = PrizeObject.value;
+    }
+  }
+
+  const supplyChange =  totalBet * 0.18;
+  return { address, supplyChange, OraclePortion, prizeAmount, payoutBlock, payoutTx, totalBet, vout, };
+};
+
 class LottoList extends Component {
   static propTypes = {
     getLottoEvents: PropTypes.func.isRequired
@@ -109,12 +174,13 @@ class LottoList extends Component {
       {key: 'event', title: t('id')},
       // {key: 'name', title: t('name')},
       // {key: 'round', title: t('round')},
-      {key: 'prizeAmount', title: t('prizeAmount')},
-      {key: 'supplyChange', title: t('supplyChange')},
+      {key: 'betAmount', title: t('Bet Amount')},
+      {key: 'prizeAmount', title: t('Prize Amount')},
+      {key: 'supplyChange', title: t('Supply Change')},
       // {key: 'betAmount', title: t('betAmount')},
-      {key: 'lottoStatus', title: t('lottoStatus')},
+      {key: 'lottoStatus', title: t('Lotto Status')},
       // {key: 'seeDetail', title: t('detail')},
-      {key: 'winningAddress', title: t('winningAddress')},
+      {key: 'winningAddress', title: t('Winning Address')},
     ]
     if (!!this.state.error) {
       return this.renderError(this.state.error)
@@ -136,10 +202,10 @@ class LottoList extends Component {
           select={select}
           title={t('title')}/>
         <Table
-          className={'table-responsive table--for-betevents'}
+          className={'table-responsive table--for-lotto'}
           cols={cols}
           data={this.state.events.map((event) => {
-            console.log(event);
+            // console.log(event);
             const betAmount = event.actions.reduce((acc, action) => {
                   return acc+ action.betValue
               },0.0
@@ -188,33 +254,23 @@ class LottoList extends Component {
                 }
               }
             }
-            let homeOdds = (event.events[event.events.length -1].homeOdds / 10000)
-            let drawOdds = (event.events[event.events.length -1].drawOdds / 10000)
-            let awayOdds = (event.events[event.events.length -1].awayOdds / 10000)
-            if (event.events.length > 1) {
-              const lastHomeOdds = (event.events[event.events.length - 2].homeOdds / 10000)
-              const lastDrawOdds = (event.events[event.events.length - 2].drawOdds / 10000)
-              const lastAwayOdds = (event.events[event.events.length - 2].awayOdds / 10000)
-              if (homeOdds > lastHomeOdds) {
-                homeOdds = homeOdds + ' ↑'
-              } else if (homeOdds < lastHomeOdds) {
-                homeOdds = homeOdds + ' ↓'
-              }
-              if (drawOdds > lastDrawOdds) {
-                drawOdds = drawOdds + ' ↑'
-              } else if (drawOdds < lastDrawOdds) {
-                drawOdds = drawOdds + ' ↓'
-              }
-              if (awayOdds > lastAwayOdds) {
-                awayOdds = awayOdds + ' ↑'
-              } else if (awayOdds < lastAwayOdds) {
-                awayOdds = awayOdds + ' ↓'
-              }
-            }
+
+            const eventDate = moment(new Date(event.events[0].createdAt)).utc().format('YYYY-MM-DD HH:mm:ss');
+            const {
+              supplyChange,
+              OraclePortion,
+              prizeAmount,
+              payoutBlock,
+              payoutTx,
+              totalBet,
+              vout,
+              address,
+            } = getResultCompilation(event.events[0], event.results, event.actions);
+
             return {
               ...event,
               start: <Link to={`/lotto/event/${ encodeURIComponent(event.events[0].eventId) }`}>
-                {(event.events[0].createdAt)} </Link>
+                {eventDate} </Link>
               ,
               event: (
                 <Link to={`/lotto/event/${ encodeURIComponent(event.events[0].eventId) }`}>
@@ -223,12 +279,15 @@ class LottoList extends Component {
               ),
               name: <Link to={`/lotto/event/${ encodeURIComponent(event.events[0].eventId) }`}>
                 {event.events[0].league}</Link>,
-              supplyChange:         <span className={`badge badge-${ event.totalMint - event.totalBet < 0 ? 'danger' : 'success' }`}>
-                {numeral(event.totalMint - event.totalBet).format('0,0.00')}
+              supplyChange:         <span className={'badge badge-danger'}>
+                {numeral(-supplyChange).format('0,0.00')}
               </span>,
-              betAmount:  <span className={ `badge badge-danger` }>{ numeral(betAmount).format('0,0.00') }</span>,
-              lottoStatus: event.results.length > 0 ? 'Pending' : 'Completed',
-              prizeAmount: event.events[0].entryPrice,
+              betAmount:  <span className={ `badge badge-danger` }>{ numeral(totalBet).format('0,0.00') }</span>,
+              lottoStatus: <span className={ `badge badge-${ event.results.length > 0 ? 'success' : 'warning' }` }>
+                {event.results.length > 0 ? 'COMPLETED' : 'PENDING'}
+              </span>,
+              prizeAmount: <span className={ `badge badge-success` }>{ numeral(prizeAmount).format('0,0.00') }</span>,
+              winningAddress: <strong>{address}</strong>,
               seeDetail:  <Link to={`/lotto/event/${ encodeURIComponent(event.events[0].eventId) }`}>{t('seeDetail')}</Link>
             }
           })}/>

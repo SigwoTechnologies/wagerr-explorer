@@ -137,6 +137,40 @@
 			text-align: right;
 		}
 	}
+
+	&--for-lotto {
+		tr:nth-child(even) {
+			color: $gray-dark;
+
+			td, a, a:visited, .link-btn {
+				color: $gray-dark;
+
+				&:hover {
+					color: $wgreen;
+				}
+			}
+		}
+		td:first-child {
+			text-align: left;
+		}
+		th:first-child {
+			text-align: left;
+		}
+		td {
+			min-width: 50px;
+			text-align: right;
+		}
+		th {
+			min-width: 50px;
+			text-align: right;
+		}
+		th:last-child {
+			text-align: left;
+		}
+		th:last-child {
+			text-align: left;
+		}
+	}
 }
 
 .super-table{

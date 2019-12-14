@@ -698,6 +698,7 @@ async function saveOPTransaction(block, rpcTx, vout, transaction, waitTime = 50)
     type: transaction.type,
     txType: transaction.txType,
     opObject: transaction,
+    betValue: vout.value || 0,
     matched: false,
   });
 }
