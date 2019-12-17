@@ -181,6 +181,7 @@ class LottoList extends Component {
       {key: 'lottoStatus', title: t('Lotto Status')},
       // {key: 'seeDetail', title: t('detail')},
       {key: 'winningAddress', title: t('Winning Address')},
+      {key: 'details', title: t('Detail')},
     ]
     if (!!this.state.error) {
       return this.renderError(this.state.error)
@@ -288,7 +289,7 @@ class LottoList extends Component {
               </span>,
               prizeAmount: <span className={ `badge badge-success` }>{ numeral(prizeAmount).format('0,0.00') }</span>,
               winningAddress: <strong>{address}</strong>,
-              seeDetail:  <Link to={`/lotto/event/${ encodeURIComponent(event.events[0].eventId) }`}>{t('seeDetail')}</Link>
+              details:  <Link to={`/lotto/event/${ encodeURIComponent(event.events[0].eventId) }`}>See Detail</Link>
             }
           })}/>
         <Pagination
